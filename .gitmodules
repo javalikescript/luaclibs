@@ -1,0 +1,42 @@
+[submodule "luasocket"]
+	path = luasocket
+	url = https://github.com/diegonehab/luasocket.git
+[submodule "luafilesystem"]
+	path = luafilesystem
+	url = https://github.com/keplerproject/luafilesystem.git
+[submodule "lua-cjson"]
+	path = lua-cjson
+	url = https://github.com/javalikescript/lua-cjson.git
+[submodule "luaunit"]
+	path = luaunit
+	url = https://github.com/bluebird75/luaunit.git
+[submodule "lpeg"]
+	path = lpeg
+	url = git@github.com:javalikescript/lpeg.git
+[submodule "libuv"]
+	path = libuv
+	url = https://github.com/libuv/libuv.git
+[submodule "luv"]
+	path = luv
+	url = https://github.com/luvit/luv.git
+[submodule "lua-zlib"]
+	path = lua-zlib
+	url = https://github.com/brimworks/lua-zlib
+[submodule "zlib"]
+	path = zlib
+	url = https://github.com/madler/zlib.git
+[submodule "lua"]
+	path = lua
+	url = https://github.com/javalikescript/lua.git
+[submodule "sigar"]
+	path = sigar
+	url = https://github.com/javalikescript/sigar.git
+[submodule "luabt"]
+	path = luabt
+	url = https://github.com/javalikescript/luabt.git
+[submodule "luaserial"]
+	path = luaserial
+	url = https://github.com/javalikescript/luaserial.git
+[submodule "lmprof"]
+	path = lmprof
+	url = https://github.com/pmusa/lmprof.git
