@@ -132,6 +132,9 @@ clean:
 .c.o: $(HDRS)
 	$(CC) -c $(CFLAGS) $(DEFS) $(INCS) -o $@ $<
 
+src/sigar_version.c: src/sigar_version.c.in
+	sed -e "s/@@VERSION_STRING*@@/1.6/g" -e "s/@@VERSION_[^@]*@@/1/g" -e "s/@@[^@]*@@/na/g" src/sigar_version.c.in > src/sigar_version.c
+
 #$(TARGET): $(OBJS)
 #	$(LD) $(LDFLAGS) $(LIBDIR) $(OBJS) $(LIBS) -o $@
 
