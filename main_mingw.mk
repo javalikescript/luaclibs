@@ -20,6 +20,7 @@ luafilesystem: lua
 
 luasocket: lua
 	$(MAKE) -C luasocket mingw LUAINC_mingw=../../lua/src \
+	  DEF_mingw="-DLUASOCKET_NODEBUG -DWINVER=0x0501" \
 		LUALIB_mingw="-L../../lua/src -llua53"
 
 lpeg: lua
