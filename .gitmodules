@@ -10,9 +10,6 @@
 [submodule "luaunit"]
 	path = luaunit
 	url = https://github.com/bluebird75/luaunit.git
-[submodule "lpeg"]
-	path = lpeg
-	url = git@github.com:javalikescript/lpeg.git
 [submodule "libuv"]
 	path = libuv
 	url = https://github.com/libuv/libuv.git
@@ -40,3 +37,6 @@
 [submodule "lmprof"]
 	path = lmprof
 	url = https://github.com/pmusa/lmprof.git
+[submodule "lpeg"]
+	path = lpeg
+	url = https://github.com/javalikescript/lpeg.git
