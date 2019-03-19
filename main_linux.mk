@@ -5,7 +5,7 @@ all: full
 
 quick: lua luasocket luafilesystem lua-zlib luacjson luv lpeg luasigar lmprof luaserial luabt
 
-full: quick
+full: quick lua-openssl
 
 lua:
 	$(MAKE) -C lua/src all \
