@@ -46,3 +46,6 @@
 [submodule "openssl"]
 	path = openssl
 	url = https://github.com/openssl/openssl.git
+[submodule "dkjson"]
+	path = dkjson
+	url = https://github.com/javalikescript/dkjson.git
