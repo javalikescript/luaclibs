@@ -40,3 +40,9 @@
 [submodule "lpeg"]
 	path = lpeg
 	url = https://github.com/javalikescript/lpeg.git
+[submodule "lua-openssl"]
+	path = lua-openssl
+	url = https://github.com/zhaozg/lua-openssl.git
+[submodule "openssl"]
+	path = openssl
+	url = https://github.com/openssl/openssl.git
