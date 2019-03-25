@@ -49,3 +49,6 @@
 [submodule "dkjson"]
 	path = dkjson
 	url = https://github.com/javalikescript/dkjson.git
+[submodule "luajls"]
+	path = luajls
+	url = https://github.com/javalikescript/luajls.git

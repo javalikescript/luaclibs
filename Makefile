@@ -1,10 +1,13 @@
 
 PLAT?=win32
 PLATS=arm arm-linux linux mingw win32
-LUA_DIST=dist-$(PLAT)
+#LUA_DIST=dist-$(PLAT)
+LUA_DIST=dist
 SO=$(SO_$(PLAT))
 EXE=$(EXE_$(PLAT))
 CROSS=$(CROSS_$(PLAT))
+
+LUAJLS=luajls
 
 SO_mingw=dll
 EXE_mingw=.exe
@@ -138,5 +141,9 @@ distCopy:
 	cp -u luasocket/src/smtp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
+	cp -u -r $(LUAJLS)/jls $(LUA_DIST)/
 
 dist: distClean distPrepare distCopy
+
+luajls.zip: dist
+	cd $(LUA_DIST) && zip -r luajls.zip *
