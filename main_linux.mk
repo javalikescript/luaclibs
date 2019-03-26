@@ -41,7 +41,7 @@ luaserial: lua
 	$(MAKE) -C luaserial CC=$(CC) LIBEXT=so
 
 luabt: lua
-	$(MAKE) -C luabt CC=$(CC) LIBEXT=so
+	$(MAKE) -C luabt CC=$(CC) LIBEXT=so EXTRA_CFLAGS=-I$(LIBBT) EXTRA_LIBOPT=-L$(LIBBT)
 
 sigar:
 	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=linux

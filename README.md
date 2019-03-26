@@ -63,7 +63,20 @@ You need to install a specific gcc for cross compile
 
 Install the [tools](https://github.com/raspberrypi/tools) on a Linux OS
 
-to be completed
+Get the Bluetooth library from your Raspberry Pi
+
+```bash
+export PATH=$HOME/raspberry/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin:$PATH
+export HOST=arm-linux-gnueabihf
+export CC=${HOST}-gcc
+export LIBBT=../../libluetooth
+```
+
+Build all modules
+```bash
+make arm
+make dist PLAT=arm
+```
 
 ### How to build on Linux?
 
