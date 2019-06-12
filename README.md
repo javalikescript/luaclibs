@@ -80,12 +80,14 @@ make dist PLAT=arm
 
 ### How to build on Linux?
 
-Get the Bluetooth library from your Raspberry Pi
+Install the Bluetooth library
 
 ```bash
 sudo apt-get install libbluetooth-dev
 ```
 
-to be completed
-
-
+Build all modules
+```bash
+make linux
+make dist PLAT=linux
+```
