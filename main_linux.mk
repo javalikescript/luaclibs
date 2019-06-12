@@ -59,6 +59,7 @@ lua-zlib: lua zlib
 	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=linux CC=$(CC) LD=$(LD) AR=$(AR) RANLIB=$(RANLIB)
 
 ## perl Configure --cross-compile-prefix=arm-linux-gnueabihf- no-threads linux-armv4 -Wl,-rpath=.
+## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 

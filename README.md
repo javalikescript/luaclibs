@@ -80,6 +80,12 @@ make dist PLAT=arm
 
 ### How to build on Linux?
 
+Get the Bluetooth library from your Raspberry Pi
+
+```bash
+sudo apt-get install libbluetooth-dev
+```
+
 to be completed
 
 
