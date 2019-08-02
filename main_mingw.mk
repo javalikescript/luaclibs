@@ -1,14 +1,17 @@
 
 all: full
 
-quick: lua luasocket luafilesystem lua-zlib luacjson luv lpeg luasigar lmprof luaserial luabt
+quick: lua lua-buffer luasocket luafilesystem lua-zlib lua-cjson luv lpeg luasigar lmprof luaserial luabt lua-jpeg
 
 full: quick lua-openssl
 
 lua:
 	$(MAKE) -C lua/src mingw
 
-luacjson: lua
+lua-buffer: lua
+	$(MAKE) -C lua-buffer CC=$(CC) LIBEXT=dll
+
+lua-cjson: lua
 	$(MAKE) -C lua-cjson TARGET=cjson.dll \
 		CJSON_CFLAGS=-DDISABLE_INVALID_NUMBERS \
 		"CJSON_LDFLAGS=-O -shared -Wl,-s -static-libgcc -L../lua/src -llua53" \
@@ -61,4 +64,11 @@ openssl:
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=windows
 
-.PHONY: full quick lua luasocket luafilesystem luacjson libuv luv lpeg luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl
+## sh configure CFLAGS='-O2 -fPIC'
+libjpeg:
+	$(MAKE) -C libjpeg
+
+lua-jpeg: lua libjpeg
+	$(MAKE) -C lua-jpeg CC=$(CC) LIBEXT=dll
+
+.PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg

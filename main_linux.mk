@@ -3,7 +3,7 @@ PLAT=linux
 
 all: full
 
-quick: lua luasocket luafilesystem lua-zlib luacjson luv lpeg luasigar lmprof luaserial luabt
+quick: lua lua-buffer luasocket luafilesystem lua-zlib lua-cjson luv lpeg luasigar lmprof luaserial luabt lua-jpeg
 
 full: quick lua-openssl
 
@@ -15,7 +15,10 @@ lua:
 		SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" \
 		SYSLIBS="-Wl,-E -ldl"
 
-luacjson: lua
+lua-buffer: lua
+	$(MAKE) -C lua-buffer CC=$(CC) LIBEXT=so
+
+lua-cjson: lua
 	$(MAKE) -C lua-cjson LUA_INCLUDE_DIR=../lua/src CC=$(CC)
 
 luafilesystem: lua
@@ -60,12 +63,20 @@ lua-zlib: lua zlib
 
 ## perl Configure --cross-compile-prefix=arm-linux-gnueabihf- no-threads linux-armv4 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
+## perl Configure no-threads linux-x86 -Wl,-rpath=.
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=linux OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
 
+## ./configure CFLAGS='-O2 -fPIC'
+libjpeg:
+	$(MAKE) -C libjpeg
 
-.PHONY: full quick lua luacjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl
+lua-jpeg: lua libjpeg
+	$(MAKE) -C lua-jpeg CC=$(CC) LIBEXT=so
+
+
+.PHONY: full quick lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg
 

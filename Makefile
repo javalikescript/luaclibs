@@ -1,6 +1,12 @@
 
-PLAT?=win32
-PLATS=arm arm-linux linux mingw win32
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+	PLAT=linux
+else
+	PLAT=win32
+endif
+
 LUA_DIST=dist-$(PLAT)
 SO=$(SO_$(PLAT))
 EXE=$(EXE_$(PLAT))
@@ -33,6 +39,9 @@ all: $(PLAT)
 quick:
 	$(MAKE) PLAT=$(PLAT) MAIN_TARGET=quick
 
+show:
+	echo $(PLAT)
+
 arm:
 	$(MAKE) linux PLAT=arm MAIN_TARGET=$(MAIN_TARGET)
 
@@ -49,7 +58,7 @@ linux:
 mingw:
 	$(MAKE) -f main_mingw.mk $(MAIN_TARGET)
 
-.PHONY: dist clean $(PLATS)
+.PHONY: dist clean arm arm-linux linux mingw win32
 
 #find . -name "*.o" -o -name "*.a" -o -name "*.exe" -o -name "*.dll" -o -name "*.so" | sed -e 's/\/[^^\/]*\(\.[^^.]*\)$/\/*\1/' | sort -u
 
@@ -61,6 +70,8 @@ cleanLua:
 cleanLuaLibs:
 	-$(RM) ./lua-cjson/*.o
 	-$(RM) ./lua-cjson/*.$(SO)
+	-$(RM) ./lua-buffer/*.o
+	-$(RM) ./lua-buffer/*.$(SO)
 	-$(RM) ./luafilesystem/src/*.o
 	-$(RM) ./luafilesystem/*.$(SO)
 	-$(RM) ./luasocket/src/*.o
@@ -81,6 +92,8 @@ cleanLuaLibs:
 	-$(RM) ./lua-zlib/*.$(SO)
 	-$(RM) ./lua-openssl/src/*.o
 	-$(RM) ./lua-openssl/*.$(SO)
+	-$(RM) ./lua-jpeg/*.o
+	-$(RM) ./lua-jpeg/*.$(SO)
 
 cleanLibs:
 	-$(RM) ./libuv/*.a
@@ -95,6 +108,9 @@ cleanLibs:
 	-$(RM) ./sigar/*.a
 	-$(RM) ./sigar/src/*.o
 	-$(RM) ./sigar/src/os/*/*.o
+	-rm -rf ./libjpeg/.libs ./libjpeg/.deps
+	-$(RM) ./libjpeg/*.o
+	-$(RM) ./libjpeg/*.lo
 
 clean: cleanLua cleanLibs cleanLuaLibs
 
@@ -115,6 +131,7 @@ distCopy:
 	-cp -u lua/src/lua53.$(SO) $(LUA_DIST)/
 	cp -u lua/src/luac$(EXE) $(LUA_DIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_DIST)/
+	cp -u lua-buffer/buffer.$(SO) $(LUA_DIST)/
 	cp -u luafilesystem/lfs.$(SO) $(LUA_DIST)/
 	cp -u luv/luv.$(SO) $(LUA_DIST)/
 	cp -u lpeg/lpeg.$(SO) $(LUA_DIST)/
@@ -127,6 +144,7 @@ distCopy:
 	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
 	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
 	cp -u lua-openssl/openssl.$(SO) $(LUA_DIST)/
+	cp -u lua-jpeg/jpeg.$(SO) $(LUA_DIST)/
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_DIST)/mime/core.$(SO)
