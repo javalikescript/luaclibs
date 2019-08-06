@@ -55,9 +55,9 @@
 [submodule "lua-buffer"]
 	path = lua-buffer
 	url = https://github.com/javalikescript/lua-buffer.git
-[submodule "libjpeg"]
-	path = libjpeg
-	url = https://github.com/javalikescript/libjpeg.git
 [submodule "lua-jpeg"]
 	path = lua-jpeg
 	url = https://github.com/javalikescript/lua-jpeg.git
+[submodule "libjpeg"]
+	path = libjpeg
+	url = https://github.com/javalikescript/libjpeg.git
