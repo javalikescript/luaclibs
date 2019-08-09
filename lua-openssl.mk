@@ -1,23 +1,18 @@
 CC ?= gcc
 
-PLAT=windows
-#PLAT=linux
-#PLAT=arm
+PLAT ?= windows
 
-OPENSSLDIR=../openssl
-LUADIR=../lua/src
+OPENSSLDIR = ../openssl
+LUADIR = ../lua/src
 
-LIBNAME=openssl
+LIBNAME = openssl
 
 LIBEXT_windows = dll
-LIBEXT_linux = so
-
 LIBOPT_windows = -O \
   -shared \
   -Wl,-s \
   -L$(OPENSSLDIR) -lssl -lcrypto \
   -L$(LUADIR) -llua53
-
 CFLAGS_windows = -Wall \
   -Wextra \
   -Wno-unused-parameter \
@@ -25,10 +20,10 @@ CFLAGS_windows = -Wall \
   -I$(OPENSSLDIR)/include \
   -I$(LUADIR)
 
+LIBEXT_linux = so
 #LIBS_linux=$(OPENSSLDIR)/libssl.a $(OPENSSLDIR)/libcrypto.a
 #LIBS_linux=-lssl -lcrypto -ldl -pthread
 LIBS_linux=-L$(OPENSSLDIR) -lssl -lcrypto -ldl
-
 #  -m32 -Wa,--noexecstack -Wall -fomit-frame-pointer
 LIBOPT_linux = -O3 \
   -shared \
@@ -36,7 +31,6 @@ LIBOPT_linux = -O3 \
   -static-libgcc \
   -Wl,-s \
   $(LIBS)
-
 CFLAGS_linux = -pedantic  \
   -fPIC \
   -Wall \

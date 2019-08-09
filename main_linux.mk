@@ -1,9 +1,13 @@
 
-PLAT=linux
+PLAT ?= linux
+SO ?= so
+CC ?= gcc
 
 all: full
 
-quick: lua lua-buffer luasocket luafilesystem lua-zlib lua-cjson luv lpeg luasigar lmprof luaserial luabt lua-jpeg
+core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
+
+quick: core luasigar lmprof luaserial luabt lua-jpeg lua-exif
 
 full: quick lua-openssl
 
@@ -16,13 +20,13 @@ lua:
 		SYSLIBS="-Wl,-E -ldl"
 
 lua-buffer: lua
-	$(MAKE) -C lua-buffer CC=$(CC) LIBEXT=so
+	$(MAKE) -C lua-buffer -f ../lua-buffer.mk CC=$(CC) LIBEXT=$(SO)
 
 lua-cjson: lua
 	$(MAKE) -C lua-cjson LUA_INCLUDE_DIR=../lua/src CC=$(CC)
 
 luafilesystem: lua
-	$(MAKE) -C luafilesystem -f ../luafilesystem.mk CC=$(CC) LIBEXT=so
+	$(MAKE) -C luafilesystem -f ../luafilesystem.mk CC=$(CC) LIBEXT=$(SO)
 
 luasocket: lua
 	$(MAKE) -C luasocket linux LUAINC_linux=../../lua/src \
@@ -32,7 +36,7 @@ luasocket: lua
 		LDFLAGS_linux="-O -fpic -shared -o"
 
 lpeg: lua
-	$(MAKE) -C lpeg lpeg.so LUADIR=../lua/src/ DLLFLAGS="-shared -fPIC"
+	$(MAKE) -C lpeg lpeg.$(SO) LUADIR=../lua/src/ DLLFLAGS="-shared -fPIC"
 
 libuv:
 	$(MAKE) -C libuv -f ../libuv_linux.mk CC=$(CC)
@@ -41,25 +45,25 @@ luv: lua libuv
 	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC)
 
 luaserial: lua
-	$(MAKE) -C luaserial CC=$(CC) LIBEXT=so
+	$(MAKE) -C luaserial -f ../luaserial.mk CC=$(CC) LIBEXT=$(SO)
 
 luabt: lua
-	$(MAKE) -C luabt CC=$(CC) LIBEXT=so EXTRA_CFLAGS=-I$(LIBBT) EXTRA_LIBOPT=-L$(LIBBT)
+	$(MAKE) -C luabt -f ../luabt.mk CC=$(CC) LIBEXT=$(SO) EXTRA_CFLAGS=-I$(LIBBT) EXTRA_LIBOPT=-L$(LIBBT)
 
 sigar:
-	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=linux
+	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT)
 
 luasigar: sigar
-	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=linux
+	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT)
 
 lmprof: lua
-	$(MAKE) -C lmprof -f ../lmprof.mk CC=$(CC) LIBEXT=so
+	$(MAKE) -C lmprof -f ../lmprof.mk CC=$(CC) LIBEXT=$(SO)
 
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk CC=$(CC)
 
 lua-zlib: lua zlib
-	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=linux CC=$(CC) LD=$(LD) AR=$(AR) RANLIB=$(RANLIB)
+	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=$(PLAT) CC=$(CC) LD=$(LD) AR=$(AR) RANLIB=$(RANLIB)
 
 ## perl Configure --cross-compile-prefix=arm-linux-gnueabihf- no-threads linux-armv4 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
@@ -68,15 +72,22 @@ openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
 lua-openssl: openssl
-	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=linux OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
+	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
 
 ## ./configure CFLAGS='-O2 -fPIC'
 libjpeg:
 	$(MAKE) -C libjpeg
 
 lua-jpeg: lua libjpeg
-	$(MAKE) -C lua-jpeg CC=$(CC) LIBEXT=so
+	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO)
+
+libexif:
+	$(MAKE) -C libexif
+
+lua-exif: lua libexif
+	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO)
 
 
-.PHONY: full quick lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg
+.PHONY: full quick lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar \
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif
 

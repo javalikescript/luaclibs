@@ -36,9 +36,9 @@ Clean the build files
 make clean
 ```
 
-You could specify the target OS using `PLAT=win32` available platform are linux(arm) and mingw(win32).
+You could specify the target OS using `PLAT=windows` available platform are arm, linux and windows.
 
-You could specify a single module to built using `MAIN_TARGET=luaserial`
+You could specify a single module to built using `MAIN_TARGET=lua-openssl`
 
 
 ### How to build on Windows (MinGW)?

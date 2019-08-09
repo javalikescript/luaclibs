@@ -61,3 +61,9 @@
 [submodule "libjpeg"]
 	path = libjpeg
 	url = https://github.com/javalikescript/libjpeg.git
+[submodule "libexif"]
+	path = libexif
+	url = https://github.com/javalikescript/libexif.git
+[submodule "lua-exif"]
+	path = lua-exif
+	url = https://github.com/javalikescript/lua-exif.git
