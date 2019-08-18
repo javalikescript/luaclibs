@@ -14,61 +14,48 @@ LUAJLS = luajls
 
 SO = $(SO_$(PLAT))
 EXE = $(EXE_$(PLAT))
-
-SO_mingw=dll
-EXE_mingw=.exe
-
-SO_win32=dll
-EXE_win32=.exe
+MAIN_MK = $(MK_$(PLAT))
 
 SO_windows=dll
 EXE_windows=.exe
+MK_windows=main_mingw.mk
 
 SO_linux=so
 EXE_linux=
+MK_linux=main_linux.mk
 
-SO_arm=so
-EXE_arm=
+def: core
 
 all: full
 
-core:
-	$(MAKE) PLAT=$(PLAT) MAIN_TARGET=core
-
-quick:
-	$(MAKE) PLAT=$(PLAT) MAIN_TARGET=quick
-
-full: $(PLAT)
+core quick full:
+	$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
-	@echo Available goals: all/full quick core clean dist
-	@echo Available platforms (PLAT): arm linux windows
+	@echo Main targets \(MAIN_TARGET\): full quick core
+	@echo Other targets: arm linux windows clean dist help
+	@echo Available platforms \(PLAT\): linux windows
 
 show:
-	@echo goals: $(MAKECMDGOALS)
+	@echo Make command goals: $(MAKECMDGOALS)
+	@echo TARGET: $@
 	@echo PLAT: $(PLAT)
 	@echo Library extension: $(SO)
 
-arm:
-	$(MAKE) linux CROSS_PREFIX=arm-linux-gnueabihf- PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
+arm linux-arm:
+	$(MAKE) main CROSS_PREFIX=arm-linux-gnueabihf- PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
 
-win32: mingw
+win32 windows linux mingw: main
 
-windows: mingw
-
-linux:
-	$(MAKE) -f main_linux.mk $(MAIN_TARGET) \
+main:
+	$(MAKE) -f $(MAIN_MK) \
 		PLAT=$(PLAT) \
 		SO=$(SO) \
 		CC=$(CROSS_PREFIX)gcc \
 		AR=$(CROSS_PREFIX)ar \
 		RANLIB=$(CROSS_PREFIX)ranlib \
-		LD=$(CROSS_PREFIX)gcc
-
-mingw:
-	$(MAKE) -f main_mingw.mk $(MAIN_TARGET) \
-		PLAT=$(PLAT) \
-		SO=$(SO)
+		LD=$(CROSS_PREFIX)gcc \
+		$(MAIN_TARGET)
 
 .PHONY: dist clean linux mingw windows win32 arm
 

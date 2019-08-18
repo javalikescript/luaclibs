@@ -13,7 +13,7 @@ git submodule init
 git submodule update
 ```
 
-The OpenSSL library needs to be configured prior the build, refer to the relevant makefile.
+The OpenSSL, JPEG and EXIF libraries need to be configured prior the build, refer to the relevant makefile.
 
 ## How to build?
 
@@ -26,7 +26,7 @@ Build all modules
 make
 ```
 
-Create a dist-win32 folder containing the binaries
+Create a dist-PLAT folder containing the binaries
 ```bash
 make dist
 ```
@@ -47,9 +47,15 @@ Tested on Windows 10 with msys packages available in March 2019
 Prerequisites
 
 Install [msys2](https://www.msys2.org/)
+
 Install make and mingw32 gcc
 ```bash
 pacman -S make mingw-w64-i686-gcc
+```
+
+Install additional stuff for OpenSSL
+```bash
+pacman -S perl libtool texinfo
 ```
 
 Add mingw32 and msys in your path using:
