@@ -1,13 +1,19 @@
 
 UNAME_S := $(shell uname -s)
 
+ARCH = x86_64
+
 ifeq ($(UNAME_S),Linux)
 	PLAT ?= linux
 else
 	PLAT ?= windows
 endif
 
-MAIN_TARGET = all
+ifdef HOST
+	CROSS_PREFIX ?= $(HOST)-
+endif
+
+MAIN_TARGET = core
 
 LUA_DIST = dist-$(PLAT)
 LUAJLS = luajls
@@ -24,12 +30,15 @@ SO_linux=so
 EXE_linux=
 MK_linux=main_linux.mk
 
-def: core
+def: main
 
 all: full
 
 core quick full:
-	$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
+	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
+
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif winapi:
+	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
 	@echo Main targets \(MAIN_TARGET\): full quick core
@@ -39,25 +48,27 @@ help:
 show:
 	@echo Make command goals: $(MAKECMDGOALS)
 	@echo TARGET: $@
+	@echo ARCH: $(ARCH)
+	@echo HOST: $(HOST)
 	@echo PLAT: $(PLAT)
 	@echo Library extension: $(SO)
 
 arm linux-arm:
-	$(MAKE) main CROSS_PREFIX=arm-linux-gnueabihf- PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
+	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
 
 win32 windows linux mingw: main
 
 main:
-	$(MAKE) -f $(MAIN_MK) \
+	@$(MAKE) -f $(MAIN_MK) \
 		PLAT=$(PLAT) \
 		SO=$(SO) \
+		ARCH=$(ARCH) \
+		HOST=$(HOST) \
 		CC=$(CROSS_PREFIX)gcc \
 		AR=$(CROSS_PREFIX)ar \
 		RANLIB=$(CROSS_PREFIX)ranlib \
 		LD=$(CROSS_PREFIX)gcc \
 		$(MAIN_TARGET)
-
-.PHONY: dist clean linux mingw windows win32 arm
 
 #find . -name "*.o" -o -name "*.a" -o -name "*.exe" -o -name "*.dll" -o -name "*.so" | sed -e 's/\/[^^\/]*\(\.[^^.]*\)$/\/*\1/' | sort -u
 
@@ -95,6 +106,8 @@ cleanLuaLibs:
 	-$(RM) ./lua-jpeg/*.$(SO)
 	-$(RM) ./lua-exif/*.o
 	-$(RM) ./lua-exif/*.$(SO)
+	-$(RM) ./winapi/*.o
+	-$(RM) ./winapi/*.$(SO)
 
 cleanLibs:
 	-$(RM) ./libuv/*.a
@@ -126,9 +139,17 @@ distPrepare:
 	mkdir $(LUA_DIST)/mime
 	mkdir $(LUA_DIST)/socket
 
-distCopy:
+distCopy-linux:
+	-cp -uP openssl/libcrypto.so* $(LUA_DIST)/
+	-cp -uP openssl/libssl.so* $(LUA_DIST)/
+
+distCopy-windows:
+	-cp -u lua/src/lua*.$(SO) $(LUA_DIST)/
+	-cp -u openssl/libcrypto*.dll $(LUA_DIST)/
+	-cp -u openssl/libssl*.dll $(LUA_DIST)/
+
+distCopy: distCopy-$(PLAT)
 	cp -u lua/src/lua$(EXE) $(LUA_DIST)/
-	-cp -u lua/src/lua53.$(SO) $(LUA_DIST)/
 	cp -u lua/src/luac$(EXE) $(LUA_DIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_DIST)/
 	cp -u lua-buffer/buffer.$(SO) $(LUA_DIST)/
@@ -143,11 +164,10 @@ distCopy:
 	-cp -u sigar/bindings/lua/*.$(SO) $(LUA_DIST)/
 	-cp -u lmprof/lmprof.$(SO) $(LUA_DIST)/
 	-cp -u lmprof/src/reduce/*.lua $(LUA_DIST)/lmprof/
-	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
-	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_DIST)/
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_DIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_DIST)/
+	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_DIST)/mime/core.$(SO)
 	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_DIST)/socket/core.$(SO)
 	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
@@ -163,7 +183,21 @@ distCopy:
 dist: distClean distPrepare distCopy
 
 dist-jls: dist
-	cp -u -r $(LUAJLS)/jls $(LUA_DIST)/
+	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+
+dist-jls.tar.gz: dist-jls
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(PLAT).tar.gz *
+
+dist-jls.zip: dist-jls
+	cd $(LUA_DIST) && zip -r luajls-$(PLAT).zip *
+
+luajls.tar.gz: dist-jls
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(shell $(CROSS_PREFIX)gcc -dumpmachine).$(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))").tar.gz *
 
 luajls.zip: dist-jls
-	cd $(LUA_DIST) && zip -r luajls.zip *
+	cd $(LUA_DIST) && zip -r luajls-$(shell $(CROSS_PREFIX)gcc -dumpmachine).$(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))").zip *
+
+
+.PHONY: dist clean linux mingw windows win32 arm \
+	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif winapi

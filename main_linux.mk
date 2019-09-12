@@ -3,13 +3,25 @@ PLAT ?= linux
 SO ?= so
 CC ?= gcc
 
+ifeq ($(ARCH),arm)
+	ARCH_SUFFIX ?= -arm
+endif
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
-quick: core luasigar lmprof luaserial luabt lua-jpeg lua-exif
+quick: core luasigar lmprof luaserial lua-jpeg lua-exif
 
-full: quick lua-openssl
+full: quick luabt lua-openssl
+
+any: full
+
+configure: configure$(ARCH_SUFFIX)
+
+configure-x86_64: configure-libjpeg configure-libexif configure-openssl
+
+configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm
 
 lua:
 	$(MAKE) -C lua/src all \
@@ -68,18 +80,35 @@ lua-zlib: lua zlib
 ## perl Configure --cross-compile-prefix=arm-linux-gnueabihf- no-threads linux-armv4 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86 -Wl,-rpath=.
+configure-openssl:
+	cd openssl && perl Configure no-threads linux-x86_64 -Wl,-rpath=.
+
+configure-openssl-arm:
+	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-armv4 -Wl,-rpath=.
+
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
 
-## ./configure CFLAGS='-O2 -fPIC'
+configure-libjpeg:
+	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'
+
+configure-libjpeg-arm:
+	cd libjpeg && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
+
 libjpeg:
-	$(MAKE) -C libjpeg
+	$(MAKE) -C libjpeg libjpeg.la
 
 lua-jpeg: lua libjpeg
 	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO)
+
+configure-libexif:
+	cd libexif && sh configure CFLAGS='-O2 -fPIC'
+
+configure-libexif-arm:
+	cd libexif && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
 
 libexif:
 	$(MAKE) -C libexif

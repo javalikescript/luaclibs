@@ -7,9 +7,13 @@ all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
-quick: core luasigar lmprof luaserial luabt lua-jpeg lua-exif
+quick: core luasigar lmprof luaserial lua-jpeg lua-exif
 
-full: quick lua-openssl
+full: quick luabt lua-openssl
+
+any: full winapi
+
+configure: configure-libjpeg configure-libexif configure-openssl
 
 lua:
 	$(MAKE) -C lua/src mingw
@@ -62,20 +66,27 @@ zlib:
 lua-zlib: lua zlib
 	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=$(PLAT)
 
-## perl Configure no-threads mingw
 ## perl Configure no-threads mingw64
+configure-openssl:
+	cd openssl && perl Configure no-threads mingw
+
 openssl:
 	$(MAKE) -C openssl
 
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT)
 
-## sh configure CFLAGS='-O2 -fPIC'
+configure-libjpeg:
+	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'
+
 libjpeg:
 	$(MAKE) -C libjpeg
 
 lua-jpeg: lua libjpeg
 	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO)
+
+configure-libexif:
+	cd libexif && sh configure CFLAGS='-O2 -fPIC'
 
 libexif:
 	$(MAKE) -C libexif
@@ -83,5 +94,9 @@ libexif:
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO)
 
+##TEST## lua\src\lua.exe -e "require('winapi/winapi').show_message('Message', 'stuff')"
+winapi:
+	$(MAKE) -C winapi -f ../winapi.mk CC=$(CC)
+
 .PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif winapi
