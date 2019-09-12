@@ -21,14 +21,21 @@ LUAJLS = luajls
 SO = $(SO_$(PLAT))
 EXE = $(EXE_$(PLAT))
 MAIN_MK = $(MK_$(PLAT))
+ZIP = $(ZIP_$(PLAT))
 
 SO_windows=dll
 EXE_windows=.exe
 MK_windows=main_mingw.mk
+ZIP_windows=.zip
 
 SO_linux=so
 EXE_linux=
 MK_linux=main_linux.mk
+ZIP_linux=.tar.gz
+
+GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
+LUA_DATE ?= $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
+DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
 
 def: main
 
@@ -51,6 +58,7 @@ show:
 	@echo ARCH: $(ARCH)
 	@echo HOST: $(HOST)
 	@echo PLAT: $(PLAT)
+	@echo GCC_NAME: $(GCC_NAME)
 	@echo Library extension: $(SO)
 
 arm linux-arm:
@@ -127,9 +135,6 @@ cleanLibs:
 
 clean: cleanLua cleanLibs cleanLuaLibs
 
-#	-cp -u openssl/libcrypto.$(SO).* $(LUA_DIST)/
-#	-cp -u openssl/libssl.$(SO).* $(LUA_DIST)/
-
 distClean:
 	rm -rf $(LUA_DIST)
 
@@ -191,12 +196,15 @@ dist-jls.tar.gz: dist-jls
 dist-jls.zip: dist-jls
 	cd $(LUA_DIST) && zip -r luajls-$(PLAT).zip *
 
+dist-jls-archive: dist-jls$(ZIP)
+
 luajls.tar.gz: dist-jls
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(shell $(CROSS_PREFIX)gcc -dumpmachine).$(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))").tar.gz *
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(DIST_SUFFIX).tar.gz *
 
 luajls.zip: dist-jls
-	cd $(LUA_DIST) && zip -r luajls-$(shell $(CROSS_PREFIX)gcc -dumpmachine).$(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))").zip *
+	cd $(LUA_DIST) && zip -r luajls$(DIST_SUFFIX).zip *
 
+luajls-archive: luajls$(ZIP)
 
 .PHONY: dist clean linux mingw windows win32 arm \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
