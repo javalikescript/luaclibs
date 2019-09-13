@@ -7,11 +7,24 @@ LUADIR = ../lua/src
 
 LIBNAME = openssl
 
+LIBOPT_OPENSSL_SHARED = -L$(OPENSSLDIR) -lssl -lcrypto
+LIBOPT_OPENSSL_STATIC = $(OPENSSLDIR)/libssl.a $(OPENSSLDIR)/libcrypto.a
+
+ifeq ($(PLAT),linux)
+  LIBOPT_OPENSSL_SHARED = -L$(OPENSSLDIR) -lssl -lcrypto -ldl
+endif
+
+ifdef OPENSSL_STATIC
+	LIBOPT_OPENSSL ?= $(LIBOPT_OPENSSL_STATIC)
+else
+	LIBOPT_OPENSSL ?= $(LIBOPT_OPENSSL_SHARED)
+endif
+
 LIBEXT_windows = dll
 LIBOPT_windows = -O \
   -shared \
   -Wl,-s \
-  -L$(OPENSSLDIR) -lssl -lcrypto \
+  $(LIBOPT_OPENSSL) \
   -L$(LUADIR) -llua53
 CFLAGS_windows = -Wall \
   -Wextra \
@@ -21,16 +34,13 @@ CFLAGS_windows = -Wall \
   -I$(LUADIR)
 
 LIBEXT_linux = so
-#LIBS_linux=$(OPENSSLDIR)/libssl.a $(OPENSSLDIR)/libcrypto.a
-#LIBS_linux=-lssl -lcrypto -ldl -pthread
-LIBS_linux=-L$(OPENSSLDIR) -lssl -lcrypto -ldl
 #  -m32 -Wa,--noexecstack -Wall -fomit-frame-pointer
 LIBOPT_linux = -O3 \
   -shared \
   -fPIC \
   -static-libgcc \
   -Wl,-s \
-  $(LIBS)
+  $(LIBOPT_OPENSSL)
 CFLAGS_linux = -pedantic  \
   -fPIC \
   -Wall \

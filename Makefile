@@ -9,8 +9,11 @@ else
 	PLAT ?= windows
 endif
 
+MAIN_SUFFIX = default
+
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
+	MAIN_SUFFIX = cross
 endif
 
 MAIN_TARGET = core
@@ -37,11 +40,11 @@ GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 LUA_DATE ?= $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
 DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
 
-def: main
+main: main-$(MAIN_SUFFIX)
 
 all: full
 
-core quick full:
+core quick full configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif winapi:
@@ -60,13 +63,17 @@ show:
 	@echo PLAT: $(PLAT)
 	@echo GCC_NAME: $(GCC_NAME)
 	@echo Library extension: $(SO)
+	@echo CC: $(CC)
+	@echo AR: $(AR)
+	@echo RANLIB: $(RANLIB)
+	@echo LD: $(LD)
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
 
 win32 windows linux mingw: main
 
-main:
+main-cross:
 	@$(MAKE) -f $(MAIN_MK) \
 		PLAT=$(PLAT) \
 		SO=$(SO) \
@@ -76,6 +83,14 @@ main:
 		AR=$(CROSS_PREFIX)ar \
 		RANLIB=$(CROSS_PREFIX)ranlib \
 		LD=$(CROSS_PREFIX)gcc \
+		$(MAIN_TARGET)
+
+main-default:
+	@$(MAKE) -f $(MAIN_MK) \
+		PLAT=$(PLAT) \
+		SO=$(SO) \
+		ARCH=$(ARCH) \
+		HOST=$(HOST) \
 		$(MAIN_TARGET)
 
 #find . -name "*.o" -o -name "*.a" -o -name "*.exe" -o -name "*.dll" -o -name "*.so" | sed -e 's/\/[^^\/]*\(\.[^^.]*\)$/\/*\1/' | sort -u

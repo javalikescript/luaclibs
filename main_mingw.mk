@@ -15,6 +15,18 @@ any: full winapi
 
 configure: configure-libjpeg configure-libexif configure-openssl
 
+show:
+	@echo Make command goals: $(MAKECMDGOALS)
+	@echo TARGET: $@
+	@echo ARCH: $(ARCH)
+	@echo HOST: $(HOST)
+	@echo PLAT: $(PLAT)
+	@echo SO: $(SO)
+	@echo CC: $(CC)
+	@echo AR: $(AR)
+	@echo RANLIB: $(RANLIB)
+	@echo LD: $(LD)
+
 lua:
 	$(MAKE) -C lua/src mingw
 
@@ -66,6 +78,7 @@ zlib:
 lua-zlib: lua zlib
 	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=$(PLAT)
 
+## perl Configure no-threads mingw
 ## perl Configure no-threads mingw64
 configure-openssl:
 	cd openssl && perl Configure no-threads mingw

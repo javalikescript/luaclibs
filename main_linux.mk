@@ -4,7 +4,9 @@ SO ?= so
 CC ?= gcc
 
 ifeq ($(ARCH),arm)
-	ARCH_SUFFIX ?= -arm
+	ARCH_SUFFIX ?= arm
+else
+	ARCH_SUFFIX ?= default
 endif
 
 all: full
@@ -17,11 +19,23 @@ full: quick luabt lua-openssl
 
 any: full
 
-configure: configure$(ARCH_SUFFIX)
+configure: configure-$(ARCH_SUFFIX)
 
-configure-x86_64: configure-libjpeg configure-libexif configure-openssl
+configure-default: configure-libjpeg configure-libexif configure-openssl
 
 configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm
+
+show:
+	@echo Make command goals: $(MAKECMDGOALS)
+	@echo TARGET: $@
+	@echo ARCH: $(ARCH)
+	@echo HOST: $(HOST)
+	@echo PLAT: $(PLAT)
+	@echo SO: $(SO)
+	@echo CC: $(CC)
+	@echo AR: $(AR)
+	@echo RANLIB: $(RANLIB)
+	@echo LD: $(LD)
 
 lua:
 	$(MAKE) -C lua/src all \
@@ -89,8 +103,13 @@ configure-openssl-arm:
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
-lua-openssl: openssl
+lua-openssl-default: openssl
+	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) OPENSSL_STATIC=1
+
+lua-openssl-arm: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
+
+lua-openssl: lua-openssl-$(ARCH_SUFFIX)
 
 configure-libjpeg:
 	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'
