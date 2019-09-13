@@ -9,11 +9,8 @@ else
 	PLAT ?= windows
 endif
 
-MAIN_SUFFIX = default
-
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
-	MAIN_SUFFIX = cross
 endif
 
 MAIN_TARGET = core
@@ -40,7 +37,7 @@ GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 LUA_DATE ?= $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
 DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
 
-main: main-$(MAIN_SUFFIX)
+main: main-$(PLAT)
 
 all: full
 
@@ -73,7 +70,7 @@ arm linux-arm:
 
 win32 windows linux mingw: main
 
-main-cross:
+main-linux:
 	@$(MAKE) -f $(MAIN_MK) \
 		PLAT=$(PLAT) \
 		SO=$(SO) \
@@ -85,7 +82,7 @@ main-cross:
 		LD=$(CROSS_PREFIX)gcc \
 		$(MAIN_TARGET)
 
-main-default:
+main-windows:
 	@$(MAKE) -f $(MAIN_MK) \
 		PLAT=$(PLAT) \
 		SO=$(SO) \
