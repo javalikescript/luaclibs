@@ -9,10 +9,6 @@ else
 	PLAT ?= windows
 endif
 
-ifdef HOST
-	CROSS_PREFIX ?= $(HOST)-
-endif
-
 MAIN_TARGET = core
 
 LUA_DIST = dist-$(PLAT)
@@ -34,8 +30,13 @@ MK_linux=main_linux.mk
 ZIP_linux=.tar.gz
 
 GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
-LUA_DATE ?= $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
+LUA_DATE = $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
 DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
+
+ifdef HOST
+	CROSS_PREFIX ?= $(HOST)-
+	LUA_DATE = $(shell date '+%Y%m%d')
+endif
 
 main: main-$(PLAT)
 
