@@ -103,13 +103,8 @@ configure-openssl-arm:
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
-lua-openssl-default: openssl
-	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) OPENSSL_STATIC=1
-
-lua-openssl-arm: openssl
+lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR)
-
-lua-openssl: lua-openssl-$(ARCH_SUFFIX)
 
 configure-libjpeg:
 	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'

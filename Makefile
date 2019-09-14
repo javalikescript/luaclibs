@@ -36,6 +36,9 @@ DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
 	LUA_DATE = $(shell date '+%Y%m%d')
+	ifneq (,$(findstring arm,$(HOST)))
+		ARCH = arm
+	endif
 endif
 
 main: main-$(PLAT)
@@ -66,6 +69,7 @@ show:
 	@echo RANLIB: $(RANLIB)
 	@echo LD: $(LD)
 
+
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
 
@@ -91,7 +95,6 @@ main-windows:
 		HOST=$(HOST) \
 		$(MAIN_TARGET)
 
-#find . -name "*.o" -o -name "*.a" -o -name "*.exe" -o -name "*.dll" -o -name "*.so" | sed -e 's/\/[^^\/]*\(\.[^^.]*\)$/\/*\1/' | sort -u
 
 cleanLua:
 	-$(RM) ./lua/src/*.o
@@ -148,6 +151,7 @@ cleanLibs:
 
 clean: cleanLua cleanLibs cleanLuaLibs
 
+
 distClean:
 	rm -rf $(LUA_DIST)
 
@@ -158,13 +162,14 @@ distPrepare:
 	mkdir $(LUA_DIST)/socket
 
 distCopy-linux:
-	-cp -uP openssl/libcrypto.so* $(LUA_DIST)/
-	-cp -uP openssl/libssl.so* $(LUA_DIST)/
+	-cp -uP openssl/libcrypto.$(SO)* $(LUA_DIST)/
+	-cp -uP openssl/libssl.$(SO)* $(LUA_DIST)/
 
 distCopy-windows:
 	-cp -u lua/src/lua*.$(SO) $(LUA_DIST)/
-	-cp -u openssl/libcrypto*.dll $(LUA_DIST)/
-	-cp -u openssl/libssl*.dll $(LUA_DIST)/
+	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
+	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
+	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
 
 distCopy: distCopy-$(PLAT)
 	cp -u lua/src/lua$(EXE) $(LUA_DIST)/
@@ -185,7 +190,6 @@ distCopy: distCopy-$(PLAT)
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_DIST)/
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_DIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_DIST)/
-	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_DIST)/mime/core.$(SO)
 	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_DIST)/socket/core.$(SO)
 	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
