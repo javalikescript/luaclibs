@@ -67,3 +67,6 @@
 [submodule "lua-exif"]
 	path = lua-exif
 	url = https://github.com/javalikescript/lua-exif.git
+[submodule "winapi"]
+	path = winapi
+	url = https://github.com/stevedonovan/winapi.git

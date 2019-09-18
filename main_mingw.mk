@@ -1,17 +1,17 @@
 
-PLAT ?= windows
-SO ?= so
-CC ?= gcc
+PLAT = windows
+SO = so
+CC = gcc
 
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
-quick: core luasigar lmprof luaserial lua-jpeg lua-exif
+quick: core luasigar lmprof luaserial lua-jpeg lua-exif winapi
 
 full: quick luabt lua-openssl
 
-any: full winapi
+any: full
 
 configure: configure-libjpeg configure-libexif configure-openssl
 
@@ -107,7 +107,7 @@ libexif:
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO)
 
-##TEST## lua\src\lua.exe -e "require('winapi/winapi').show_message('Message', 'stuff')"
+##TEST## set LUA_CPATH=.\winapi\?.dll && lua\src\lua.exe -e "require('winapi').show_message('Message', 'stuff')"
 winapi:
 	$(MAKE) -C winapi -f ../winapi.mk CC=$(CC)
 
