@@ -107,7 +107,6 @@ libexif:
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO)
 
-##TEST## set LUA_CPATH=.\winapi\?.dll && lua\src\lua.exe -e "require('winapi').show_message('Message', 'stuff')"
 winapi:
 	$(MAKE) -C winapi -f ../winapi.mk CC=$(CC)
 
