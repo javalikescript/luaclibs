@@ -1,0 +1,13 @@
+language: c
+
+compiler: gcc
+
+before_install:
+  - sudo apt-get install libbluetooth-dev
+  
+install:
+  - make configure
+
+script:
+  - make all
+  - make dist
