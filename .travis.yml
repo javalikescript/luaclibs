@@ -10,4 +10,12 @@ install:
 
 script:
   - make all
-  - make dist
+  - make luajls-archive
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file_glob: true
+  file: dist-*/luajls-*.*
+  skip_cleanup: true
+  draft: true
