@@ -6,6 +6,8 @@ The targeted operating systems are Linux and Windows. The targeted architectures
 
 You could find informations and releases [here](javalikescript.free.fr/lua/)
 
+[![Build Status](https://travis-ci.org/javalikescript/luaclibs.svg?branch=master)](https://travis-ci.org/javalikescript/luaclibs)
+
 ## How to setup?
 
 This repository mainly contains submodule and so needs to be initialized before it can be used
@@ -20,6 +22,7 @@ The OpenSSL, JPEG and EXIF libraries need to be configured prior the build.
 ## How to build?
 
 Prerequisites
+
 You need make and gcc tools
 
 Build core modules
@@ -54,6 +57,7 @@ You could specify a single module to built using `MAIN_TARGET=lua-openssl`
 Tested on Windows 10 with msys packages available in March 2019
 
 Prerequisites
+
 Install [msys2](https://www.msys2.org/)
 
 Install make and mingw32 gcc
@@ -79,17 +83,14 @@ Install the Bluetooth library
 sudo apt-get install libbluetooth-dev
 ```
 
-Build all modules
-```bash
-make all
-make dist
-```
-
 ### How to build for Raspberry Pi (ARM)?
 
 Prerequisites
+
 You need to install a specific gcc for cross compile
+
 Install the [tools](https://github.com/raspberrypi/tools) on a Linux OS
+
 Get the Bluetooth library from your Raspberry Pi
 
 ```bash
@@ -98,10 +99,3 @@ export HOST=arm-linux-gnueabihf
 export CC=${HOST}-gcc
 export LIBBT=../../libluetooth
 ```
-
-Build all modules
-```bash
-make all
-make dist
-```
-
