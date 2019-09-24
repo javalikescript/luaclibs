@@ -1,6 +1,9 @@
 
 UNAME_S := $(shell uname -s)
 
+MK_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MK_DIR := $(dir $(MK_PATH))
+
 ARCH = x86_64
 
 ifeq ($(UNAME_S),Linux)
@@ -11,13 +14,8 @@ endif
 
 MAIN_TARGET = core
 
-LUA_DIST = dist-$(PLAT)
+LUA_DIST := dist-$(PLAT)
 LUAJLS = luajls
-
-SO = $(SO_$(PLAT))
-EXE = $(EXE_$(PLAT))
-MAIN_MK = $(MK_$(PLAT))
-ZIP = $(ZIP_$(PLAT))
 
 SO_windows=dll
 EXE_windows=.exe
@@ -28,6 +26,11 @@ SO_linux=so
 EXE_linux=
 MK_linux=main_linux.mk
 ZIP_linux=.tar.gz
+
+SO := $(SO_$(PLAT))
+EXE := $(EXE_$(PLAT))
+MAIN_MK := $(MK_$(PLAT))
+ZIP := $(ZIP_$(PLAT))
 
 GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 LUA_DATE = $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
@@ -40,6 +43,9 @@ ifdef HOST
 		ARCH = arm
 	endif
 endif
+
+TESTS_LUA := $(patsubst luajls/%.lua,%.lua,$(wildcard luajls/tests/*.lua))
+LUAJLS_CMD := LUA_PATH=$(MK_DIR)/$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)/$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)/$(LUA_DIST) $(MK_DIR)/$(LUA_DIST)/lua$(EXE)
 
 main: main-$(PLAT)
 
@@ -55,6 +61,7 @@ help:
 	@echo Main targets \(MAIN_TARGET\): full quick core
 	@echo Other targets: arm linux windows clean dist help
 	@echo Available platforms \(PLAT\): linux windows
+	@echo Available architecture \(ARCH\): x86_64 arm
 
 show:
 	@echo Make command goals: $(MAKECMDGOALS)
@@ -68,6 +75,7 @@ show:
 	@echo AR: $(AR)
 	@echo RANLIB: $(RANLIB)
 	@echo LD: $(LD)
+	@echo MK_DIR: $(MK_DIR)
 
 
 arm linux-arm:
@@ -94,6 +102,14 @@ main-windows:
 		ARCH=$(ARCH) \
 		HOST=$(HOST) \
 		$(MAIN_TARGET)
+
+
+test: $(TESTS_LUA)
+	@echo $(words $(TESTS_LUA)) tests passed
+
+$(TESTS_LUA):
+	@echo Testing $@
+	@cd luajls && $(LUAJLS_CMD) $@
 
 
 cleanLua:
@@ -202,27 +218,27 @@ distCopy: distCopy-$(PLAT)
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
 
-dist: distClean distPrepare distCopy
+dist $(LUA_DIST): distClean distPrepare distCopy
 
-dist-jls: dist
+dist-jls $(LUAJLS)/jls: $(LUA_DIST)
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 
-dist-jls.tar.gz: dist-jls
+dist.tar.gz:
 	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(PLAT).tar.gz *
 
-dist-jls.zip: dist-jls
-	cd $(LUA_DIST) && zip -r luajls-$(PLAT).zip *
-
-dist-jls-archive: dist-jls$(ZIP)
-
-luajls.tar.gz: dist-jls
+luajls.tar.gz:
 	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(DIST_SUFFIX).tar.gz *
 
-luajls.zip: dist-jls
+dist.zip:
+	cd $(LUA_DIST) && zip -r luajls-$(PLAT).zip *
+
+luajls.zip:
 	cd $(LUA_DIST) && zip -r luajls$(DIST_SUFFIX).zip *
+
+dist-archive: dist-jls$(ZIP)
 
 luajls-archive: luajls$(ZIP)
 
-.PHONY: dist clean linux mingw windows win32 arm \
+.PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
 	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif winapi

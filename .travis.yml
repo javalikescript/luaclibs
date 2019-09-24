@@ -10,7 +10,7 @@ install:
 
 script:
   - make all
-  - make luajls-archive
+  - make dist-jls test luajls-archive
 
 deploy:
   provider: releases
