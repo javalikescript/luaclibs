@@ -3,7 +3,7 @@ language: c
 compiler: gcc
 
 before_install:
-  - sudo apt-get install libbluetooth-dev
+  - sudo apt-get install libbluetooth-dev libgtk-3-dev libwebkit2gtk-4.0-dev
   
 install:
   - make configure

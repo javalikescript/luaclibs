@@ -54,7 +54,7 @@ all: full
 core quick full configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif winapi:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -146,6 +146,8 @@ cleanLuaLibs:
 	-$(RM) ./lua-jpeg/*.$(SO)
 	-$(RM) ./lua-exif/*.o
 	-$(RM) ./lua-exif/*.$(SO)
+	-$(RM) ./lua-webview/*.o
+	-$(RM) ./lua-webview/*.$(SO)
 	-$(RM) ./winapi/*.o
 	-$(RM) ./winapi/*.$(SO)
 
@@ -206,6 +208,7 @@ distCopy: distCopy-$(PLAT)
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_DIST)/
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_DIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_DIST)/
+	-cp -u lua-webview/webview.$(SO) $(LUA_DIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_DIST)/mime/core.$(SO)
 	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_DIST)/socket/core.$(SO)
 	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
@@ -218,10 +221,11 @@ distCopy: distCopy-$(PLAT)
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
 
-dist $(LUA_DIST): distClean distPrepare distCopy
+dist: distClean distPrepare distCopy
 
-dist-jls $(LUAJLS)/jls: $(LUA_DIST)
+dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+
 
 dist.tar.gz:
 	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(PLAT).tar.gz *
@@ -241,4 +245,4 @@ luajls-archive: luajls$(ZIP)
 
 .PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif winapi
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi

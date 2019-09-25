@@ -9,7 +9,7 @@ core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
 quick: core luasigar lmprof luaserial lua-jpeg lua-exif winapi
 
-full: quick luabt lua-openssl
+full: quick luabt lua-webview lua-openssl
 
 any: full
 
@@ -56,6 +56,9 @@ libuv:
 
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_mingw.mk
+
+lua-webview: lua
+	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO)
 
 luaserial: lua
 	$(MAKE) -C luaserial -f ../luaserial.mk CC=$(CC) LIBEXT=$(SO)
@@ -111,4 +114,4 @@ winapi:
 	$(MAKE) -C winapi -f ../winapi.mk CC=$(CC)
 
 .PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif winapi
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi
