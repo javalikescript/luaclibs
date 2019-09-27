@@ -105,7 +105,7 @@ main-windows:
 
 
 test: $(TESTS_LUA)
-	@echo $(words $(TESTS_LUA)) tests passed
+	@echo $(words $(TESTS_LUA)) test files passed
 
 $(TESTS_LUA):
 	@echo Testing $@
