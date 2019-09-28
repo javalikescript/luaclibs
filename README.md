@@ -77,10 +77,12 @@ SET PATH=...\msys64\mingw32\bin;...\msys64\usr\bin;%PATH%
 
 ### How to build on Linux?
 
-Install the Bluetooth library
+Prerequisites
+
+Install the Bluetooth library and gtk-webkit2
 
 ```bash
-sudo apt-get install libbluetooth-dev
+sudo apt-get install libbluetooth-dev libgtk-3-dev libwebkit2gtk-4.0-dev
 ```
 
 ### How to build for Raspberry Pi (ARM)?

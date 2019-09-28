@@ -7,9 +7,9 @@ all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
-quick: core luasigar lmprof luaserial lua-jpeg lua-exif winapi
+quick: core luasigar lmprof luaserial lua-jpeg lua-exif
 
-full: quick luabt lua-webview lua-openssl
+full: quick luabt lua-webview lua-openssl winapi
 
 any: full
 
