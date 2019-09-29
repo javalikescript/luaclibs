@@ -4,9 +4,11 @@
 This repository contains [lua](http://www.lua.org/) 5.3, selected lua modules and the associated makefiles.
 The targeted operating systems are Linux and Windows. The targeted architectures are x86, x86-64, ARM.
 
-You could find informations and releases [here](javalikescript.free.fr/lua/)
+You could find informations and releases on the [luajls](http://javalikescript.free.fr/lua/) page.
 
-[![Build Status](https://travis-ci.org/javalikescript/luaclibs.svg?branch=master)](https://travis-ci.org/javalikescript/luaclibs)
+| Target | Status |
+|--|--|
+| x86_64-linux-gnu | [![Build Status](https://travis-ci.org/javalikescript/luaclibs.svg?branch=master)](https://travis-ci.org/javalikescript/luaclibs) |
 
 ## How to setup?
 
