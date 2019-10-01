@@ -4,6 +4,10 @@ LIBEXT=dll
 LIBNAME=winapi
 TARGET=$(LIBNAME).$(LIBEXT)
 
+# test
+# lua -e "print(require('winapi').show_message('Message', 'stuff\nand nonsense', 'yes-no', 'warning'))"
+# lua -e "print(require('winapi').show_message('Message', 'arguments\n'..table.concat(arg, ' ')))"
+
 LIBOPT = -shared \
   -Wl,-s \
   -L..\lua\src -llua53 \
