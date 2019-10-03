@@ -109,7 +109,7 @@ test: $(TESTS_LUA)
 
 $(TESTS_LUA):
 	@echo Testing $@
-	@cd luajls && $(LUAJLS_CMD) $@
+	-@cd luajls && $(LUAJLS_CMD) $@
 
 
 cleanLua:
