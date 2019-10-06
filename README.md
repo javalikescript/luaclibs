@@ -1,10 +1,10 @@
 
 ## Overview
 
-This repository contains [lua](http://www.lua.org/) 5.3, selected lua modules and the associated makefiles.
-The targeted operating systems are Linux and Windows. The targeted architectures are x86, x86-64, ARM.
+This repository contains [Lua](http://www.lua.org/) 5.3, selected Lua modules and the associated makefiles.
+The targeted operating systems are Linux and Windows. The targeted architectures are x86, x86-64 and ARM.
 
-You could find informations and releases on the [luajls](http://javalikescript.free.fr/lua/) page.
+You could find information and download binaries on the [luajls](http://javalikescript.free.fr/lua/) page.
 
 | Target | Status |
 |--|--|
