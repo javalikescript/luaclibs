@@ -1,25 +1,27 @@
 CC ?= gcc
 
 LIBEXT ?= dll
-LIBNAME=buffer
-TARGET=$(LIBNAME).$(LIBEXT)
+LIBNAME = buffer
+TARGET = $(LIBNAME).$(LIBEXT)
+LUA_PATH = lua
+LUA_LIB = lua53
 
 LIBOPT_dll = -O \
   -shared \
   -Wl,-s \
-  -L..\lua\src -llua53
+  -L..\$(LUA_PATH)\src -l$(LUA_LIB)
 
 CFLAGS_dll = -Wall \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src
+  -I../$(LUA_PATH)/src
 
 LIBOPT_so = -O \
   -shared \
   -static-libgcc \
   -Wl,-s \
-  -L..\lua\src
+  -L..\$(LUA_PATH)\src
 
 CFLAGS_so = -pedantic  \
   -fPIC \
@@ -27,7 +29,7 @@ CFLAGS_so = -pedantic  \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src
+  -I../$(LUA_PATH)/src
 
 LIBOPT = $(LIBOPT_$(LIBEXT))
 

@@ -14,6 +14,9 @@ endif
 
 MAIN_TARGET = core
 
+LUA_PATH := lua
+LUA_LIB := lua53
+
 LUA_DIST := dist-$(PLAT)
 LUAJLS = luajls
 
@@ -33,8 +36,9 @@ MAIN_MK := $(MK_$(PLAT))
 ZIP := $(ZIP_$(PLAT))
 
 GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
-LUA_DATE = $(shell lua/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
-DIST_SUFFIX ?= -$(GCC_NAME).$(LUA_DATE)
+LUA_DATE = $(shell $(LUA_PATH)/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
+LUA_VERSION = $(shell $(LUA_PATH)/src/lua$(EXE) -e "print(string.sub(_VERSION, 5))")
+DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
 
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
@@ -51,7 +55,7 @@ main: main-$(PLAT)
 
 all: full
 
-core quick full configure configure-libjpeg configure-libexif configure-openssl:
+core quick full show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi:
@@ -70,6 +74,9 @@ show:
 	@echo HOST: $(HOST)
 	@echo PLAT: $(PLAT)
 	@echo GCC_NAME: $(GCC_NAME)
+	@echo LUA_LIB: $(LUA_LIB)
+	@echo LUA_PATH: $(LUA_PATH)
+	@echo LUA_VERSION: $(LUA_VERSION)
 	@echo Library extension: $(SO)
 	@echo CC: $(CC)
 	@echo AR: $(AR)
@@ -83,12 +90,16 @@ arm linux-arm:
 
 win32 windows linux mingw: main
 
-main-linux:
-	@$(MAKE) -f $(MAIN_MK) \
-		PLAT=$(PLAT) \
+MAIN_VARS = PLAT=$(PLAT) \
+		LUA_LIB=$(LUA_LIB) \
+		LUA_PATH=$(LUA_PATH) \
 		SO=$(SO) \
 		ARCH=$(ARCH) \
-		HOST=$(HOST) \
+		HOST=$(HOST)
+
+main-linux:
+	@$(MAKE) -f $(MAIN_MK) \
+		$(MAIN_VARS) \
 		CC=$(CROSS_PREFIX)gcc \
 		AR=$(CROSS_PREFIX)ar \
 		RANLIB=$(CROSS_PREFIX)ranlib \
@@ -97,10 +108,7 @@ main-linux:
 
 main-windows:
 	@$(MAKE) -f $(MAIN_MK) \
-		PLAT=$(PLAT) \
-		SO=$(SO) \
-		ARCH=$(ARCH) \
-		HOST=$(HOST) \
+		$(MAIN_VARS) \
 		$(MAIN_TARGET)
 
 
@@ -113,9 +121,9 @@ $(TESTS_LUA):
 
 
 cleanLua:
-	-$(RM) ./lua/src/*.o
-	-$(RM) ./lua/src/*.a ./lua/src/*.$(SO)
-	-$(RM) ./lua/src/lua$(EXE) ./lua/src/luac$(EXE)
+	-$(RM) ./$(LUA_PATH)/src/*.o
+	-$(RM) ./$(LUA_PATH)/src/*.a ./lua/src/*.$(SO)
+	-$(RM) ./$(LUA_PATH)/src/lua$(EXE) ./lua/src/luac$(EXE)
 
 cleanLuaLibs:
 	-$(RM) ./lua-cjson/*.o
@@ -167,6 +175,8 @@ cleanLibs:
 	-$(MAKE) -C libjpeg clean
 	-$(MAKE) -C libexif clean
 
+cleanAllLua: cleanLua cleanLuaLibs
+
 clean: cleanLua cleanLibs cleanLuaLibs
 
 
@@ -184,18 +194,18 @@ distCopy-linux:
 	-cp -uP openssl/libssl.$(SO)* $(LUA_DIST)/
 
 distCopy-windows:
-	-cp -u lua/src/lua*.$(SO) $(LUA_DIST)/
+	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_DIST)/
 	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
 	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
 
 distCopy: distCopy-$(PLAT)
-	cp -u lua/src/lua$(EXE) $(LUA_DIST)/
-	cp -u lua/src/luac$(EXE) $(LUA_DIST)/
+	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_DIST)/
+	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_DIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_DIST)/
 	cp -u lua-buffer/buffer.$(SO) $(LUA_DIST)/
 	cp -u luafilesystem/lfs.$(SO) $(LUA_DIST)/
-	cp -u luv/luv.$(SO) $(LUA_DIST)/
+	-cp -u luv/luv.$(SO) $(LUA_DIST)/
 	cp -u lpeg/lpeg.$(SO) $(LUA_DIST)/
 	cp -u lua-zlib/zlib.$(SO) $(LUA_DIST)/
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/

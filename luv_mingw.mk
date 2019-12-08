@@ -2,11 +2,14 @@ CC ?= gcc
 
 LIB_UV = ..\libuv\libuv.a
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 LIB_OPTION= -O \
 	-shared \
 	-static-libgcc \
 	-Wl,-s \
-	-L..\lua\src -llua53 \
+	-L..\$(LUA_PATH)\src -l$(LUA_LIB) \
 	$(LIB_UV) \
 	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32
 
@@ -23,7 +26,7 @@ CFLAGS += -Wall \
 	-Wstrict-prototypes \
 	-fpic \
 	-Isrc \
-	-I../lua/src \
+	-I../$(LUA_PATH)/src \
 	-I../libuv/include \
 	-D_WIN32_WINNT=0x0600 \
 	-DLUA_USE_DLOPEN \

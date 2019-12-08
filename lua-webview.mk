@@ -4,10 +4,13 @@ LIBEXT ?= dll
 LIBNAME=webview
 TARGET=$(LIBNAME).$(LIBEXT)
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 LIBOPT_dll = -O \
   -shared \
   -Wl,-s \
-  -L..\lua\src -llua53 \
+  -L..\$(LUA_PATH)\src -l$(LUA_LIB) \
   -static-libgcc \
   -lole32 -lcomctl32 -loleaut32 -luuid -mwindows
 
@@ -15,14 +18,14 @@ CFLAGS_dll = -Wall \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src \
+  -I../$(LUA_PATH)/src \
   -DWEBVIEW_WINAPI=1
 
 LIBOPT_so = -O \
   -shared \
   -static-libgcc \
   -Wl,-s \
-  -L..\lua\src \
+  -L..\$(LUA_PATH)\src \
   $(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
 
 CFLAGS_so = -pedantic  \
@@ -31,7 +34,7 @@ CFLAGS_so = -pedantic  \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src \
+  -I../$(LUA_PATH)/src \
   -DWEBVIEW_GTK=1 \
   $(shell pkg-config --cflags gtk+-3.0 webkit2gtk-4.0)
 
