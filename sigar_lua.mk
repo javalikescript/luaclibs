@@ -2,6 +2,9 @@
 PLAT=windows
 #PLAT=linux
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 SIGAR_HOME = ../..
 
 LIBNAME = sigar
@@ -18,7 +21,7 @@ TARGET=$(LIBNAME).$(LIBEXT_$(PLAT))
 
 ## Includes
 
-INCS = -I$(SIGAR_HOME)/../lua/src -I$(SIGAR_HOME)/include
+INCS = -I$(SIGAR_HOME)/../$(LUA_PATH)/src -I$(SIGAR_HOME)/include
 
 ## Sources
 
@@ -54,8 +57,8 @@ OBJS = sigar-cpu.o \
 
 ## Libraries
 
-LIBS_windows = -L$(SIGAR_HOME)/../lua/src -llua53 -lws2_32 -lnetapi32 -lversion
-LIBS_linux = -L$(SIGAR_HOME)/../lua/src
+LIBS_windows = -L$(SIGAR_HOME)/../$(LUA_PATH)/src -l$(LUA_LIB) -lws2_32 -lnetapi32 -lversion
+LIBS_linux = -L$(SIGAR_HOME)/../$(LUA_PATH)/src
 LIBS += $(LIBS_$(PLAT))
 
 WARN = -pedantic

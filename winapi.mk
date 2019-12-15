@@ -1,5 +1,8 @@
 CC ?= gcc
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 LIBEXT=dll
 LIBNAME=winapi
 TARGET=$(LIBNAME).$(LIBEXT)
@@ -10,7 +13,7 @@ TARGET=$(LIBNAME).$(LIBEXT)
 
 LIBOPT = -shared \
   -Wl,-s \
-  -L..\lua\src -llua53 \
+  -L..\$(LUA_PATH)\src -l$(LUA_LIB) \
   -static-libgcc \
   -lkernel32 -luser32 -lpsapi -ladvapi32 -lshell32 -lMpr
 
@@ -21,7 +24,7 @@ CFLAGS = -Wall \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
   -DPSAPI_VERSION=1 \
-  -I../lua/src
+  -I../$(LUA_PATH)/src
 
 ## -g -O1 -DWIN32=1
 

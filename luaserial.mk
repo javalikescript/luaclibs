@@ -1,5 +1,8 @@
 CC ?= gcc
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 LIBEXT ?= dll
 LIBNAME = serial
 TARGET = $(LIBNAME).$(LIBEXT)
@@ -7,19 +10,19 @@ TARGET = $(LIBNAME).$(LIBEXT)
 LIBOPT_dll = -O \
   -shared \
   -Wl,-s \
-  -L..\lua\src -llua53
+  -L..\$(LUA_PATH)\src -l$(LUA_LIB)
 
 CFLAGS_dll = -Wall \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src
+  -I../$(LUA_PATH)/src
 
 LIBOPT_so = -O \
   -shared \
   -static-libgcc \
   -Wl,-s \
-  -L..\lua\src \
+  -L..\$(LUA_PATH)\src \
   $(LIBS)
 
 CFLAGS_so = -pedantic  \
@@ -28,7 +31,7 @@ CFLAGS_so = -pedantic  \
   -Wextra \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
-  -I../lua/src
+  -I../$(LUA_PATH)/src
 
 LIBOPT = $(LIBOPT_$(LIBEXT))
 

@@ -175,9 +175,9 @@ cleanLibs:
 	-$(MAKE) -C libjpeg clean
 	-$(MAKE) -C libexif clean
 
-cleanAllLua: cleanLua cleanLuaLibs
+clean: cleanLua cleanLuaLibs
 
-clean: cleanLua cleanLibs cleanLuaLibs
+clean-all: cleanLua cleanLibs cleanLuaLibs
 
 
 distClean:

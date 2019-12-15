@@ -1,9 +1,12 @@
 CC ?= gcc
 
+LUA_PATH = lua
+LUA_LIB = lua53
+
 PLAT ?= windows
 
 OPENSSLDIR = ../openssl
-LUADIR = ../lua/src
+LUADIR = ../$(LUA_PATH)/src
 
 LIBNAME = openssl
 
@@ -25,7 +28,7 @@ LIBOPT_windows = -O \
   -shared \
   -Wl,-s \
   $(LIBOPT_OPENSSL) \
-  -L$(LUADIR) -llua53
+  -L$(LUADIR) -l$(LUA_LIB)
 CFLAGS_windows = -Wall \
   -Wextra \
   -Wno-unused-parameter \
