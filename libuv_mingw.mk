@@ -8,13 +8,14 @@ CFLAGS += -Wall \
           -Iinclude \
           -Isrc \
           -Isrc/win \
+          -DMCAST_JOIN_SOURCE_GROUP=45 \
+          -DMCAST_LEAVE_SOURCE_GROUP=46 \
           -DWIN32_LEAN_AND_MEAN \
           -D_WIN32_WINNT=0x0600
 
 INCLUDES = include/uv.h \
            include/uv/errno.h \
            include/uv/posix.h \
-           include/uv/pthread-barrier.h \
            include/uv/stdint-msvc2008.h \
            include/uv/threadpool.h \
            include/uv/tree.h \
@@ -32,10 +33,13 @@ INCLUDES = include/uv.h \
            src/win/winsock.h
 
 OBJS = src/fs-poll.o \
+       src/idna.o \
        src/inet.o \
+       src/strscpy.o \
        src/timer.o \
        src/threadpool.o \
        src/uv-common.o \
+       src/uv-data-getter-setters.o \
        src/version.o \
        src/win/async.o \
        src/win/core.o \
@@ -52,7 +56,6 @@ OBJS = src/fs-poll.o \
        src/win/poll.o \
        src/win/process-stdio.o \
        src/win/process.o \
-       src/win/req.o \
        src/win/signal.o \
        src/win/stream.o \
        src/win/tcp.o \

@@ -77,7 +77,9 @@ SOURCES += src/unix/linux-core.c \
 	src/unix/sysinfo-memory.c
 
 OBJS = src/fs-poll.o \
+	src/idna.o \
 	src/inet.o \
+	src/strscpy.o \
 	src/timer.o \
 	src/threadpool.o \
 	src/uv-data-getter-setters.o \
