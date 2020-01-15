@@ -43,6 +43,7 @@ DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
 	LUA_DATE = $(shell date '+%Y%m%d')
+	LUA_VERSION = $(shell echo $(LUA_LIB) | sed 's/^[^0-9]*\([0-9]\)/\1./')
 	ifneq (,$(findstring arm,$(HOST)))
 		ARCH = arm
 	endif
@@ -125,7 +126,11 @@ cleanLua:
 	-$(RM) ./$(LUA_PATH)/src/*.a ./lua/src/*.$(SO)
 	-$(RM) ./$(LUA_PATH)/src/lua$(EXE) ./lua/src/luac$(EXE)
 
-cleanLuaLibs:
+clean-luv:
+	-$(RM) ./luv/*.$(SO)
+	-$(RM) ./luv/src/*.o
+
+cleanLuaLibs: clean-luv
 	-$(RM) ./lua-cjson/*.o
 	-$(RM) ./lua-cjson/*.$(SO)
 	-$(RM) ./lua-buffer/*.o
@@ -136,8 +141,6 @@ cleanLuaLibs:
 	-$(RM) ./luasocket/src/*.$(SO)
 	-$(RM) ./lpeg/*.o
 	-$(RM) ./lpeg/*.$(SO)
-	-$(RM) ./luv/*.$(SO)
-	-$(RM) ./luv/src/*.o
 	-$(RM) ./luaserial/*.o
 	-$(RM) ./luaserial/*.$(SO)
 	-$(RM) ./luabt/*.o
@@ -159,11 +162,13 @@ cleanLuaLibs:
 	-$(RM) ./winapi/*.o
 	-$(RM) ./winapi/*.$(SO)
 
-cleanLibs:
+clean-libuv:
 	-$(RM) ./libuv/*.a
 	-$(RM) ./libuv/src/*.o
 	-$(RM) ./libuv/src/unix/*.o
 	-$(RM) ./libuv/src/win/*.o
+
+cleanLibs: clean-libuv
 	-$(MAKE) -C openssl clean
 	-$(RM) ./openssl/*/*.$(SO)
 	-$(RM) ./zlib/*.o
