@@ -44,7 +44,11 @@ INCLUDES += src/heap-inl.h \
 	src/unix/linux-syscalls.h
 
 SOURCES = src/fs-poll.c \
+	src/idna.c \
 	src/inet.c \
+	src/random.c \
+	src/strscpy.c \
+	src/timer.c \
 	src/threadpool.c \
 	src/uv-data-getter-setters.c \
 	src/uv-common.c \
@@ -61,6 +65,9 @@ SOURCES += src/unix/async.c \
 	src/unix/pipe.c \
 	src/unix/poll.c \
 	src/unix/process.c \
+	src/unix/random-devurandom.c \
+	src/unix/random-getrandom.c \
+	src/unix/random-sysctl-linux.c \
 	src/unix/signal.c \
 	src/unix/stream.c \
 	src/unix/tcp.c \
@@ -79,6 +86,7 @@ SOURCES += src/unix/linux-core.c \
 OBJS = src/fs-poll.o \
 	src/idna.o \
 	src/inet.o \
+	src/random.o \
 	src/strscpy.o \
 	src/timer.o \
 	src/threadpool.o \
@@ -97,6 +105,9 @@ OBJS += src/unix/async.o \
 	src/unix/pipe.o \
 	src/unix/poll.o \
 	src/unix/process.o \
+	src/unix/random-devurandom.o \
+	src/unix/random-getrandom.o \
+	src/unix/random-sysctl-linux.o \
 	src/unix/signal.o \
 	src/unix/stream.o \
 	src/unix/tcp.o \

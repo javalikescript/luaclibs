@@ -8,8 +8,6 @@ CFLAGS += -Wall \
           -Iinclude \
           -Isrc \
           -Isrc/win \
-          -DMCAST_JOIN_SOURCE_GROUP=45 \
-          -DMCAST_LEAVE_SOURCE_GROUP=46 \
           -DWIN32_LEAN_AND_MEAN \
           -D_WIN32_WINNT=0x0600
 
@@ -35,6 +33,7 @@ INCLUDES = include/uv.h \
 OBJS = src/fs-poll.o \
        src/idna.o \
        src/inet.o \
+       src/random.o \
        src/strscpy.o \
        src/timer.o \
        src/threadpool.o \
