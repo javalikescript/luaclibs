@@ -1,12 +1,18 @@
 CC=gcc
 
-CFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1
-#CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
-#CFLAGS=-g -DZLIB_DEBUG
+ifdef CLIBS_DEBUG
+	CFLAGS = -g -DZLIB_DEBUG
+else
+	CFLAGS = -O3 -DNDEBUG
+endif
+
+
+CFLAGS += -fPIC -D_LARGEFILE64_SOURCE=1
+
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
 #           -Wstrict-prototypes -Wmissing-prototypes
 
-SFLAGS=-O3 -fPIC -D_LARGEFILE64_SOURCE=1
+SFLAGS = $(CFLAGS)
 LDFLAGS=
 #SLA#LDFLAGS=-O -shared -fPIC -Wl,-s
 TEST_LDFLAGS=-L. libz.a

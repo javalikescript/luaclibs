@@ -3,15 +3,19 @@ CC ?= gcc
 LIB_UV = ../libuv/libuv.a
 #LIB_UV = ../libuv/libuv.so
 
-LIB_OPTION= -O \
-	-shared \
+LUA_PATH = lua
+
+ifndef CLIBS_DEBUG
+	LIB_OPTION += -O2
+endif
+
+LIB_OPTION += -shared \
 	-lrt \
+	-pthread \
 	-lpthread \
 	-static-libgcc \
-	-L../lua/src \
+	-L../$(LUA_PATH)/src \
 	-fPIC -Wl,-s
-
-LIB_OPTION += -pthread
 
 #-Wl,-s \
 #-Wl,--whole-archive $(LIB_UV) -Wl,--no-whole-archive
@@ -30,9 +34,15 @@ LIB_OPTION += -pthread
 #cc  -fPIC   -shared  -o luv.so CMakeFiles/luv.dir/src/luv.c.o libuv.a -lrt -lpthread 
 
 
+ifdef CLIBS_DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O2 -DNDEBUG
+endif
+
 CFLAGS += -fPIC \
 	-Isrc \
-	-I../lua/src \
+	-I../$(LUA_PATH)/src \
 	-I../libuv/include \
 	-DBUILDING_UV_SHARED \
 	-D_FILE_OFFSET_BITS=64  \
@@ -40,9 +50,8 @@ CFLAGS += -fPIC \
 	-D_LARGEFILE_SOURCE \
 	-DLUA_USE_DLOPEN  \
 	-DLUA_LIB \
-	-Dluv_EXPORTS
-
-CFLAGS += -pthread
+	-Dluv_EXPORTS \
+	-pthread
 
 INCLUDES = src/lhandle.h \
 	src/lreq.h \

@@ -5,11 +5,20 @@ ARFLAGS ?= rc
 #ARFLAGS ?= crs
 RANLIB ?= ranlib
 
-CFLAGS += -g \
-	-O2 \
-	-fPIC \
+LIBUV_VERSION = 1.22
+
+ifneq ($(wildcard src/random.c),)
+    LIBUV_VERSION = 1.34
+endif 
+
+ifdef CLIBS_DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O2 -DNDEBUG
+endif
+
+CFLAGS += -fPIC \
 	-pedantic \
-	-g \
 	-Iinclude \
 	-Isrc \
 	-Isrc/unix \
@@ -17,9 +26,8 @@ CFLAGS += -g \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
-	-Wstrict-prototypes
-
-CFLAGS += -pthread
+	-Wstrict-prototypes \
+	-pthread
 
 #-static-libgcc
 
@@ -43,56 +51,13 @@ INCLUDES += src/heap-inl.h \
 	src/unix/internal.h \
 	src/unix/linux-syscalls.h
 
-SOURCES = src/fs-poll.c \
-	src/idna.c \
-	src/inet.c \
-	src/random.c \
-	src/strscpy.c \
-	src/timer.c \
-	src/threadpool.c \
-	src/uv-data-getter-setters.c \
-	src/uv-common.c \
-	src/version.c
-
-SOURCES += src/unix/async.c \
-	src/unix/core.c \
-	src/unix/dl.c \
-	src/unix/fs.c \
-	src/unix/getaddrinfo.c \
-	src/unix/getnameinfo.c \
-	src/unix/loop-watcher.c \
-	src/unix/loop.c \
-	src/unix/pipe.c \
-	src/unix/poll.c \
-	src/unix/process.c \
-	src/unix/random-devurandom.c \
-	src/unix/random-getrandom.c \
-	src/unix/random-sysctl-linux.c \
-	src/unix/signal.c \
-	src/unix/stream.c \
-	src/unix/tcp.c \
-	src/unix/thread.c \
-	src/unix/tty.c \
-	src/unix/udp.c
-
-SOURCES += src/unix/linux-core.c \
-	src/unix/linux-inotify.c \
-	src/unix/linux-syscalls.c \
-	src/unix/procfs-exepath.c \
-	src/unix/proctitle.c \
-	src/unix/sysinfo-loadavg.c \
-	src/unix/sysinfo-memory.c
-
 OBJS = src/fs-poll.o \
-	src/idna.o \
 	src/inet.o \
-	src/random.o \
-	src/strscpy.o \
 	src/timer.o \
 	src/threadpool.o \
-	src/uv-data-getter-setters.o \
 	src/uv-common.o \
-	src/version.o
+	src/version.o \
+	src/uv-data-getter-setters.o
 
 OBJS += src/unix/async.o \
 	src/unix/core.o \
@@ -105,9 +70,6 @@ OBJS += src/unix/async.o \
 	src/unix/pipe.o \
 	src/unix/poll.o \
 	src/unix/process.o \
-	src/unix/random-devurandom.o \
-	src/unix/random-getrandom.o \
-	src/unix/random-sysctl-linux.o \
 	src/unix/signal.o \
 	src/unix/stream.o \
 	src/unix/tcp.o \
@@ -123,7 +85,19 @@ OBJS += src/unix/linux-core.o \
 	src/unix/sysinfo-loadavg.o \
 	src/unix/sysinfo-memory.o
 
+ifeq ($(LIBUV_VERSION),1.34)
+	OBJS += src/idna.o \
+		src/random.o \
+		src/strscpy.o \
+		src/unix/random-devurandom.o \
+		src/unix/random-getrandom.o \
+		src/unix/random-sysctl-linux.o
+endif
+
 all: libuv.a
+
+version:
+	@echo $(LIBUV_VERSION)
 
 clean:
 	-$(RM) $(OBJS) libuv.a libuv.so

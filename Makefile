@@ -36,8 +36,9 @@ MAIN_MK := $(MK_$(PLAT))
 ZIP := $(ZIP_$(PLAT))
 
 GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
-LUA_DATE = $(shell $(LUA_PATH)/src/lua$(EXE) -e "print(os.date('%Y%m%d'))")
-LUA_VERSION = $(shell $(LUA_PATH)/src/lua$(EXE) -e "print(string.sub(_VERSION, 5))")
+LUA_APP = $(LUA_PATH)/src/lua$(EXE)
+LUA_DATE = $(shell $(LUA_APP) -e "print(os.date('%Y%m%d'))")
+LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
 
 ifdef HOST
@@ -85,6 +86,21 @@ show:
 	@echo LD: $(LD)
 	@echo MK_DIR: $(MK_DIR)
 
+versions:
+	@$(LUA_APP) -e "print(_VERSION)"
+	-@LUA_CPATH=luasocket/src/socket-3.0-rc1.$(SO) $(LUA_APP) -e "print('socket', require('socket_core')._VERSION)"
+	-@LUA_CPATH=luv/?.$(SO) $(LUA_APP) -e "print('luv', require('luv').version_string())"
+	-@LUA_CPATH=lua-cjson/?.$(SO) $(LUA_APP) -e "print('cjson', require('cjson')._VERSION)"
+	-@LUA_CPATH=lua-zlib/?.$(SO) $(LUA_APP) -e "print('zlib', require('zlib')._VERSION)"
+	-@LUA_CPATH=lua-openssl/?.$(SO) $(LUA_APP) -e "print('openssl', require('openssl').version())"
+
+dist-versions:
+	@$(LUAJLS_CMD) -e "print(_VERSION)"
+	-@$(LUAJLS_CMD) -e "print('socket', require('socket')._VERSION)"
+	-@$(LUAJLS_CMD) -e "print('cjson', require('cjson')._VERSION)"
+	-@$(LUAJLS_CMD) -e "print('zlib', require('zlib')._VERSION)"
+	-@$(LUAJLS_CMD) -e "print('luv', require('luv').version_string())"
+	-@$(LUAJLS_CMD) -e "print('openssl', require('openssl').version())"
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)

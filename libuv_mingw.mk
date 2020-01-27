@@ -1,6 +1,12 @@
 
 CC ?= gcc
 
+ifdef CLIBS_DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O -DNDEBUG
+endif
+
 CFLAGS += -Wall \
           -Wextra \
           -Wno-unused-parameter \

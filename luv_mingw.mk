@@ -5,8 +5,11 @@ LIB_UV = ..\libuv\libuv.a
 LUA_PATH = lua
 LUA_LIB = lua53
 
-LIB_OPTION= -O \
-	-shared \
+ifndef CLIBS_DEBUG
+	LIB_OPTION += -O
+endif
+
+LIB_OPTION += -shared \
 	-static-libgcc \
 	-Wl,-s \
 	-L..\$(LUA_PATH)\src -l$(LUA_LIB) \
@@ -19,6 +22,12 @@ LIB_OPTION= -O \
 # -Wl,--output-def,luv.def,--out-implib,luv.a
 
 # WARN= -O2 -Wall -fPIC -W -Waggregate-return -Wcast-align -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -pedantic
+
+ifdef CLIBS_DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O -DNDEBUG
+endif
 
 CFLAGS += -Wall \
 	-Wextra \
