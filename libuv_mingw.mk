@@ -1,6 +1,12 @@
 
 CC ?= gcc
 
+LIBUV_VERSION = 1.22
+
+ifneq ($(wildcard src/random.c),)
+    LIBUV_VERSION = 1.34
+endif 
+
 ifdef CLIBS_DEBUG
 	CFLAGS += -g
 else
@@ -37,10 +43,7 @@ INCLUDES = include/uv.h \
            src/win/winsock.h
 
 OBJS = src/fs-poll.o \
-       src/idna.o \
        src/inet.o \
-       src/random.o \
-       src/strscpy.o \
        src/timer.o \
        src/threadpool.o \
        src/uv-common.o \
@@ -70,6 +73,16 @@ OBJS = src/fs-poll.o \
        src/win/util.o \
        src/win/winapi.o \
        src/win/winsock.o
+
+ifeq ($(LIBUV_VERSION),1.22)
+	OBJS += src/win/req.o
+endif
+
+ifeq ($(LIBUV_VERSION),1.34)
+	OBJS += src/idna.o \
+		src/random.o \
+		src/strscpy.o
+endif
 
 all: libuv.a
 

@@ -137,7 +137,7 @@ $(TESTS_LUA):
 	-@cd luajls && $(LUAJLS_CMD) $@
 
 
-cleanLua:
+clean-lua:
 	-$(RM) ./$(LUA_PATH)/src/*.o
 	-$(RM) ./$(LUA_PATH)/src/*.a ./lua/src/*.$(SO)
 	-$(RM) ./$(LUA_PATH)/src/lua$(EXE) ./lua/src/luac$(EXE)
@@ -146,7 +146,7 @@ clean-luv:
 	-$(RM) ./luv/*.$(SO)
 	-$(RM) ./luv/src/*.o
 
-cleanLuaLibs: clean-luv
+clean-lua-libs: clean-luv
 	-$(RM) ./lua-cjson/*.o
 	-$(RM) ./lua-cjson/*.$(SO)
 	-$(RM) ./lua-buffer/*.o
@@ -184,7 +184,7 @@ clean-libuv:
 	-$(RM) ./libuv/src/unix/*.o
 	-$(RM) ./libuv/src/win/*.o
 
-cleanLibs: clean-libuv
+clean-libs: clean-libuv
 	-$(MAKE) -C openssl clean
 	-$(RM) ./openssl/*/*.$(SO)
 	-$(RM) ./zlib/*.o
@@ -196,31 +196,31 @@ cleanLibs: clean-libuv
 	-$(MAKE) -C libjpeg clean
 	-$(MAKE) -C libexif clean
 
-clean: cleanLua cleanLuaLibs
+clean: clean-lua clean-lua-libs
 
-clean-all: cleanLua cleanLibs cleanLuaLibs
+clean-all: clean-lua clean-libs clean-lua-libs
 
 
-distClean:
+dist-clean:
 	rm -rf $(LUA_DIST)
 
-distPrepare:
+dist-prepare:
 	mkdir $(LUA_DIST)
 	mkdir $(LUA_DIST)/lmprof
 	mkdir $(LUA_DIST)/mime
 	mkdir $(LUA_DIST)/socket
 
-distCopy-linux:
+dist-copy-linux:
 	-cp -uP openssl/libcrypto.$(SO)* $(LUA_DIST)/
 	-cp -uP openssl/libssl.$(SO)* $(LUA_DIST)/
 
-distCopy-windows:
+dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_DIST)/
 	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
 	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
 
-distCopy: distCopy-$(PLAT)
+dist-copy: dist-copy-$(PLAT)
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_DIST)/
 	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_DIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_DIST)/
@@ -252,27 +252,21 @@ distCopy: distCopy-$(PLAT)
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
 
-dist: distClean distPrepare distCopy
+dist: dist-clean dist-prepare dist-copy
 
 dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 
 
-dist.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-$(PLAT).tar.gz *
-
 luajls.tar.gz:
 	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(DIST_SUFFIX).tar.gz *
-
-dist.zip:
-	cd $(LUA_DIST) && zip -r luajls-$(PLAT).zip *
 
 luajls.zip:
 	cd $(LUA_DIST) && zip -r luajls$(DIST_SUFFIX).zip *
 
-dist-archive: dist-jls$(ZIP)
-
 luajls-archive: luajls$(ZIP)
+
+dist-archive: luajls-archive
 
 .PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \

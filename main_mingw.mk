@@ -8,6 +8,12 @@ LUA_LIB = lua53
 
 LUA_VARS = LUA_LIB=$(LUA_LIB) LUA_PATH=$(LUA_PATH)
 
+ifdef CLIBS_DEBUG
+	LUA_MYCFLAGS = -g -DLUA_USE_APICHECK
+else
+	LUA_MYCFLAGS = -DNDEBUG
+endif
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
@@ -35,7 +41,8 @@ show show-main:
 	@echo LD: $(LD)
 
 lua:
-	$(MAKE) -C $(LUA_PATH)/src mingw
+	$(MAKE) -C $(LUA_PATH)/src mingw \
+		MYCFLAGS="$(LUA_MYCFLAGS)"
 
 lua-buffer: lua
 	$(MAKE) -C lua-buffer -f ../lua-buffer.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)

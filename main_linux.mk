@@ -13,6 +13,12 @@ else
 	ARCH_SUFFIX ?= default
 endif
 
+ifdef CLIBS_DEBUG
+	LUA_MYCFLAGS = -g -DLUA_USE_APICHECK
+else
+	LUA_MYCFLAGS = -DNDEBUG
+endif
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
@@ -51,6 +57,7 @@ lua:
 		AR="$(AR) rcu" \
 		RANLIB=$(RANLIB) \
 		SYSCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" \
+		MYCFLAGS="$(LUA_MYCFLAGS)" \
 		SYSLIBS="-Wl,-E -ldl"
 
 lua-buffer: lua

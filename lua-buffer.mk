@@ -33,6 +33,12 @@ CFLAGS_so = -pedantic  \
 
 LIBOPT = $(LIBOPT_$(LIBEXT))
 
+ifdef CLIBS_DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O -DNDEBUG
+endif
+
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
 SOURCES = buffer.c
