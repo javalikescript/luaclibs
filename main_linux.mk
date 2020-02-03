@@ -15,8 +15,10 @@ endif
 
 ifdef CLIBS_DEBUG
 	LUA_MYCFLAGS = -g -DLUA_USE_APICHECK
-else
-	LUA_MYCFLAGS = -DNDEBUG
+endif
+
+ifdef CLIBS_NDEBUG
+	LUA_MYCFLAGS += -DNDEBUG
 endif
 
 all: full

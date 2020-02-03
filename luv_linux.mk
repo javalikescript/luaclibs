@@ -37,7 +37,11 @@ LIB_OPTION += -shared \
 ifdef CLIBS_DEBUG
 	CFLAGS += -g
 else
-	CFLAGS += -O2 -DNDEBUG
+	CFLAGS += -O2
+endif
+
+ifdef CLIBS_NDEBUG
+	CFLAGS += -DNDEBUG
 endif
 
 CFLAGS += -fPIC \

@@ -3,7 +3,11 @@ CC=gcc
 ifdef CLIBS_DEBUG
 	CFLAGS = -g -DZLIB_DEBUG
 else
-	CFLAGS = -O3 -DNDEBUG
+	CFLAGS = -O3
+endif
+
+ifdef CLIBS_NDEBUG
+	CFLAGS += -DNDEBUG
 endif
 
 

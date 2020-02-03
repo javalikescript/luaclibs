@@ -10,8 +10,10 @@ LUA_VARS = LUA_LIB=$(LUA_LIB) LUA_PATH=$(LUA_PATH)
 
 ifdef CLIBS_DEBUG
 	LUA_MYCFLAGS = -g -DLUA_USE_APICHECK
-else
-	LUA_MYCFLAGS = -DNDEBUG
+endif
+
+ifdef CLIBS_NDEBUG
+	LUA_MYCFLAGS += -DNDEBUG
 endif
 
 all: full
@@ -89,13 +91,16 @@ zlib:
 lua-zlib: lua zlib
 	$(MAKE) -C lua-zlib -f ../lua-zlib.mk PLAT=$(PLAT) $(LUA_VARS)
 
-## perl Configure no-threads mingw
-## perl Configure no-threads mingw64
-configure-openssl:
+configure-openssl- configure-openssl-i686:
 	cd openssl && perl Configure no-threads mingw
 
+configure-openssl-x86_64:
+	cd openssl && perl Configure no-threads mingw64
+
+configure-openssl: configure-openssl-$(ARCH)
+
 openssl:
-	$(MAKE) -C openssl
+	$(MAKE) -C openssl LD=$(LD)
 
 lua-openssl: lua openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) $(LUA_VARS)

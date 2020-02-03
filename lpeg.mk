@@ -4,7 +4,11 @@ LUADIR = ../lua/
 ifdef CLIBS_DEBUG
 	COPT = -g
 else
-	COPT = -O2 -DNDEBUG
+	COPT = -O2
+endif
+
+ifdef CLIBS_NDEBUG
+	COPT += -DNDEBUG
 endif
 
 CWARNS = -Wall -Wextra -pedantic \

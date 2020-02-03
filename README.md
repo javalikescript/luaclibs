@@ -45,7 +45,7 @@ make dist
 
 Clean the build files
 ```bash
-make clean
+make clean-all
 ```
 
 You could specify the target OS using `PLAT=linux` available OSes are linux and windows.

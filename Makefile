@@ -65,7 +65,7 @@ lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zl
 
 help:
 	@echo Main targets \(MAIN_TARGET\): full quick core
-	@echo Other targets: arm linux windows clean dist help
+	@echo Other targets: arm linux windows configure clean clean-all dist help
 	@echo Available platforms \(PLAT\): linux windows
 	@echo Available architecture \(ARCH\): x86_64 arm
 
@@ -86,21 +86,12 @@ show:
 	@echo LD: $(LD)
 	@echo MK_DIR: $(MK_DIR)
 
-versions:
-	@$(LUA_APP) -e "print(_VERSION)"
-	-@LUA_CPATH=luasocket/src/socket-3.0-rc1.$(SO) $(LUA_APP) -e "print('socket', require('socket_core')._VERSION)"
-	-@LUA_CPATH=luv/?.$(SO) $(LUA_APP) -e "print('luv', require('luv').version_string())"
-	-@LUA_CPATH=lua-cjson/?.$(SO) $(LUA_APP) -e "print('cjson', require('cjson')._VERSION)"
-	-@LUA_CPATH=lua-zlib/?.$(SO) $(LUA_APP) -e "print('zlib', require('zlib')._VERSION)"
-	-@LUA_CPATH=lua-openssl/?.$(SO) $(LUA_APP) -e "print('openssl', require('openssl').version())"
-
 dist-versions:
-	@$(LUAJLS_CMD) -e "print(_VERSION)"
-	-@$(LUAJLS_CMD) -e "print('socket', require('socket')._VERSION)"
-	-@$(LUAJLS_CMD) -e "print('cjson', require('cjson')._VERSION)"
-	-@$(LUAJLS_CMD) -e "print('zlib', require('zlib')._VERSION)"
-	-@$(LUAJLS_CMD) -e "print('luv', require('luv').version_string())"
-	-@$(LUAJLS_CMD) -e "print('openssl', require('openssl').version())"
+	@$(LUAJLS_CMD) -v -e "print(tostring(string.len(string.pack('T', 0)) * 8)..' bits')" \
+		-e "print(require('socket')._VERSION); print('lua-cjson', require('cjson')._VERSION); print(require('zlib')._VERSION)" \
+		-e "print('luv', require('luv').version_string()); print('lua-openssl', require('openssl').version())" \
+		-e "print('lpeg', require('lpeg').version()); print('luaunit', require('luaunit')._VERSION)" \
+		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION)"
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
@@ -256,6 +247,7 @@ dist: dist-clean dist-prepare dist-copy
 
 dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+	-@$(MAKE) --quiet dist-versions >$(LUA_DIST)/versions.txt
 
 
 luajls.tar.gz:

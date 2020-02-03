@@ -10,7 +10,11 @@ endif
 ifdef CLIBS_DEBUG
 	CFLAGS += -g
 else
-	CFLAGS += -O -DNDEBUG
+	CFLAGS += -O
+endif
+
+ifdef CLIBS_NDEBUG
+	CFLAGS += -DNDEBUG
 endif
 
 CFLAGS += -Wall \
