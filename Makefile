@@ -18,6 +18,8 @@ LUA_PATH := lua
 LUA_LIB := lua53
 
 LUA_DIST := dist-$(PLAT)
+LUA_CDIST = $(LUA_DIST)
+LUA_EDIST = $(LUA_CDIST)
 LUAJLS = luajls
 
 SO_windows=dll
@@ -50,7 +52,7 @@ ifdef HOST
 	endif
 endif
 
-TESTS_LUA := $(patsubst luajls/%.lua,%.lua,$(wildcard luajls/tests/*.lua))
+LUAJLS_TESTS := $(patsubst luajls/%.lua,%.lua,$(wildcard luajls/tests/*/*.lua))
 LUAJLS_CMD := LUA_PATH=$(MK_DIR)/$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)/$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)/$(LUA_DIST) $(MK_DIR)/$(LUA_DIST)/lua$(EXE)
 
 main: main-$(PLAT)
@@ -120,10 +122,10 @@ main-windows:
 		$(MAIN_TARGET)
 
 
-test: $(TESTS_LUA)
-	@echo $(words $(TESTS_LUA)) test files passed
+test: $(LUAJLS_TESTS)
+	@echo $(words $(LUAJLS_TESTS)) test files passed
 
-$(TESTS_LUA):
+$(LUAJLS_TESTS):
 	@echo Testing $@
 	-@cd luajls && $(LUAJLS_CMD) $@
 
@@ -196,43 +198,44 @@ dist-clean:
 	rm -rf $(LUA_DIST)
 
 dist-prepare:
-	mkdir $(LUA_DIST)
+	-mkdir $(LUA_DIST)
 	mkdir $(LUA_DIST)/lmprof
-	mkdir $(LUA_DIST)/mime
+	mkdir $(LUA_CDIST)/mime
 	mkdir $(LUA_DIST)/socket
+	-mkdir $(LUA_CDIST)/socket
 
 dist-copy-linux:
-	-cp -uP openssl/libcrypto.$(SO)* $(LUA_DIST)/
-	-cp -uP openssl/libssl.$(SO)* $(LUA_DIST)/
+	-cp -uP openssl/libcrypto.$(SO)* $(LUA_CDIST)/
+	-cp -uP openssl/libssl.$(SO)* $(LUA_CDIST)/
 
 dist-copy-windows:
-	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_DIST)/
-	-cp -u openssl/libcrypto*.$(SO) $(LUA_DIST)/
-	-cp -u openssl/libssl*.$(SO) $(LUA_DIST)/
-	-cp -u winapi/winapi.$(SO) $(LUA_DIST)/
+	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
+	-cp -u openssl/libcrypto*.$(SO) $(LUA_CDIST)/
+	-cp -u openssl/libssl*.$(SO) $(LUA_CDIST)/
+	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT)
-	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_DIST)/
-	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_DIST)/
-	cp -u lua-cjson/cjson.$(SO) $(LUA_DIST)/
-	cp -u lua-buffer/buffer.$(SO) $(LUA_DIST)/
-	cp -u luafilesystem/lfs.$(SO) $(LUA_DIST)/
-	-cp -u luv/luv.$(SO) $(LUA_DIST)/
-	cp -u lpeg/lpeg.$(SO) $(LUA_DIST)/
-	cp -u lua-zlib/zlib.$(SO) $(LUA_DIST)/
+	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/
+	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_EDIST)/
+	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
+	cp -u lua-buffer/buffer.$(SO) $(LUA_CDIST)/
+	cp -u luafilesystem/lfs.$(SO) $(LUA_CDIST)/
+	-cp -u luv/luv.$(SO) $(LUA_CDIST)/
+	cp -u lpeg/lpeg.$(SO) $(LUA_CDIST)/
+	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
-	-cp -u luaserial/serial.$(SO) $(LUA_DIST)/
-	-cp -u luabt/bt.$(SO) $(LUA_DIST)/
-	-cp -u sigar/bindings/lua/*.$(SO) $(LUA_DIST)/
-	-cp -u lmprof/lmprof.$(SO) $(LUA_DIST)/
+	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
+	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
+	-cp -u sigar/bindings/lua/*.$(SO) $(LUA_CDIST)/
+	-cp -u lmprof/lmprof.$(SO) $(LUA_CDIST)/
 	-cp -u lmprof/src/reduce/*.lua $(LUA_DIST)/lmprof/
-	-cp -u lua-openssl/openssl.$(SO) $(LUA_DIST)/
-	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_DIST)/
-	-cp -u lua-exif/exif.$(SO) $(LUA_DIST)/
-	-cp -u lua-webview/webview.$(SO) $(LUA_DIST)/
-	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_DIST)/mime/core.$(SO)
-	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_DIST)/socket/core.$(SO)
+	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
+	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
+	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
+	-cp -u lua-webview/webview.$(SO) $(LUA_CDIST)/
+	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_CDIST)/mime/core.$(SO)
+	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_CDIST)/socket/core.$(SO)
 	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
 	cp -u luasocket/src/mime.lua $(LUA_DIST)/
 	cp -u luasocket/src/socket.lua $(LUA_DIST)/

@@ -48,6 +48,7 @@ CFLAGS += -fPIC \
 	-Isrc \
 	-I../$(LUA_PATH)/src \
 	-I../libuv/include \
+	-std=gnu99 \
 	-DBUILDING_UV_SHARED \
 	-D_FILE_OFFSET_BITS=64  \
 	-D_GNU_SOURCE  \
