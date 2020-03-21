@@ -73,3 +73,6 @@
 [submodule "lua-webview"]
 	path = lua-webview
 	url = https://github.com/javalikescript/lua-webview.git
+[submodule "sha1"]
+	path = sha1
+	url = https://github.com/mpeterv/sha1.git

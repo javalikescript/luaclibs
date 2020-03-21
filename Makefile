@@ -203,6 +203,7 @@ dist-prepare:
 	mkdir $(LUA_CDIST)/mime
 	mkdir $(LUA_DIST)/socket
 	-mkdir $(LUA_CDIST)/socket
+	mkdir $(LUA_DIST)/sha1
 
 dist-copy-linux:
 	-cp -uP openssl/libcrypto.$(SO)* $(LUA_CDIST)/
@@ -245,6 +246,8 @@ dist-copy: dist-copy-$(PLAT)
 	cp -u luasocket/src/smtp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
+	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
+	printf "require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
 dist: dist-clean dist-prepare dist-copy
 
