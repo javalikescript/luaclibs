@@ -21,6 +21,12 @@ ifdef CLIBS_NDEBUG
 	LUA_MYCFLAGS += -DNDEBUG
 endif
 
+ifeq ($(LUA_OPENSSL_LINKING),dynamic)
+	LUA_OPENSSL_VARS =
+else
+	LUA_OPENSSL_VARS = OPENSSL_STATIC=1
+endif
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
@@ -124,7 +130,7 @@ openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
 
 lua-openssl: openssl
-	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_VARS)
+	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_OPENSSL_VARS) $(LUA_VARS)
 
 configure-libjpeg:
 	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'

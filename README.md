@@ -56,15 +56,14 @@ You could specify a single module to built using `MAIN_TARGET=lua-openssl`
 
 
 ### How to build on Windows (MinGW)?
-Tested on Windows 10 with msys packages available in March 2019
-
+<!--- Tested on Windows 10 with msys packages available in March 2019 -->
 Prerequisites
 
 Install [msys2](https://www.msys2.org/)
 
-Install make and mingw32 gcc
+Install make and mingw gcc
 ```bash
-pacman -S make mingw-w64-i686-gcc
+pacman -S make mingw-w64-x86_64-gcc
 ```
 
 Install additional stuff for OpenSSL
@@ -72,9 +71,9 @@ Install additional stuff for OpenSSL
 pacman -S perl libtool texinfo
 ```
 
-Add mingw32 and msys in your path using:
+Set mingw64 and msys in the beginning of your path using:
 ```
-SET PATH=...\msys64\mingw32\bin;...\msys64\usr\bin;%PATH%
+SET PATH=...\msys64\mingw64\bin;...\msys64\usr\bin;%PATH%
 ```
 
 ### How to build on Linux?

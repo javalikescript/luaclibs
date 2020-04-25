@@ -52,6 +52,10 @@ ifdef HOST
 	endif
 endif
 
+ifneq ($(LUA_OPENSSL_LINKING),dynamic)
+	LUA_OPENSSL_LINKING = static
+endif
+
 LUAJLS_TESTS := $(patsubst luajls/%.lua,%.lua,$(wildcard luajls/tests/*/*.lua))
 LUAJLS_CMD := LUA_PATH=$(MK_DIR)/$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)/$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)/$(LUA_DIST) $(MK_DIR)/$(LUA_DIST)/lua$(EXE)
 
@@ -205,17 +209,22 @@ dist-prepare:
 	-mkdir $(LUA_CDIST)/socket
 	mkdir $(LUA_DIST)/sha1
 
-dist-copy-linux:
+
+dist-copy-openssl-dynamic-linux:
 	-cp -uP openssl/libcrypto.$(SO)* $(LUA_CDIST)/
 	-cp -uP openssl/libssl.$(SO)* $(LUA_CDIST)/
 
-dist-copy-windows:
-	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
+dist-copy-openssl-dynamic-windows:
 	-cp -u openssl/libcrypto*.$(SO) $(LUA_CDIST)/
 	-cp -u openssl/libssl*.$(SO) $(LUA_CDIST)/
+
+dist-copy-openssl-static-linux dist-copy-openssl-static-windows dist-copy-linux:
+
+dist-copy-windows:
+	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
 
-dist-copy: dist-copy-$(PLAT)
+dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/
 	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_EDIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/

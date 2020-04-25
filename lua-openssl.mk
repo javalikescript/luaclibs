@@ -17,11 +17,17 @@ ifeq ($(PLAT),linux)
   LIBOPT_OPENSSL_SHARED = -L$(OPENSSLDIR) -lssl -lcrypto -ldl
 endif
 
+ifeq ($(PLAT),windows)
+  LIBOPT_OPENSSL_STATIC = $(OPENSSLDIR)/libssl.a $(OPENSSLDIR)/libcrypto.a -lws2_32 -lgdi32 -lcrypt32
+endif
+
 ifdef OPENSSL_STATIC
 	LIBOPT_OPENSSL ?= $(LIBOPT_OPENSSL_STATIC)
 else
 	LIBOPT_OPENSSL ?= $(LIBOPT_OPENSSL_SHARED)
 endif
+
+# pkg-config openssl --static --libs
 
 LIBEXT_windows = dll
 LIBOPT_windows = -O \
