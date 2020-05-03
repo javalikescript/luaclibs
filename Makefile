@@ -223,6 +223,8 @@ dist-copy-openssl-static-linux dist-copy-openssl-static-windows dist-copy-linux:
 dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
+	-cp -u lua-webview/WebView2Win32.dll $(LUA_CDIST)/
+	-cp -u lua-webview/webview-c/ms.webview2.0.8.355/x64/WebView2Loader.dll $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/
