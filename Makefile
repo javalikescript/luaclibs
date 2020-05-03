@@ -43,6 +43,11 @@ LUA_DATE = $(shell $(LUA_APP) -e "print(os.date('%Y%m%d'))")
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
 
+WEBVIEW_ARCH = x64
+ifeq (,$(findstring x86_64,$(GCC_NAME)))
+  WEBVIEW_ARCH = x86
+endif
+
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
 	LUA_DATE = $(shell date '+%Y%m%d')
@@ -224,7 +229,7 @@ dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
 	-cp -u lua-webview/WebView2Win32.dll $(LUA_CDIST)/
-	-cp -u lua-webview/webview-c/ms.webview2.0.8.355/x64/WebView2Loader.dll $(LUA_CDIST)/
+	-cp -u lua-webview/webview-c/ms.webview2.0.8.355/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/

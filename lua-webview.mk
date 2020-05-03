@@ -10,11 +10,11 @@ LUA_LIB = lua53
 WEBVIEW_C = webview-c
 MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2.0.8.355
 
-GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
+GCC_NAME ?= $(shell $(CC) -dumpmachine)
 
-ARCH = x64
+WEBVIEW_ARCH = x64
 ifeq (,$(findstring x86_64,$(GCC_NAME)))
-  ARCH = x86
+  WEBVIEW_ARCH = x86
 endif
 
 LIBOPT_dll = -O \
@@ -73,7 +73,7 @@ WebView2Win32.dll: $(WEBVIEW_C)/WebView2Win32.h $(WEBVIEW_C)/WebView2Win32.c
     -static-libgcc \
     -Wl,-s \
     -I$(WEBVIEW_C) -I$(MS_WEBVIEW2)/include \
-    -L$(MS_WEBVIEW2)/x64 -lWebView2Loader \
+    -L$(MS_WEBVIEW2)/$(WEBVIEW_ARCH) -lWebView2Loader \
     -o WebView2Win32.dll
 
 clean:
