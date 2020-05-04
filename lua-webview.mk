@@ -19,9 +19,9 @@ endif
 
 LIBOPT_dll = -O \
   -shared \
+  -static-libgcc \
   -Wl,-s \
   -L..\$(LUA_PATH)\src -l$(LUA_LIB) \
-  -static-libgcc \
   -lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
 
 CFLAGS_dll = -Wall \
@@ -29,6 +29,7 @@ CFLAGS_dll = -Wall \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
   -I$(WEBVIEW_C) \
+  -I$(MS_WEBVIEW2)/include \
   -I../$(LUA_PATH)/src \
   -DWEBVIEW_WINAPI=1
 
@@ -58,23 +59,16 @@ SOURCES = webview.c
 
 OBJS = webview.o
 
-SRCS = $(WEBVIEW_C)/webview.h $(WEBVIEW_C)/webview-cocoa.c $(WEBVIEW_C)/webview-gtk.c $(WEBVIEW_C)/webview-win32.c
+SRCS = $(WEBVIEW_C)/webview.h \
+  $(WEBVIEW_C)/webview-cocoa.c \
+  $(WEBVIEW_C)/webview-gtk.c \
+  $(WEBVIEW_C)/webview-win32.c \
+  $(WEBVIEW_C)/webview-win32-edge.c
 
-lib: $(TARGET) WebView2Win32.$(LIBEXT)
+lib: $(TARGET)
 
 $(TARGET): $(OBJS) $(SRCS)
 	$(CC) $(OBJS) $(LIBOPT) -o $(TARGET)
-
-WebView2Win32.so:
-
-WebView2Win32.dll: $(WEBVIEW_C)/WebView2Win32.h $(WEBVIEW_C)/WebView2Win32.c
-	$(CC) $(WEBVIEW_C)/WebView2Win32.c \
-    -shared \
-    -static-libgcc \
-    -Wl,-s \
-    -I$(WEBVIEW_C) -I$(MS_WEBVIEW2)/include \
-    -L$(MS_WEBVIEW2)/$(WEBVIEW_ARCH) -lWebView2Loader \
-    -o WebView2Win32.dll
 
 clean:
 	-$(RM) $(OBJS) $(TARGET)
