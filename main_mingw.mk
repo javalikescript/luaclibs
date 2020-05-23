@@ -28,7 +28,7 @@ core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
 
 quick: core luasigar lmprof luaserial lua-jpeg lua-exif
 
-full: quick luabt lua-webview lua-openssl winapi
+full: quick luabt lua-webview lua-openssl winapi lua-win32
 
 any: full
 
@@ -52,9 +52,6 @@ lua:
 	$(MAKE) -C $(LUA_PATH)/src mingw \
 		MYCFLAGS="$(LUA_MYCFLAGS)"
 
-lua-buffer: lua
-	$(MAKE) -C lua-buffer -f ../lua-buffer.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
-
 lua-cjson: lua
 	$(MAKE) -C lua-cjson TARGET=cjson.$(SO) \
 		CJSON_CFLAGS=-DDISABLE_INVALID_NUMBERS \
@@ -62,16 +59,15 @@ lua-cjson: lua
 		LUA_BIN_SUFFIX=.lua \
 		LUA_INCLUDE_DIR=../$(LUA_PATH)/src CC=$(CC)
 
-luafilesystem: lua
-	$(MAKE) -C luafilesystem -f ../luafilesystem.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
-
 luasocket: lua
 	$(MAKE) -C luasocket mingw LUAINC_mingw=../../$(LUA_PATH)/src \
 	  DEF_mingw="-DLUASOCKET_NODEBUG -DWINVER=0x0501" \
 		LUALIB_mingw="-L../../$(LUA_PATH)/src -l$(LUA_LIB)"
 
 lpeg: lua
-	$(MAKE) -C lpeg -f ../lpeg.mk lpeg.$(SO) LUADIR=../$(LUA_PATH)/src/ DLLFLAGS="-O -shared -fPIC -Wl,-s -static-libgcc -L../$(LUA_PATH)/src -l$(LUA_LIB)"
+	$(MAKE) -C lpeg -f ../lpeg.mk lpeg.$(SO) \
+		LUADIR=../$(LUA_PATH)/src/ \
+		DLLFLAGS="-O -shared -fPIC -Wl,-s -static-libgcc -L../$(LUA_PATH)/src -l$(LUA_LIB)"
 
 libuv:
 	$(MAKE) -C libuv -f ../libuv_mingw.mk CC=$(CC)
@@ -79,7 +75,7 @@ libuv:
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_mingw.mk $(LUA_VARS)
 
-lua-webview luaserial luabt: lua
+luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi lmprof: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 sigar:
@@ -87,9 +83,6 @@ sigar:
 
 luasigar: lua sigar
 	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) PLAT=$(PLAT) $(LUA_VARS)
-
-lmprof: lua
-	$(MAKE) -C lmprof -f ../lmprof.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk
@@ -129,8 +122,6 @@ libexif:
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
-winapi:
-	$(MAKE) -C winapi -f ../winapi.mk CC=$(CC) $(LUA_VARS)
-
-.PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi
+.PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
+	luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl libjpeg \
+	lua-jpeg libexif lua-exif lua-webview winapi lua-win32

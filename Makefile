@@ -71,7 +71,7 @@ all: full
 core quick full show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -228,6 +228,7 @@ dist-copy-openssl-static-linux dist-copy-openssl-static-windows dist-copy-linux:
 dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
+	-cp -u lua-win32/win32.$(SO) $(LUA_CDIST)/
 	-cp -u lua-webview/webview-c/ms.webview2.0.8.355/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
@@ -283,4 +284,4 @@ dist-archive: luajls-archive
 
 .PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32
