@@ -88,7 +88,7 @@ lpeg: lua
 	$(MAKE) -C lpeg lpeg.$(SO) LUADIR=../$(LUA_PATH)/src/ DLLFLAGS="-shared -fPIC"
 
 libuv:
-	$(MAKE) -C libuv -f ../libuv_linux.mk CC=$(CC)
+	$(MAKE) -C luv/deps/libuv -f ../../../libuv_linux.mk CC=$(CC)
 
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)

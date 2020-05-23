@@ -10,9 +10,6 @@
 [submodule "luaunit"]
 	path = luaunit
 	url = https://github.com/bluebird75/luaunit.git
-[submodule "libuv"]
-	path = libuv
-	url = https://github.com/libuv/libuv.git
 [submodule "luv"]
 	path = luv
 	url = https://github.com/luvit/luv.git

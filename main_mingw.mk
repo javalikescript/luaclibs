@@ -70,7 +70,7 @@ lpeg: lua
 		DLLFLAGS="-O -shared -fPIC -Wl,-s -static-libgcc -L../$(LUA_PATH)/src -l$(LUA_LIB)"
 
 libuv:
-	$(MAKE) -C libuv -f ../libuv_mingw.mk CC=$(CC)
+	$(MAKE) -C luv/deps/libuv -f ../../../libuv_mingw.mk CC=$(CC)
 
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_mingw.mk $(LUA_VARS)

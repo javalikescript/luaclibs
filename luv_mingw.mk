@@ -1,6 +1,7 @@
 CC ?= gcc
 
-LIB_UV = ..\libuv\libuv.a
+LIB_UV_PATH = deps/libuv
+LIB_UV_LIB = $(LIB_UV_PATH)/libuv.a
 
 LUA_PATH = lua
 LUA_LIB = lua53
@@ -13,7 +14,7 @@ LIB_OPTION += -shared \
 	-static-libgcc \
 	-Wl,-s \
 	-L..\$(LUA_PATH)\src -l$(LUA_LIB) \
-	$(LIB_UV) \
+	$(LIB_UV_LIB) \
 	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32
 
 ##-lws2_32 -lpsapi -liphlpapi -luserenv
@@ -40,7 +41,7 @@ CFLAGS += -Wall \
 	-fpic \
 	-Isrc \
 	-I../$(LUA_PATH)/src \
-	-I../libuv/include \
+	-I$(LIB_UV_PATH)/include \
 	-D_WIN32_WINNT=0x0600 \
 	-DLUA_USE_DLOPEN \
 	-DBUILDING_UV_SHARED \
@@ -58,7 +59,7 @@ OBJS = src/luv.o
 
 lib: luv.dll
 
-luv.dll: $(OBJS) $(LIB_UV)
+luv.dll: $(OBJS) $(LIB_UV_LIB)
 	$(CC) $(OBJS) $(LIB_OPTION) -o luv.dll
 
 clean:
