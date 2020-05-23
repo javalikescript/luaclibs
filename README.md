@@ -15,8 +15,7 @@ You could find information and download binaries on the [luajls](http://javalike
 This repository mainly contains submodule and so needs to be initialized before it can be used
 
 ```bash
-git submodule init
-git submodule update
+git submodule update --init --recursive
 ```
 
 The OpenSSL, JPEG and EXIF libraries need to be configured prior the build.
