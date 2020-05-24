@@ -29,7 +29,7 @@ endif
 
 all: full
 
-core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib
+core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2
 
 quick: core luasigar lmprof luaserial lua-jpeg lua-exif
 
@@ -68,14 +68,8 @@ lua:
 		MYCFLAGS="$(LUA_MYCFLAGS)" \
 		SYSLIBS="-Wl,-E -ldl"
 
-lua-buffer: lua
-	$(MAKE) -C lua-buffer -f ../lua-buffer.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
-
 lua-cjson: lua
 	$(MAKE) -C lua-cjson LUA_INCLUDE_DIR=../$(LUA_PATH)/src CC=$(CC)
-
-luafilesystem: lua
-	$(MAKE) -C luafilesystem -f ../luafilesystem.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 luasocket: lua
 	$(MAKE) -C luasocket linux LUAINC_linux=../../$(LUA_PATH)/src \
@@ -93,23 +87,20 @@ libuv:
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)
 
-lua-webview: lua
+luafilesystem lua-buffer luaserial lua-webview lmprof: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
-
-luaserial: lua
-	$(MAKE) -C luaserial -f ../luaserial.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 luabt: lua
 	$(MAKE) -C luabt -f ../luabt.mk CC=$(CC) LIBEXT=$(SO) EXTRA_CFLAGS=-I$(LIBBT) EXTRA_LIBOPT=-L$(LIBBT) $(LUA_VARS)
 
+lua-llthreads2: lua
+	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
+
 sigar:
 	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT)
 
-luasigar: sigar
+luasigar: lua sigar
 	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT) $(LUA_VARS)
-
-lmprof: lua
-	$(MAKE) -C lmprof -f ../lmprof.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk CC=$(CC)
@@ -158,5 +149,5 @@ lua-exif: lua libexif
 
 
 .PHONY: full quick lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview
+	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2
 

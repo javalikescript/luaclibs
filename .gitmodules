@@ -70,3 +70,6 @@
 [submodule "lua-win32"]
 	path = lua-win32
 	url = https://github.com/javalikescript/lua-win32.git
+[submodule "lua-llthreads2"]
+	path = lua-llthreads2
+	url = https://github.com/moteus/lua-llthreads2.git
