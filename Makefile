@@ -181,10 +181,10 @@ clean-lua-libs: clean-luv
 	-$(RM) ./winapi/*.$(SO)
 
 clean-libuv:
-	-$(RM) ./libuv/*.a
-	-$(RM) ./libuv/src/*.o
-	-$(RM) ./libuv/src/unix/*.o
-	-$(RM) ./libuv/src/win/*.o
+	-$(RM) ./luv/deps/libuv/*.a
+	-$(RM) ./luv/deps/libuv/src/*.o
+	-$(RM) ./luv/deps/libuv/src/unix/*.o
+	-$(RM) ./luv/deps/libuv/src/win/*.o
 
 clean-libs: clean-libuv
 	-$(MAKE) -C openssl clean
