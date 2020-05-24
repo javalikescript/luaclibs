@@ -133,13 +133,13 @@ lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_OPENSSL_VARS) $(LUA_VARS)
 
 configure-libjpeg:
-	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'
+	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
 configure-libjpeg-arm:
-	cd libjpeg && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
+	cd lua-jpeg/libjpeg && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
 
 libjpeg:
-	$(MAKE) -C libjpeg libjpeg.la
+	$(MAKE) -C lua-jpeg/libjpeg libjpeg.la
 
 lua-jpeg: lua libjpeg
 	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)

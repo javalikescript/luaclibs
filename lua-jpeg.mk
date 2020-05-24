@@ -3,7 +3,7 @@ CC ?= gcc
 LUA_PATH = lua
 LUA_LIB = lua53
 
-LIBJPEG_HOME = ../libjpeg
+LIBJPEG_HOME = libjpeg
 LIBJPEG = $(LIBJPEG_HOME)/.libs/libjpeg.a
 
 LIBEXT=dll

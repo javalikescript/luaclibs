@@ -105,10 +105,10 @@ lua-openssl: lua openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk $(LUA_OPENSSL_VARS) PLAT=$(PLAT) $(LUA_VARS)
 
 configure-libjpeg:
-	cd libjpeg && sh configure CFLAGS='-O2 -fPIC'
+	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
 libjpeg:
-	$(MAKE) -C libjpeg
+	$(MAKE) -C lua-jpeg/libjpeg
 
 lua-jpeg: lua libjpeg
 	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
