@@ -145,13 +145,13 @@ lua-jpeg: lua libjpeg
 	$(MAKE) -C lua-jpeg -f ../lua-jpeg.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 configure-libexif:
-	cd libexif && sh configure CFLAGS='-O2 -fPIC'
+	cd lua-exif/libexif && sh configure CFLAGS='-O2 -fPIC'
 
 configure-libexif-arm:
-	cd libexif && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
+	cd lua-exif/libexif && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
 
 libexif:
-	$(MAKE) -C libexif
+	$(MAKE) -C lua-exif/libexif
 
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)

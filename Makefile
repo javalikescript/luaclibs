@@ -196,7 +196,7 @@ clean-libs: clean-libuv
 	-$(RM) ./sigar/src/*.o
 	-$(RM) ./sigar/src/os/*/*.o
 	-$(MAKE) -C lua-jpeg/libjpeg clean
-	-$(MAKE) -C libexif clean
+	-$(MAKE) -C lua-exif/libexif clean
 
 clean: clean-lua clean-lua-libs
 

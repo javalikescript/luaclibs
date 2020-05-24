@@ -3,7 +3,7 @@ CC ?= gcc
 LUA_PATH = lua
 LUA_LIB = lua53
 
-LIBEXIF_HOME = ../libexif
+LIBEXIF_HOME = libexif
 LIBEXIF = $(LIBEXIF_HOME)/libexif/.libs/libexif.a
 
 LIBEXT=dll
