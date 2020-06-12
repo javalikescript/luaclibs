@@ -20,6 +20,8 @@ CFLAGS_dll = -Wall \
 
 LIBOPT_so = -O \
   -shared \
+	-pthread \
+	-lpthread \
   -static-libgcc \
   -Wl,-s \
   -L../../$(LUA_PATH)\src \
@@ -27,6 +29,7 @@ LIBOPT_so = -O \
 
 CFLAGS_so = -pedantic  \
   -fPIC \
+  -pthread \
   -Wall \
   -Wextra \
   -Wno-unused-parameter \
