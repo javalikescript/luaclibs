@@ -15,7 +15,7 @@ endif
 MAIN_TARGET = core
 
 LUA_PATH := lua
-LUA_LIB := lua53
+LUA_LIB := lua54
 
 LUA_DIST := dist-$(PLAT)
 LUA_CDIST = $(LUA_DIST)

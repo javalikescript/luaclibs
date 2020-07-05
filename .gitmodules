@@ -10,9 +10,6 @@
 [submodule "luaunit"]
 	path = luaunit
 	url = https://github.com/bluebird75/luaunit.git
-[submodule "luv"]
-	path = luv
-	url = https://github.com/luvit/luv.git
 [submodule "lua-zlib"]
 	path = lua-zlib
 	url = https://github.com/brimworks/lua-zlib
@@ -70,3 +67,6 @@
 [submodule "lua-llthreads2"]
 	path = lua-llthreads2
 	url = https://github.com/moteus/lua-llthreads2.git
+[submodule "luv"]
+	path = luv
+	url = https://github.com/javalikescript/luv.git
