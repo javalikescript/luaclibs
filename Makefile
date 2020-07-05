@@ -228,7 +228,7 @@ dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
 	-cp -u lua-win32/win32.$(SO) $(LUA_CDIST)/
-	-cp -u lua-webview/webview-c/ms.webview2.0.8.355/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/
+	-cp -u lua-webview/webview-c/ms.webview2.0.9.430/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/

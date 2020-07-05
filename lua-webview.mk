@@ -8,7 +8,7 @@ LUA_PATH = lua
 LUA_LIB = lua53
 
 WEBVIEW_C = webview-c
-MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2.0.8.355
+MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2.0.9.430
 
 GCC_NAME ?= $(shell $(CC) -dumpmachine)
 
@@ -67,11 +67,11 @@ SRCS = $(WEBVIEW_C)/webview.h \
 
 lib: $(TARGET)
 
-$(TARGET): $(OBJS) $(SRCS)
+$(TARGET): $(OBJS)
 	$(CC) $(OBJS) $(LIBOPT) -o $(TARGET)
 
 clean:
 	-$(RM) $(OBJS) $(TARGET)
 
-$(OBJS): %.o : %.c $(SOURCES)
+$(OBJS): %.o : %.c $(SOURCES) $(SRCS)
 	$(CC) $(CFLAGS) -c -o $@ $<
