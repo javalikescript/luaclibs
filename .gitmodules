@@ -31,9 +31,6 @@
 [submodule "luaserial"]
 	path = luaserial
 	url = https://github.com/javalikescript/luaserial.git
-[submodule "lmprof"]
-	path = lmprof
-	url = https://github.com/pmusa/lmprof.git
 [submodule "lpeg"]
 	path = lpeg
 	url = https://github.com/javalikescript/lpeg.git

@@ -31,7 +31,7 @@ all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2
 
-quick: core luasigar lmprof luaserial lua-jpeg lua-exif
+quick: core luasigar luaserial lua-jpeg lua-exif
 
 full: full-$(ARCH_SUFFIX)
 
@@ -87,7 +87,7 @@ libuv:
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)
 
-luafilesystem lua-buffer luaserial lua-webview lmprof: lua
+luafilesystem lua-buffer luaserial lua-webview: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 luabt: lua
@@ -149,5 +149,5 @@ lua-exif: lua libexif
 
 
 .PHONY: full quick lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2
 

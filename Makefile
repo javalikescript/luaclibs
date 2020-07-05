@@ -165,8 +165,6 @@ clean-lua-libs: clean-luv
 	-$(RM) ./luabt/*.$(SO)
 	-$(RM) ./sigar/bindings/lua/*.o
 	-$(RM) ./sigar/bindings/lua/*.$(SO)
-	-$(RM) ./lmprof/src/*.o
-	-$(RM) ./lmprof/*.$(SO)
 	-$(RM) ./lua-zlib/*.o
 	-$(RM) ./lua-zlib/*.$(SO)
 	-$(RM) ./lua-openssl/src/*.o
@@ -210,7 +208,6 @@ dist-clean:
 
 dist-prepare:
 	-mkdir $(LUA_DIST)
-	mkdir $(LUA_DIST)/lmprof
 	mkdir $(LUA_CDIST)/mime
 	mkdir $(LUA_DIST)/socket
 	-mkdir $(LUA_CDIST)/socket
@@ -247,8 +244,6 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
 	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
 	-cp -u sigar/bindings/lua/*.$(SO) $(LUA_CDIST)/
-	-cp -u lmprof/lmprof.$(SO) $(LUA_CDIST)/
-	-cp -u lmprof/src/reduce/*.lua $(LUA_DIST)/lmprof/
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
@@ -287,4 +282,4 @@ dist-archive: luajls-archive
 
 .PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
-	lmprof zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2

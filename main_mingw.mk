@@ -26,7 +26,7 @@ all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2
 
-quick: core luasigar lmprof luaserial lua-jpeg lua-exif
+quick: core luasigar luaserial lua-jpeg lua-exif
 
 full: quick luabt lua-webview lua-openssl winapi lua-win32
 
@@ -75,7 +75,7 @@ libuv:
 luv: lua libuv
 	$(MAKE) -C luv -f ../luv_mingw.mk $(LUA_VARS)
 
-luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi lmprof: lua
+luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 lua-llthreads2: lua
@@ -126,5 +126,5 @@ lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 .PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
-	luaserial luabt sigar luasigar lmprof zlib lua-zlib openssl lua-openssl libjpeg \
+	luaserial luabt sigar luasigar zlib lua-zlib openssl lua-openssl libjpeg \
 	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2
