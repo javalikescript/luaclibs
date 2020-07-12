@@ -67,3 +67,6 @@
 [submodule "luv"]
 	path = luv
 	url = https://github.com/javalikescript/luv.git
+[submodule "luaunit"]
+	path = luaunit
+	url = https://github.com/javalikescript/luaunit.git
