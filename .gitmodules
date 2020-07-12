@@ -7,9 +7,6 @@
 [submodule "lua-cjson"]
 	path = lua-cjson
 	url = https://github.com/javalikescript/lua-cjson.git
-[submodule "luaunit"]
-	path = luaunit
-	url = https://github.com/bluebird75/luaunit.git
 [submodule "lua-zlib"]
 	path = lua-zlib
 	url = https://github.com/brimworks/lua-zlib
