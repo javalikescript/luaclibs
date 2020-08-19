@@ -179,6 +179,8 @@ clean-lua-libs: clean-luv
 	-$(RM) ./winapi/*.$(SO)
 	-$(RM) ./lua-llthreads2/src/*.o
 	-$(RM) ./lua-llthreads2/src/*.$(SO)
+	-$(RM) ./lua-win32/*.o
+	-$(RM) ./lua-win32/*.$(SO)
 
 clean-libuv:
 	-$(RM) ./luv/deps/libuv/*.a
@@ -279,6 +281,8 @@ luajls.zip:
 luajls-archive: luajls$(ZIP)
 
 dist-archive: luajls-archive
+
+release: dist-jls test luajls-archive
 
 .PHONY: dist clean linux mingw windows win32 arm test \
 	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
