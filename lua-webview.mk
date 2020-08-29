@@ -8,7 +8,7 @@ LUA_PATH = lua
 LUA_LIB = lua53
 
 WEBVIEW_C = webview-c
-MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2.0.9.430
+MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2.0.9.538
 
 GCC_NAME ?= $(shell $(CC) -dumpmachine)
 
