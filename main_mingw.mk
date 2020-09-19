@@ -26,9 +26,11 @@ all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2
 
-quick: core luasigar luaserial lua-jpeg lua-exif
+quick: core luaserial lua-jpeg lua-exif
 
-full: quick luabt lua-webview lua-openssl winapi lua-win32
+full: quick lua-openssl lua-webview winapi lua-win32
+
+extras: luabt luasigar
 
 any: full
 
@@ -125,6 +127,6 @@ libexif:
 lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
-.PHONY: full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
+.PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
 	luaserial luabt sigar luasigar zlib lua-zlib openssl lua-openssl libjpeg \
 	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2

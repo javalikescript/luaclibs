@@ -9,8 +9,8 @@ install:
   - make configure
 
 script:
-  - make all
-  - make dist-jls test luajls-archive
+  - make all extras
+  - make release
 
 deploy:
   provider: releases

@@ -68,14 +68,14 @@ main: main-$(PLAT)
 
 all: full
 
-core quick full show-main configure configure-libjpeg configure-libexif configure-openssl:
+core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
-	@echo Main targets \(MAIN_TARGET\): full quick core
+	@echo Main targets \(MAIN_TARGET\): full core quick extras
 	@echo Other targets: arm linux windows configure clean clean-all dist help
 	@echo Available platforms \(PLAT\): linux windows
 	@echo Available architecture \(ARCH\): x86_64 arm
@@ -284,6 +284,6 @@ dist-archive: luajls-archive
 
 release: dist-jls test luajls-archive
 
-.PHONY: dist clean linux mingw windows win32 arm test \
-	full quick lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
+.PHONY: dist release clean linux mingw windows win32 arm test \
+	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
 	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2
