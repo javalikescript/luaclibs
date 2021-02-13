@@ -250,6 +250,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
 	-cp -u lua-webview/webview.$(SO) $(LUA_CDIST)/
+	-cp -u lua-webview/webview-launcher.lua $(LUA_CDIST)/
 	-cp -u lua-llthreads2/src/llthreads.$(SO) $(LUA_CDIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_CDIST)/mime/core.$(SO)
 	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_CDIST)/socket/core.$(SO)
