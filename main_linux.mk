@@ -120,7 +120,7 @@ configure-openssl-arm:
 	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-armv4 -Wl,-rpath=.
 
 openssl:
-	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR) rcu"
+	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR)"
 
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_OPENSSL_VARS) $(LUA_VARS)
