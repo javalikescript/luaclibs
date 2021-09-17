@@ -6,10 +6,6 @@ The targeted operating systems are Linux and Windows. The targeted architectures
 
 You could find information and download binaries on the [luajls](http://javalikescript.free.fr/lua/) page.
 
-| Target | Status |
-|--|--|
-| x86_64-linux-gnu | [![Build Status](https://travis-ci.org/javalikescript/luaclibs.svg?branch=master)](https://travis-ci.org/javalikescript/luaclibs) |
-
 ## How to setup?
 
 This repository mainly contains submodule and so needs to be initialized before it can be used
