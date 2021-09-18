@@ -63,7 +63,7 @@ pacman -S make mingw-w64-x86_64-gcc
 
 Install additional stuff for OpenSSL
 ```bash
-pacman -S perl libtool texinfo
+pacman -S perl libtool texinfo zip
 ```
 
 Set mingw64 and msys in the beginning of your path using:
