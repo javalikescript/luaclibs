@@ -98,11 +98,17 @@ show:
 	@echo MK_DIR: $(MK_DIR)
 
 dist-versions:
-	@$(LUAJLS_CMD) -v -e "print(tostring(string.len(string.pack('T', 0)) * 8)..' bits')" \
+	@$(LUAJLS_CMD) -v -e "print(_VERSION, tostring(string.len(string.pack('T', 0)) * 8)..' bits')" \
 		-e "print(require('socket')._VERSION); print('lua-cjson', require('cjson')._VERSION); print(require('zlib')._VERSION)" \
 		-e "print('luv', require('luv').version_string()); print('lua-openssl', require('openssl').version())" \
 		-e "print('lpeg', require('lpeg').version()); print('luaunit', require('luaunit')._VERSION)" \
 		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION)"
+
+versions: dist-versions
+	@echo " cc:"
+	@$(CROSS_PREFIX)gcc -dumpversion
+	@echo " os:"
+	-@uname -s
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
@@ -271,7 +277,7 @@ dist: dist-clean dist-prepare dist-copy
 
 dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
-	-@$(MAKE) --quiet dist-versions >$(LUA_DIST)/versions.txt
+	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
 
 
 luajls.tar.gz:
