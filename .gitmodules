@@ -73,3 +73,9 @@
 [submodule "xml2lua"]
 	path = xml2lua
 	url = https://github.com/manoelcampos/xml2lua.git
+[submodule "LDoc"]
+	path = LDoc
+	url = https://github.com/lunarmodules/LDoc.git
+[submodule "Penlight"]
+	path = Penlight
+	url = https://github.com/lunarmodules/Penlight.git

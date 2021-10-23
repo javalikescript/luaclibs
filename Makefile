@@ -2,7 +2,6 @@
 UNAME_S := $(shell uname -s)
 
 MK_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-MK_DIR := $(dir $(MK_PATH))
 
 ARCH = x86_64
 
@@ -10,6 +9,7 @@ ifeq ($(UNAME_S),Linux)
 	PLAT ?= linux
 else
 	PLAT ?= windows
+	MK_PATH := $(subst /c/,C:/,$(MK_PATH))
 endif
 
 MAIN_TARGET = core
@@ -17,10 +17,12 @@ MAIN_TARGET = core
 LUA_PATH := lua
 LUA_LIB := lua54
 
+MK_DIR := $(dir $(MK_PATH))
 LUA_DIST := dist-$(PLAT)
 LUA_CDIST = $(LUA_DIST)
 LUA_EDIST = $(LUA_CDIST)
-LUAJLS = luajls
+LUAJLS := luajls
+JLSDOC := jls-doc
 
 SO_windows=dll
 EXE_windows=.exe
@@ -61,8 +63,9 @@ ifneq ($(LUA_OPENSSL_LINKING),dynamic)
 	LUA_OPENSSL_LINKING = static
 endif
 
-LUAJLS_TESTS := $(patsubst luajls/%.lua,%.lua,$(wildcard luajls/tests/*/*.lua))
-LUAJLS_CMD := LUA_PATH=$(MK_DIR)/$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)/$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)/$(LUA_DIST) $(MK_DIR)/$(LUA_DIST)/lua$(EXE)
+LUAJLS_TESTS := $(patsubst $(LUAJLS)/%.lua,%.lua,$(wildcard $(LUAJLS)/tests/*/*.lua))
+LUAJLS_CMD := LUA_PATH=$(MK_DIR)$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)$(LUA_DIST) $(MK_DIR)$(LUA_DIST)/lua$(EXE)
+LUADOC_CMD := LUA_PATH="$(MK_DIR)LDoc/?.lua;$(MK_DIR)Penlight/lua/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua" LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc.lua
 
 main: main-$(PLAT)
 
@@ -108,7 +111,10 @@ versions: dist-versions
 	@echo " cc:"
 	@$(CROSS_PREFIX)gcc -dumpversion
 	@echo " os:"
-	-@uname -s
+	-@uname -s -r
+
+ldoc:
+	cd $(LUAJLS) && $(LUADOC_CMD) -i -d ../$(LUA_DIST)/$(JLSDOC) .
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
@@ -142,7 +148,7 @@ test: $(LUAJLS_TESTS)
 
 $(LUAJLS_TESTS):
 	@echo Testing $@
-	-@cd luajls && $(LUAJLS_CMD) $@
+	-@cd $(LUAJLS) && $(LUAJLS_CMD) $@
 
 
 clean-lua:
@@ -275,8 +281,9 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 
 dist: dist-clean dist-prepare dist-copy
 
-dist-jls: dist
+dist-jls: dist ldoc
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+	cp -ur $(LUAJLS)/examples $(LUA_DIST)/$(JLSDOC)/
 	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
 
 
@@ -292,6 +299,6 @@ dist-archive: luajls-archive
 
 release: dist-jls test luajls-archive
 
-.PHONY: dist release clean linux mingw windows win32 arm test \
+.PHONY: dist release clean linux mingw windows win32 arm test ldoc \
 	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
 	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2
