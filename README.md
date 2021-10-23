@@ -1,7 +1,9 @@
 
 ## Overview
 
-This repository contains [Lua](http://www.lua.org/) 5.4, selected Lua modules and the associated makefiles.
+luaclibs provides the dependent modules used by [luajls](https://github.com/javalikescript/luajls).
+
+This repository contains [Lua](http://www.lua.org/) 5.4, selected Lua modules and associated makefiles.
 The targeted operating systems are Linux and Windows. The targeted architectures are x86, x86-64 and ARM.
 
 You could find information and download binaries on the [luajls](http://javalikescript.free.fr/lua/) page.
@@ -43,12 +45,6 @@ Clean the build files
 make clean-all
 ```
 
-You could specify the target OS using `PLAT=linux` available OSes are linux and windows.
-
-You could specify the target architecture using `ARCH=arm` available architectures are arm and x86_64.
-
-You could specify a single module to built using `MAIN_TARGET=lua-openssl`
-
 
 ### How to build on Windows (MinGW)?
 <!--- Tested on Windows 10 with msys packages available in March 2019 -->
@@ -89,7 +85,7 @@ You need to install a specific gcc for cross compile
 
 Install the [tools](https://github.com/raspberrypi/tools) on a Linux OS
 
-Get the Bluetooth library from your Raspberry Pi
+Get the Bluetooth library from your Raspberry Pi and export the following variables
 
 ```bash
 export PATH=$HOME/raspberry/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin:$PATH
