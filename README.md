@@ -57,9 +57,9 @@ Install make and mingw gcc
 pacman -S make mingw-w64-x86_64-gcc
 ```
 
-Install additional stuff for OpenSSL
+Install additional stuff for OpenSSL and webview
 ```bash
-pacman -S perl libtool texinfo zip
+pacman -S perl libtool texinfo zip pkg-config
 ```
 
 Set mingw64 and msys in the beginning of your path using:

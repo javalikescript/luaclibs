@@ -22,7 +22,8 @@ LUA_DIST := dist-$(PLAT)
 LUA_CDIST = $(LUA_DIST)
 LUA_EDIST = $(LUA_CDIST)
 LUAJLS := luajls
-JLSDOC := jls-doc
+JLSDOC_DIR := dist-doc
+LDOC_DIR := ../$(JLSDOC_DIR)
 
 SO_windows=dll
 EXE_windows=.exe
@@ -112,9 +113,6 @@ versions: dist-versions
 	@$(CROSS_PREFIX)gcc -dumpversion
 	@echo " os:"
 	-@uname -s -r
-
-ldoc:
-	cd $(LUAJLS) && $(LUADOC_CMD) -i -d ../$(LUA_DIST)/$(JLSDOC) .
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
@@ -281,9 +279,24 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 
 dist: dist-clean dist-prepare dist-copy
 
-dist-jls: dist ldoc
+ldoc:
+	cd $(LUAJLS) && $(LUADOC_CMD) -i -d $(LDOC_DIR) .
+
+ldoc-dev:
+	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d ../$(LUAJLS)/doc .
+
+ldoc-clean:
+	rm -rf $(JLSDOC_DIR)
+
+ldoc.zip: ldoc-clean ldoc
+	mkdir $(JLSDOC_DIR)/lua
+	cp -ur $(LUA_PATH)/doc/* $(JLSDOC_DIR)/lua/
+	rm -f $(LUA_DIST)/docs.zip
+	cd $(JLSDOC_DIR) && zip -r ../$(LUA_DIST)/docs.zip *
+
+dist-jls: dist ldoc.zip
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
-	cp -ur $(LUAJLS)/examples $(LUA_DIST)/$(JLSDOC)/
+	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
 
 
