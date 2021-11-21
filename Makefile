@@ -67,6 +67,7 @@ endif
 LUAJLS_TESTS := $(patsubst $(LUAJLS)/%.lua,%.lua,$(wildcard $(LUAJLS)/tests/*/*.lua))
 LUAJLS_CMD := LUA_PATH=$(MK_DIR)$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)$(LUA_DIST) $(MK_DIR)$(LUA_DIST)/lua$(EXE)
 LUADOC_CMD := LUA_PATH="$(MK_DIR)LDoc/?.lua;$(MK_DIR)Penlight/lua/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua" LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc.lua
+MD_CMD := LUA_PATH=$(MK_DIR)$(LUA_DIST)/?.lua $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc/markdown.lua
 
 main: main-$(PLAT)
 
@@ -285,10 +286,18 @@ ldoc:
 ldoc-dev:
 	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d ../$(LUAJLS)/doc .
 
+md-ldoc:
+	$(MD_CMD) LDoc/doc/doc.md
+	mv LDoc/doc/doc.html $(JLSDOC_DIR)/ldoc.html
+	$(MD_CMD) luajls/README.md
+	mv luajls/README.html $(JLSDOC_DIR)/luajls.html
+	-$(MD_CMD) luaunit/doc/index.md
+	-mv luaunit/doc/index.html $(JLSDOC_DIR)/luaunit.html
+
 ldoc-clean:
 	rm -rf $(JLSDOC_DIR)
 
-ldoc.zip: ldoc-clean ldoc
+ldoc.zip: ldoc-clean ldoc md-ldoc
 	mkdir $(JLSDOC_DIR)/lua
 	cp -ur $(LUA_PATH)/doc/* $(JLSDOC_DIR)/lua/
 	rm -f $(LUA_DIST)/docs.zip
