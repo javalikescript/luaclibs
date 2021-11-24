@@ -276,7 +276,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
 	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
-	printf "require('sha1.init')" > $(LUA_DIST)/sha1.lua
+	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
 dist: dist-clean dist-prepare dist-copy
 
