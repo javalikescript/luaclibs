@@ -174,8 +174,6 @@ clean-lua-libs: clean-luv
 	-$(RM) ./luaserial/*.$(SO)
 	-$(RM) ./luabt/*.o
 	-$(RM) ./luabt/*.$(SO)
-	-$(RM) ./sigar/bindings/lua/*.o
-	-$(RM) ./sigar/bindings/lua/*.$(SO)
 	-$(RM) ./lua-zlib/*.o
 	-$(RM) ./lua-zlib/*.$(SO)
 	-$(RM) ./lua-openssl/src/*.o
@@ -205,9 +203,6 @@ clean-libs: clean-libuv
 	-$(RM) ./zlib/*.o
 	-$(RM) ./zlib/*.lo
 	-$(RM) ./zlib/*.a ./zlib/*.$(SO)*
-	-$(RM) ./sigar/*.a
-	-$(RM) ./sigar/src/*.o
-	-$(RM) ./sigar/src/os/*/*.o
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
 
@@ -256,7 +251,6 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
 	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
 	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
-	-cp -u sigar/bindings/lua/*.$(SO) $(LUA_CDIST)/
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
 	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
 	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
@@ -284,7 +278,7 @@ ldoc:
 	cd $(LUAJLS) && $(LUADOC_CMD) -i -d $(LDOC_DIR) .
 
 ldoc-dev:
-	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d ../$(LUAJLS)/doc .
+	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d doc .
 
 md-ldoc:
 	$(MD_CMD) LDoc/doc/doc.md
@@ -322,5 +316,5 @@ dist-archive: luajls-archive
 release: dist-jls test luajls-archive
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc \
-	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt sigar luasigar \
+	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt \
 	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2

@@ -39,7 +39,7 @@ full-default: lua-webview
 
 full-arm:
 
-extras: luabt luasigar
+extras: luabt
 
 any: full
 
@@ -98,12 +98,6 @@ luabt: lua
 lua-llthreads2: lua
 	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
-sigar:
-	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT)
-
-luasigar: lua sigar
-	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) LD=$(LD) AR=$(AR) PLAT=$(PLAT) $(LUA_VARS)
-
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk CC=$(CC)
 
@@ -150,6 +144,6 @@ lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 
-.PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt sigar luasigar \
+.PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt \
 	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2
 

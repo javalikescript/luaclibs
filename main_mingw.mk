@@ -30,7 +30,7 @@ quick: core luaserial lua-jpeg lua-exif
 
 full: quick lua-openssl lua-webview winapi lua-win32
 
-extras: luabt luasigar
+extras: luabt
 
 any: full
 
@@ -83,12 +83,6 @@ luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi: lua
 lua-llthreads2: lua
 	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
-sigar:
-	$(MAKE) -C sigar -f ../sigar.mk CC=$(CC) PLAT=$(PLAT)
-
-luasigar: lua sigar
-	$(MAKE) -C sigar/bindings/lua -f ../../../sigar_lua.mk CC=$(CC) PLAT=$(PLAT) $(LUA_VARS)
-
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk
 
@@ -128,5 +122,5 @@ lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 .PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
-	luaserial luabt sigar luasigar zlib lua-zlib openssl lua-openssl libjpeg \
+	luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
 	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2

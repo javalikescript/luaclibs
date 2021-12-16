@@ -22,9 +22,6 @@
 [submodule "lua"]
 	path = lua
 	url = https://github.com/javalikescript/lua.git
-[submodule "sigar"]
-	path = sigar
-	url = https://github.com/javalikescript/sigar.git
 [submodule "luabt"]
 	path = luabt
 	url = https://github.com/javalikescript/luabt.git
