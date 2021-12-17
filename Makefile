@@ -49,7 +49,10 @@ DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
 WEBVIEW_ARCH = x64
 ifeq (,$(findstring x86_64,$(GCC_NAME)))
   WEBVIEW_ARCH = x86
+	ARCH = x86
 endif
+
+# in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
@@ -297,9 +300,11 @@ ldoc.zip: ldoc-clean ldoc md-ldoc
 	rm -f $(LUA_DIST)/docs.zip
 	cd $(JLSDOC_DIR) && zip -r ../$(LUA_DIST)/docs.zip *
 
-dist-jls: dist ldoc.zip
+dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
+
+dist-jls-full: dist-jls ldoc.zip
 	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
 
 
@@ -313,7 +318,9 @@ luajls-archive: luajls$(ZIP)
 
 dist-archive: luajls-archive
 
-release: dist-jls test luajls-archive
+release-cross: dist-jls luajls-archive
+
+release: dist-jls-full test luajls-archive
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc \
 	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt \

@@ -108,7 +108,7 @@ lua-zlib: lua zlib
 ## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86 -Wl,-rpath=.
 configure-openssl:
-	cd openssl && perl Configure no-threads linux-x86_64 -Wl,-rpath=.
+	cd openssl && perl Configure no-threads linux-$(ARCH) -Wl,-rpath=.
 
 configure-openssl-arm:
 	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-armv4 -Wl,-rpath=.
