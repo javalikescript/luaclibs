@@ -79,7 +79,7 @@ all: full
 core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -233,7 +233,10 @@ dist-copy-openssl-dynamic-windows:
 	-cp -u openssl/libcrypto*.$(SO) $(LUA_CDIST)/
 	-cp -u openssl/libssl*.$(SO) $(LUA_CDIST)/
 
-dist-copy-openssl-static-linux dist-copy-openssl-static-windows dist-copy-linux:
+dist-copy-openssl-static-linux dist-copy-openssl-static-windows:
+
+dist-copy-linux:
+	-cp -u lua-linux/linux.$(SO) $(LUA_CDIST)/
 
 dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
@@ -324,4 +327,5 @@ release: dist-jls-full test luajls-archive
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc \
 	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt \
-	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux
+

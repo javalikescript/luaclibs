@@ -76,3 +76,6 @@
 [submodule "Penlight"]
 	path = Penlight
 	url = https://github.com/lunarmodules/Penlight.git
+[submodule "lua-linux"]
+	path = lua-linux
+	url = https://github.com/javalikescript/lua-linux.git
