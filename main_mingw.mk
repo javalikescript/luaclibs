@@ -4,7 +4,7 @@ SO = so
 CC = gcc
 
 LUA_PATH = lua
-LUA_LIB = lua53
+LUA_LIB = lua54
 
 LUA_VARS = LUA_LIB=$(LUA_LIB) LUA_PATH=$(LUA_PATH)
 

@@ -2,10 +2,11 @@ CC ?= gcc
 
 LIBEXT ?= dll
 LIBNAME = win32
+SRCNAME = $(LIBNAME)
 TARGET = $(LIBNAME).$(LIBEXT)
 
 LUA_PATH = lua
-LUA_LIB = lua53
+LUA_LIB = lua54
 
 LIBOPT = -O \
   -shared \
@@ -22,9 +23,9 @@ CFLAGS += -Wall \
   -Wstrict-prototypes \
   -I../$(LUA_PATH)/src
 
-OBJS = win32.o
+OBJS = $(SRCNAME).o
 
-SRCS = win32.c
+SRCS = $(SRCNAME).c
 
 lib: $(TARGET)
 
