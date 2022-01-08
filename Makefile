@@ -209,7 +209,12 @@ clean-libs: clean-libuv
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
 
-clean: clean-lua clean-lua-libs
+clean-linux:
+
+clean-windows:
+	-$(RM) ./$(LUA_PATH)/src/wlua.exe ./lua/src/wlua.res
+
+clean: clean-lua clean-lua-libs clean-$(PLAT)
 
 clean-all: clean-lua clean-libs clean-lua-libs
 
@@ -240,6 +245,7 @@ dist-copy-linux:
 
 dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
+	-cp -u $(LUA_PATH)/src/wlua$(EXE) $(LUA_CDIST)/
 	-cp -u winapi/winapi.$(SO) $(LUA_CDIST)/
 	-cp -u lua-win32/win32.$(SO) $(LUA_CDIST)/
 	-cp -u lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/

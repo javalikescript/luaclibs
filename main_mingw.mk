@@ -50,9 +50,13 @@ show show-main:
 	@echo RANLIB: $(RANLIB)
 	@echo LD: $(LD)
 
-lua:
-	$(MAKE) -C $(LUA_PATH)/src mingw \
-		MYCFLAGS="$(LUA_MYCFLAGS)"
+wlua.res: wlua.rc
+	windres wlua.rc -O coff -o $(LUA_PATH)/src/wlua.res
+
+lua: wlua.res
+	$(MAKE) -C $(LUA_PATH)/src mingw  MYCFLAGS="$(LUA_MYCFLAGS)"
+	$(MAKE) -C $(LUA_PATH)/src MYCFLAGS="$(LUA_MYCFLAGS)" "LUA_A=lua54.dll" "LUA_T=wlua.exe" "LIBS=wlua.res" \
+		"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s -mwindows" wlua.exe
 
 lua-cjson: lua
 	$(MAKE) -C lua-cjson TARGET=cjson.$(SO) \
