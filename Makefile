@@ -289,14 +289,16 @@ dist: dist-clean dist-prepare dist-copy
 ldoc:
 	cd $(LUAJLS) && $(LUADOC_CMD) -i -d $(LDOC_DIR) .
 
+ldoc-dev-content:
+	grep -E "^##* .*$$" ../$(LUAJLS)/doc_topics/manual.md
+	grep -E "^## .*$$" ../$(LUAJLS)/doc_topics/manual.md | sed -E 's/^##*  *//g' | sed 's/[^A-Za-z][^A-Za-z]*/_/g' | sed 's/_$$//g' | sed -E 's/^(.*)$$/@{manual.md.\1|\1}/g'
+
 ldoc-dev:
 	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d doc .
 
 md-ldoc:
 	$(MD_CMD) LDoc/doc/doc.md
 	mv LDoc/doc/doc.html $(JLSDOC_DIR)/ldoc.html
-	$(MD_CMD) luajls/README.md
-	mv luajls/README.html $(JLSDOC_DIR)/luajls.html
 	-$(MD_CMD) luaunit/doc/index.md
 	-mv luaunit/doc/index.html $(JLSDOC_DIR)/luaunit.html
 
