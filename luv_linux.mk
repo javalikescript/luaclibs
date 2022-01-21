@@ -49,6 +49,35 @@ INCLUDES = src/lhandle.h \
 
 OBJS = src/luv.o
 
+SRCS = src/async.c \
+	src/check.c \
+	src/constants.c \
+	src/dns.c \
+	src/fs.c \
+	src/fs_event.c \
+	src/fs_poll.c \
+	src/handle.c \
+	src/idle.c \
+	src/lhandle.c \
+	src/loop.c \
+	src/lreq.c \
+	src/metrics.c \
+	src/misc.c \
+	src/pipe.c \
+	src/poll.c \
+	src/prepare.c \
+	src/process.c \
+	src/req.c \
+	src/signal.c \
+	src/stream.c \
+	src/tcp.c \
+	src/thread.c \
+	src/timer.c \
+	src/tty.c \
+	src/udp.c \
+	src/util.c \
+	src/work.c
+
 TARGET = luv.so
 
 lib: $(TARGET)
@@ -59,6 +88,6 @@ $(TARGET): $(OBJS) $(LIB_UV_LIB)
 clean:
 	-$(RM) $(OBJS) $(TARGET)
 
-$(OBJS): %.o : %.c $(INCLUDES)
+$(OBJS): %.o : %.c $(INCLUDES) $(SRCS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 

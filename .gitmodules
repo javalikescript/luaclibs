@@ -79,3 +79,9 @@
 [submodule "lua-linux"]
 	path = lua-linux
 	url = https://github.com/javalikescript/lua-linux.git
+[submodule "luachild"]
+	path = luachild
+	url = https://github.com/pocomane/luachild.git
+[submodule "luacov"]
+	path = luacov
+	url = https://github.com/keplerproject/luacov.git

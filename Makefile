@@ -79,7 +79,7 @@ all: full
 core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -193,6 +193,8 @@ clean-lua-libs: clean-luv
 	-$(RM) ./lua-llthreads2/src/*.$(SO)
 	-$(RM) ./lua-win32/*.o
 	-$(RM) ./lua-win32/*.$(SO)
+	-$(RM) ./luachild/*.o
+	-$(RM) ./luachild/*.$(SO)
 
 clean-libuv:
 	-$(RM) ./luv/deps/libuv/*.a
@@ -228,6 +230,7 @@ dist-prepare:
 	mkdir $(LUA_DIST)/socket
 	-mkdir $(LUA_CDIST)/socket
 	mkdir $(LUA_DIST)/sha1
+	mkdir $(LUA_DIST)/luacov
 
 
 dist-copy-openssl-dynamic-linux:
@@ -261,6 +264,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
+	-cp -u luachild/luachild.$(SO) $(LUA_CDIST)/
 	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
 	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
@@ -281,6 +285,8 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
 	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
+	cp -u luacov/src/luacov.lua $(LUA_DIST)/
+	cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
 	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
@@ -313,6 +319,7 @@ ldoc.zip: ldoc-clean ldoc md-ldoc
 
 dist-jls: dist
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 
 dist-jls-full: dist-jls ldoc.zip
@@ -335,5 +342,5 @@ release: dist-jls-full test luajls-archive
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc \
 	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt \
-	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild
 
