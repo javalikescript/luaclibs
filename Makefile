@@ -311,9 +311,13 @@ md-ldoc:
 ldoc-clean:
 	rm -rf $(JLSDOC_DIR)
 
-ldoc.zip: ldoc-clean ldoc md-ldoc
+ldoc-all: ldoc-clean ldoc md-ldoc
 	mkdir $(JLSDOC_DIR)/lua
 	cp -ur $(LUA_PATH)/doc/* $(JLSDOC_DIR)/lua/
+	mkdir $(JLSDOC_DIR)/luacov
+	cp -ur luacov/docs/* $(JLSDOC_DIR)/luacov/
+
+ldoc.zip: ldoc-all
 	rm -f $(LUA_DIST)/docs.zip
 	cd $(JLSDOC_DIR) && zip -r ../$(LUA_DIST)/docs.zip *
 
