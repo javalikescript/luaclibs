@@ -288,6 +288,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luacov/src/luacov.lua $(LUA_DIST)/
 	cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
+	cp -u lua-cbor/cbor.lua $(LUA_DIST)/
 	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
 dist: dist-clean dist-prepare dist-copy

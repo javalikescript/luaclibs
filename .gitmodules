@@ -85,3 +85,6 @@
 [submodule "luacov"]
 	path = luacov
 	url = https://github.com/keplerproject/luacov.git
+[submodule "lua-cbor"]
+	path = lua-cbor
+	url = https://github.com/Zash/lua-cbor.git
