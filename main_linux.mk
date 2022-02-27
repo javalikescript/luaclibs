@@ -9,6 +9,8 @@ LUA_VARS = LUA_PATH=$(LUA_PATH)
 
 ifeq ($(ARCH),arm)
 	ARCH_SUFFIX ?= arm
+else ifeq ($(ARCH),aarch64)
+	ARCH_SUFFIX ?= aarch64
 else
 	ARCH_SUFFIX ?= default
 endif
@@ -37,7 +39,7 @@ full: quick lua-openssl lua-linux full-$(ARCH_SUFFIX)
 
 full-default: lua-webview
 
-full-arm:
+full-arm full-aarch64:
 
 extras: luabt
 
@@ -48,6 +50,8 @@ configure: configure-$(ARCH_SUFFIX)
 configure-default: configure-libjpeg configure-libexif configure-openssl
 
 configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm
+
+configure-aarch64: configure-libjpeg-aarch64 configure-libexif-aarch64 configure-openssl-aarch64
 
 show:
 	@echo Make command goals: $(MAKECMDGOALS)
@@ -113,6 +117,9 @@ configure-openssl:
 configure-openssl-arm:
 	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-armv4 -Wl,-rpath=.
 
+configure-openssl-aarch64:
+	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-aarch64 -Wl,-rpath=.
+
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR)"
 
@@ -122,7 +129,7 @@ lua-openssl: openssl
 configure-libjpeg:
 	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
-configure-libjpeg-arm:
+configure-libjpeg-arm configure-libjpeg-aarch64:
 	cd lua-jpeg/libjpeg && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
 
 libjpeg:
@@ -134,7 +141,7 @@ lua-jpeg: lua libjpeg
 configure-libexif:
 	cd lua-exif/libexif && sh configure CFLAGS='-O2 -fPIC'
 
-configure-libexif-arm:
+configure-libexif-arm configure-libexif-aarch64:
 	cd lua-exif/libexif && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc CFLAGS='-O2 -fPIC'
 
 libexif:

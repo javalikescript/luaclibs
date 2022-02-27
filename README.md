@@ -81,15 +81,23 @@ sudo apt-get install libbluetooth-dev libgtk-3-dev libwebkit2gtk-4.0-dev
 
 Prerequisites
 
-You need to install a specific gcc for cross compile
-
-Install the [tools](https://github.com/raspberrypi/tools) on a Linux OS
-
-Get the Bluetooth library from your Raspberry Pi and export the following variables
+You need to install a specific gcc for cross compilation
 
 ```bash
-export PATH=$HOME/raspberry/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin:$PATH
-export HOST=arm-linux-gnueabihf
-export CC=${HOST}-gcc
-export LIBBT=../../libluetooth
+# 32-bits
+sudo apt-get install gcc-arm-linux-gnueabihf
+# 64-bits:
+sudo apt-get install gcc-aarch64-linux-gnu
 ```
+
+Then export the following variables prior running make
+
+```bash
+# 32-bits
+export HOST=arm-linux-gnueabihf
+# 64-bits:
+export HOST=aarch64-linux-gnu
+export CC=${HOST}-gcc
+```
+
+You could also get the Bluetooth library from your Raspberry Pi and set it using the `LIBBT` environment variable.

@@ -60,6 +60,8 @@ ifdef HOST
 	LUA_VERSION = $(shell echo $(LUA_LIB) | sed 's/^[^0-9]*\([0-9]\)/\1./')
 	ifneq (,$(findstring arm,$(HOST)))
 		ARCH = arm
+	else ifneq (,$(findstring aarch64,$(HOST)))
+		ARCH = aarch64
 	endif
 endif
 
@@ -86,7 +88,7 @@ help:
 	@echo Main targets \(MAIN_TARGET\): full core quick extras
 	@echo Other targets: arm linux windows configure clean clean-all dist help
 	@echo Available platforms \(PLAT\): linux windows
-	@echo Available architecture \(ARCH\): x86_64 arm
+	@echo Available architecture \(ARCH\): x86_64 arm aarch64
 
 show:
 	@echo Make command goals: $(MAKECMDGOALS)
@@ -120,6 +122,9 @@ versions: dist-versions
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
+
+aarch64 linux-aarch64:
+	@$(MAKE) main ARCH=aarch64 HOST=aarch64-linux-gnu PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
 
 win32 windows linux mingw: main
 
