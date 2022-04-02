@@ -81,7 +81,7 @@ all: full
 core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lpeglabel:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -178,6 +178,8 @@ clean-lua-libs: clean-luv
 	-$(RM) ./luasocket/src/*.$(SO)
 	-$(RM) ./lpeg/*.o
 	-$(RM) ./lpeg/*.$(SO)
+	-$(RM) ./lpeglabel/*.o
+	-$(RM) ./lpeglabel/*.$(SO)
 	-$(RM) ./luaserial/*.o
 	-$(RM) ./luaserial/*.$(SO)
 	-$(RM) ./luabt/*.o
@@ -270,6 +272,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
 	-cp -u luachild/luachild.$(SO) $(LUA_CDIST)/
+	-cp -u lpeglabel/lpeglabel.$(SO) $(LUA_CDIST)/
 	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
 	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
 	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
@@ -350,7 +353,7 @@ release-cross: dist-jls luajls-archive
 
 release: dist-jls-full test luajls-archive
 
-.PHONY: dist release clean linux mingw windows win32 arm test ldoc \
-	full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg luaserial luabt \
-	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild
+.PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
+	lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg lpeglabel zlib lua-zlib openssl lua-openssl \
+	luaserial luabt libjpeg lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild
 

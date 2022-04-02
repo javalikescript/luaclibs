@@ -88,3 +88,6 @@
 [submodule "lua-cbor"]
 	path = lua-cbor
 	url = https://github.com/Zash/lua-cbor.git
+[submodule "lpeglabel"]
+	path = lpeglabel
+	url = https://github.com/sqmedeiros/lpeglabel.git

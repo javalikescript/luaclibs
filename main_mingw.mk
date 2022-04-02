@@ -24,7 +24,7 @@ endif
 
 all: full
 
-core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild
+core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel
 
 quick: core luaserial lua-jpeg lua-exif
 
@@ -75,6 +75,11 @@ luasocket: lua
 
 lpeg: lua
 	$(MAKE) -C lpeg -f ../lpeg.mk lpeg.$(SO) \
+		LUADIR=../$(LUA_PATH)/src/ \
+		DLLFLAGS="-O -shared -fPIC -Wl,-s -static-libgcc -L../$(LUA_PATH)/src -l$(LUA_LIB)"
+
+lpeglabel: lua
+	$(MAKE) -C lpeglabel -f ../lpeglabel.mk lpeglabel.$(SO) \
 		LUADIR=../$(LUA_PATH)/src/ \
 		DLLFLAGS="-O -shared -fPIC -Wl,-s -static-libgcc -L../$(LUA_PATH)/src -l$(LUA_LIB)"
 
@@ -130,4 +135,4 @@ lua-exif: lua libexif
 
 .PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
 	luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
-	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild
+	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel
