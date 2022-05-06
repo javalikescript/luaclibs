@@ -112,7 +112,7 @@ dist-versions:
 		-e "print(require('socket')._VERSION); print('lua-cjson', require('cjson')._VERSION); print(require('zlib')._VERSION)" \
 		-e "print('luv', require('luv').version_string()); print('lua-openssl', require('openssl').version())" \
 		-e "print('lpeg', require('lpeg').version()); print('luaunit', require('luaunit')._VERSION)" \
-		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION)"
+		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION); print(require('lpeglabel').version)"
 
 versions: dist-versions
 	@echo " cc:"
