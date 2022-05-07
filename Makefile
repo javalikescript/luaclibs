@@ -167,7 +167,11 @@ clean-luv:
 	-$(RM) ./luv/*.$(SO)
 	-$(RM) ./luv/src/*.o
 
-clean-lua-libs: clean-luv
+clean-lua-openssl:
+	-$(RM) ./lua-openssl/src/*.o
+	-$(RM) ./lua-openssl/*.$(SO)
+
+clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./lua-cjson/*.o
 	-$(RM) ./lua-cjson/*.$(SO)
 	-$(RM) ./lua-buffer/*.o
@@ -186,8 +190,6 @@ clean-lua-libs: clean-luv
 	-$(RM) ./luabt/*.$(SO)
 	-$(RM) ./lua-zlib/*.o
 	-$(RM) ./lua-zlib/*.$(SO)
-	-$(RM) ./lua-openssl/src/*.o
-	-$(RM) ./lua-openssl/*.$(SO)
 	-$(RM) ./lua-jpeg/*.o
 	-$(RM) ./lua-jpeg/*.$(SO)
 	-$(RM) ./lua-exif/*.o
