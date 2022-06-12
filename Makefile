@@ -1,10 +1,41 @@
 
+GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
+
+ifdef HOST
+	CROSS_PREFIX ?= $(HOST)-
+	ifneq (,$(findstring arm,$(HOST)))
+		ARCH = arm
+	else ifneq (,$(findstring aarch64,$(HOST)))
+		ARCH = aarch64
+	else ifneq (,$(findstring x86_64,$(HOST)))
+		ARCH = x86_64
+	else ifneq (,$(findstring x86,$(HOST)))
+		ARCH = x86
+	else
+		$(error Unknown host $(HOST))
+	endif
+else
+	ifneq (,$(findstring x86_64,$(GCC_NAME)))
+		ARCH = x86_64
+	else ifneq (,$(findstring x86,$(GCC_NAME)))
+		ARCH = x86
+	else ifneq (,$(findstring arm,$(GCC_NAME)))
+		ARCH = arm
+	else ifneq (,$(findstring aarch64,$(GCC_NAME)))
+		ARCH = aarch64
+	else
+		$(error Unknown compiler target $(GCC_NAME))
+	endif
+endif
+
+ifeq ($(ARCH),x86_64)
+	WEBVIEW_ARCH ?= x64
+else
+	WEBVIEW_ARCH ?= $(ARCH)
+endif
+
 UNAME_S := $(shell uname -s)
-
 MK_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-
-ARCH = x86_64
-
 ifeq ($(UNAME_S),Linux)
 	PLAT ?= linux
 else
@@ -12,17 +43,18 @@ else
 	MK_PATH := $(subst /c/,C:/,$(MK_PATH))
 endif
 
+
 MAIN_TARGET = core
 
 LUA_PATH := lua
 LUA_LIB := lua54
 
 MK_DIR := $(dir $(MK_PATH))
-LUA_DIST := dist-$(PLAT)
+LUA_DIST := dist
 LUA_CDIST = $(LUA_DIST)
 LUA_EDIST = $(LUA_CDIST)
 LUAJLS := luajls
-JLSDOC_DIR := dist-doc
+JLSDOC_DIR := $(LUA_DIST)-doc
 LDOC_DIR := ../$(JLSDOC_DIR)
 
 SO_windows=dll
@@ -40,29 +72,15 @@ EXE := $(EXE_$(PLAT))
 MAIN_MK := $(MK_$(PLAT))
 ZIP := $(ZIP_$(PLAT))
 
-GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 LUA_APP = $(LUA_PATH)/src/lua$(EXE)
-LUA_DATE = $(shell $(LUA_APP) -e "print(os.date('%Y%m%d'))")
+RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
-DIST_SUFFIX ?= -$(LUA_VERSION)-$(GCC_NAME).$(LUA_DATE)
-
-WEBVIEW_ARCH = x64
-ifeq (,$(findstring x86_64,$(GCC_NAME)))
-  WEBVIEW_ARCH = x86
-	ARCH = x86
-endif
+RELEASE_NAME ?= -$(LUA_VERSION)-$(GCC_NAME)$(RELEASE_SUFFIX).$(RELEASE_DATE)
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
 ifdef HOST
-	CROSS_PREFIX ?= $(HOST)-
-	LUA_DATE = $(shell date '+%Y%m%d')
 	LUA_VERSION = $(shell echo $(LUA_LIB) | sed 's/^[^0-9]*\([0-9]\)/\1./')
-	ifneq (,$(findstring arm,$(HOST)))
-		ARCH = arm
-	else ifneq (,$(findstring aarch64,$(HOST)))
-		ARCH = aarch64
-	endif
 endif
 
 ifneq ($(LUA_OPENSSL_LINKING),dynamic)
@@ -100,6 +118,8 @@ show:
 	@echo LUA_LIB: $(LUA_LIB)
 	@echo LUA_PATH: $(LUA_PATH)
 	@echo LUA_VERSION: $(LUA_VERSION)
+	@echo RELEASE_DATE: $(RELEASE_DATE)
+	@echo RELEASE_NAME: $(RELEASE_NAME)
 	@echo Library extension: $(SO)
 	@echo CC: $(CC)
 	@echo AR: $(AR)
@@ -107,18 +127,24 @@ show:
 	@echo LD: $(LD)
 	@echo MK_DIR: $(MK_DIR)
 
-dist-versions:
+versions-dist:
 	@$(LUAJLS_CMD) -v -e "print(_VERSION, tostring(string.len(string.pack('T', 0)) * 8)..' bits')" \
 		-e "print(require('socket')._VERSION); print('lua-cjson', require('cjson')._VERSION); print(require('zlib')._VERSION)" \
 		-e "print('luv', require('luv').version_string()); print('lua-openssl', require('openssl').version())" \
 		-e "print('lpeg', require('lpeg').version()); print('luaunit', require('luaunit')._VERSION)" \
 		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION); print(require('lpeglabel').version)"
 
-versions: dist-versions
-	@echo " cc:"
+versions-cross:
+	@printf "cc\t"
 	@$(CROSS_PREFIX)gcc -dumpversion
-	@echo " os:"
+	@printf "platform\t"
+	@echo $(PLAT)
+	@printf "target\t"
+	@echo $(GCC_NAME)$(RELEASE_SUFFIX)
+	@printf "os\t"
 	-@uname -s -r
+
+versions: versions-dist versions-cross
 
 arm linux-arm:
 	@$(MAKE) main ARCH=arm HOST=arm-linux-gnueabihf PLAT=linux MAIN_TARGET=$(MAIN_TARGET)
@@ -340,18 +366,21 @@ dist-jls: dist
 dist-jls-full: dist-jls ldoc.zip
 	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
 
+dist-jls-cross: dist-jls
+	-@$(MAKE) --quiet versions-cross >$(LUA_DIST)/versions.txt
+
 
 luajls.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(DIST_SUFFIX).tar.gz *
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(RELEASE_NAME).tar.gz *
 
 luajls.zip:
-	cd $(LUA_DIST) && zip -r luajls$(DIST_SUFFIX).zip *
+	cd $(LUA_DIST) && zip -r luajls$(RELEASE_NAME).zip *
 
 luajls-archive: luajls$(ZIP)
 
 dist-archive: luajls-archive
 
-release-cross: dist-jls luajls-archive
+release-cross: dist-jls-cross luajls-archive
 
 release: dist-jls-full test luajls-archive
 
