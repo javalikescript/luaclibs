@@ -63,7 +63,9 @@ SRCS = $(WEBVIEW_C)/webview.h \
   $(WEBVIEW_C)/webview-cocoa.c \
   $(WEBVIEW_C)/webview-gtk.c \
   $(WEBVIEW_C)/webview-win32.c \
-  $(WEBVIEW_C)/webview-win32-edge.c
+  $(WEBVIEW_C)/webview-win32-edge.c \
+  $(WEBVIEW_C)/ms.webview2/include/WebView2.h \
+  $(WEBVIEW_C)/ms.webview2/include/WebView2EnvironmentOptions.h
 
 lib: $(TARGET)
 
