@@ -6,7 +6,7 @@ luaclibs provides the dependent modules used by [luajls](https://github.com/java
 This repository contains [Lua](http://www.lua.org/) 5.4, selected Lua modules and associated makefiles.
 The targeted operating systems are Linux and Windows. The targeted architectures are x86, x86-64 and ARM.
 
-You could find information and download binaries on the [luajls](http://javalikescript.free.fr/lua/) page.
+You could find information and download binaries on the [luajls releases](https://github.com/javalikescript/luajls/releases) page.
 
 ## How to setup?
 
