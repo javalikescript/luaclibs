@@ -33,6 +33,7 @@ INCLUDES += src/heap-inl.h \
 	src/idna.h \
 	src/queue.h \
 	src/strscpy.h \
+	src/strtok.h \
 	src/uv-common.h \
 	src/win/atomicops-inl.h \
 	src/win/handle-inl.h \
@@ -47,6 +48,7 @@ OBJS = src/fs-poll.o \
 	src/inet.o \
 	src/random.o \
 	src/strscpy.o \
+	src/strtok.o \
 	src/threadpool.o \
 	src/timer.o \
 	src/uv-data-getter-setters.o \

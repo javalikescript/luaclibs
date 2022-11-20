@@ -21,6 +21,8 @@ CFLAGS += -fPIC \
 	-Isrc \
 	-Isrc/unix \
 	-std=gnu89 \
+	-D_GNU_SOURCE \
+	-D_POSIX_C_SOURCE=200112 \
 	-Wall \
 	-Wextra \
 	-Wno-unused-parameter \
@@ -46,6 +48,7 @@ INCLUDES += src/heap-inl.h \
 	src/idna.h \
 	src/queue.h \
 	src/strscpy.h \
+	src/strtok.h \
 	src/uv-common.h \
 	src/unix/atomic-ops.h \
 	src/unix/internal.h \
@@ -57,6 +60,7 @@ OBJS = src/fs-poll.o \
 	src/inet.o \
 	src/random.o \
 	src/strscpy.o \
+	src/strtok.o \
 	src/threadpool.o \
 	src/timer.o \
 	src/uv-data-getter-setters.o \
