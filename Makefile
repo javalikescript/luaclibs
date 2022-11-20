@@ -310,7 +310,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	-cp -u lua-webview/webview-launcher.lua $(LUA_CDIST)/
 	-cp -u lua-llthreads2/src/llthreads.$(SO) $(LUA_CDIST)/
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_CDIST)/mime/core.$(SO)
-	cp -u luasocket/src/socket-3.0-rc1.$(SO) $(LUA_CDIST)/socket/core.$(SO)
+	cp -u luasocket/src/socket-3.0.0.$(SO) $(LUA_CDIST)/socket/core.$(SO)
 	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
 	cp -u luasocket/src/mime.lua $(LUA_DIST)/
 	cp -u luasocket/src/socket.lua $(LUA_DIST)/
