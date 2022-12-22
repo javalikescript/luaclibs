@@ -91,3 +91,6 @@
 [submodule "lpeglabel"]
 	path = lpeglabel
 	url = https://github.com/sqmedeiros/lpeglabel.git
+[submodule "DumbLuaParser"]
+	path = DumbLuaParser
+	url = https://github.com/ReFreezed/DumbLuaParser.git

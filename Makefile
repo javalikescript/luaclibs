@@ -99,7 +99,7 @@ all: full
 core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lpeglabel:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lpeglabel:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -320,6 +320,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luasocket/src/smtp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
+	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
 	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
 	cp -u luacov/src/luacov.lua $(LUA_DIST)/
 	cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
