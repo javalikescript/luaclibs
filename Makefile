@@ -264,6 +264,7 @@ dist-prepare:
 	mkdir $(LUA_CDIST)/mime
 	mkdir $(LUA_DIST)/socket
 	-mkdir $(LUA_CDIST)/socket
+	mkdir $(LUA_DIST)/bitop
 	mkdir $(LUA_DIST)/sha1
 	mkdir $(LUA_DIST)/luacov
 
@@ -320,6 +321,7 @@ dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u luasocket/src/smtp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
 	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
+	cp -u bitop-lua/src/bitop/funcs.lua $(LUA_DIST)/bitop/
 	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
 	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
 	cp -u luacov/src/luacov.lua $(LUA_DIST)/

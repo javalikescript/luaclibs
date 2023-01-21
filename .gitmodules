@@ -94,3 +94,6 @@
 [submodule "DumbLuaParser"]
 	path = DumbLuaParser
 	url = https://github.com/ReFreezed/DumbLuaParser.git
+[submodule "bitop-lua"]
+	path = bitop-lua
+	url = https://github.com/AlberTajuelo/bitop-lua.git
