@@ -37,9 +37,15 @@ CFLAGS += $(CFLAGS_$(LIBEXT))
 
 HDRS = luachild.h
 
-OBJS = ${SRCS:.c=.o}
+SRCS = luachild_common.c luachild_posix.c luachild_windows.c
 
-SRCS = luachild_common.c luachild_lua_5_3.c luachild_posix.c luachild_windows.c
+ifeq ($(LUA_LIB),lua51)
+  SRCS += luachild_lua_5_1.c
+else
+  SRCS += luachild_lua_5_3.c
+endif
+
+OBJS = ${SRCS:.c=.o}
 
 lib: $(TARGET)
 

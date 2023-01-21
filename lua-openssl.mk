@@ -42,6 +42,7 @@ CFLAGS_windows = -Wall \
   -Wno-unused-parameter \
   -Wstrict-prototypes \
   -I$(OPENSSLDIR)/include \
+  -Ideps/lua-compat/c-api \
   -I$(AUXDIR) \
   -I$(LUADIR)
 

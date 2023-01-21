@@ -54,11 +54,11 @@ wlua.res: wlua.rc
 	windres wlua.rc -O coff -o $(LUA_PATH)/src/wlua.res
 
 lua: wlua.res
-	$(MAKE) -C $(LUA_PATH)/src "LUA_A=lua54.dll" "LUA_T=lua.exe" \
+	$(MAKE) -C $(LUA_PATH)/src "LUA_A=$(LUA_LIB).dll" "LUA_T=lua.exe" \
 		"AR=$(CC) -static-libgcc -shared -o" "RANLIB=strip --strip-unneeded" \
 		"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
 	$(MAKE) -C $(LUA_PATH)/src "LUAC_T=luac.exe" luac.exe
-	$(MAKE) -C $(LUA_PATH)/src MYCFLAGS="$(LUA_MYCFLAGS)" "LUA_A=lua54.dll" "LUA_T=wlua.exe" "LIBS=wlua.res" \
+	$(MAKE) -C $(LUA_PATH)/src MYCFLAGS="$(LUA_MYCFLAGS)" "LUA_A=$(LUA_LIB).dll" "LUA_T=wlua.exe" "LIBS=wlua.res" \
 		"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s -mwindows" wlua.exe
 
 lua-cjson: lua

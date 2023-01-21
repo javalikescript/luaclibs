@@ -42,6 +42,7 @@ CFLAGS += -Wall \
 	-Isrc \
 	-I../$(LUA_PATH)/src \
 	-I$(LIB_UV_PATH)/include \
+	-Ideps/lua-compat-5.3/c-api \
 	-D_WIN32_WINNT=0x0600 \
 	-DLUA_USE_DLOPEN \
 	-DBUILDING_UV_SHARED \
