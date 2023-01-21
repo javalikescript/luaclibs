@@ -97,3 +97,6 @@
 [submodule "bitop-lua"]
 	path = bitop-lua
 	url = https://github.com/AlberTajuelo/bitop-lua.git
+[submodule "lua-struct"]
+	path = lua-struct
+	url = git@github.com:javalikescript/lua-struct.git
