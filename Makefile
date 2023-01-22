@@ -76,6 +76,7 @@ LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(GCC_NAME)$(RELEASE_SUFFIX).$(RELEASE_DATE)
+STATIC_NAME = $(LUA_LIB)jls
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
@@ -182,6 +183,27 @@ test: $(LUAJLS_TESTS)
 $(LUAJLS_TESTS):
 	@echo Testing $@
 	-@cd $(LUAJLS) && $(LUAJLS_CMD) $@
+
+
+static: static-$(PLAT)
+
+static-windows:
+	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
+		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
+	cat bootstrap.lua >> $(STATIC_NAME).lua
+	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua lua\src\liblua.a -Ilua\src \
+		luv\src\luv.o luv\deps\libuv\libuv.a \
+		lua-cjson\lua_cjson.o lua-cjson\fpconv.o lua-cjson\strbuf.o \
+		zlib\libz.a lua-zlib\lua_zlib.o \
+		lua-webview\webview.o \
+		-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
+	rm $(STATIC_NAME).lua
+	rm $(STATIC_NAME).luastatic.c
+
+#	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
+
+static-linux:
+	@echo not available
 
 
 clean-lua:
