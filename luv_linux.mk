@@ -31,6 +31,7 @@ CFLAGS += -fPIC \
 	-Isrc \
 	-I../$(LUA_PATH)/src \
 	-I$(LIB_UV_PATH)/include \
+	-Ideps/lua-compat-5.3/c-api \
 	-std=gnu99 \
 	-DBUILDING_UV_SHARED \
 	-D_FILE_OFFSET_BITS=64  \

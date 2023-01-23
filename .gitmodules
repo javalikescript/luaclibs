@@ -94,12 +94,12 @@
 [submodule "bitop-lua"]
 	path = bitop-lua
 	url = https://github.com/AlberTajuelo/bitop-lua.git
-[submodule "lua-struct"]
-	path = lua-struct
-	url = git@github.com:javalikescript/lua-struct.git
 [submodule "luachild"]
 	path = luachild
 	url = https://github.com/javalikescript/luachild.git
 [submodule "luastatic"]
 	path = luastatic
 	url = https://github.com/javalikescript/luastatic.git
+[submodule "lua-struct"]
+	path = lua-struct
+	url = https://github.com/javalikescript/lua-struct.git

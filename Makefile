@@ -203,7 +203,18 @@ static-windows:
 #	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
 
 static-linux:
-	@echo not available
+	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
+		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
+	cat bootstrap.lua >> $(STATIC_NAME).lua
+	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua lua/src/liblua.a -Ilua/src \
+		luv/src/luv.o luv/deps/libuv/libuv.a \
+		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
+		zlib/libz.a lua-zlib/lua_zlib.o \
+		lua-webview/webview.o \
+		-lrt -pthread -lpthread \
+		$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
+	rm $(STATIC_NAME).lua
+	rm $(STATIC_NAME).luastatic.c
 
 
 clean-lua:
