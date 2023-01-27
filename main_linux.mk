@@ -65,7 +65,18 @@ show:
 	@echo RANLIB: $(RANLIB)
 	@echo LD: $(LD)
 
-lua:
+lua: $(LUA_LIB)
+
+lua51:
+	$(MAKE) -C $(LUA_PATH)/src all \
+		CC="$(CC) -std=gnu99" \
+		AR="$(AR) rcu" \
+		RANLIB=$(RANLIB) \
+		MYCFLAGS="-DLUA_USE_LINUX $(LUA_MYCFLAGS)" \
+		MYLIBS="-Wl,-E -ldl -lreadline -lhistory -lncurses" \
+		SYSLIBS="-Wl,-E -ldl"
+
+lua54:
 	$(MAKE) -C $(LUA_PATH)/src all \
 		CC="$(CC) -std=gnu99" \
 		AR="$(AR) rcu" \

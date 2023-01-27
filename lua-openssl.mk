@@ -62,6 +62,7 @@ CFLAGS_linux = -pedantic  \
   -DLUA_USE_DLOPEN  \
   -DLUA_LIB \
   -I$(OPENSSLDIR)/include \
+  -Ideps/lua-compat/c-api \
   -I$(AUXDIR) \
   -I$(LUADIR)
 

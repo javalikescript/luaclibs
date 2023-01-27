@@ -397,10 +397,18 @@ ldoc.zip: ldoc-all
 	rm -f $(LUA_DIST)/docs.zip
 	cd $(JLSDOC_DIR) && zip -r ../$(LUA_DIST)/docs.zip *
 
-dist-jls: dist
+dist-jls-lua51:
+	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
+		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a copy -strip true -t 5.1 -outdir $(LUA_DIST)
+	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
+	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
+
+dist-jls-lua54:
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
+
+dist-jls: dist dist-jls-$(LUA_LIB)
 
 dist-jls-full: dist-jls ldoc.zip
 	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
