@@ -76,7 +76,7 @@ LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(GCC_NAME)$(RELEASE_SUFFIX).$(RELEASE_DATE)
-STATIC_NAME = $(LUA_LIB)jls
+STATIC_NAME = luajls
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
@@ -109,7 +109,7 @@ help:
 	@echo Available platforms \(PLAT\): linux windows
 	@echo Available architecture \(ARCH\): x86_64 arm aarch64
 
-show:
+echo show:
 	@echo Make command goals: $(MAKECMDGOALS)
 	@echo TARGET: $@
 	@echo ARCH: $(ARCH)
@@ -129,11 +129,7 @@ show:
 	@echo MK_DIR: $(MK_DIR)
 
 versions-dist:
-	@$(LUAJLS_CMD) -v -e "print(_VERSION, tostring(string.len(string.pack('T', 0)) * 8)..' bits')" \
-		-e "print(require('socket')._VERSION); print('lua-cjson', require('cjson')._VERSION); print(require('zlib')._VERSION)" \
-		-e "print('luv', require('luv').version_string()); print('lua-openssl', require('openssl').version())" \
-		-e "print('lpeg', require('lpeg').version()); print('luaunit', require('luaunit')._VERSION)" \
-		-e "print('lua-exif', require('exif')._VERSION); print('lua-jpeg', require('jpeg')._VERSION); print(require('lpeglabel').version)"
+	@$(LUAJLS_CMD) -v versions.lua
 
 versions-cross:
 	@printf "cc\t"
@@ -191,7 +187,7 @@ static-windows:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
 		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
 	cat bootstrap.lua >> $(STATIC_NAME).lua
-	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua lua\src\liblua.a -Ilua\src \
+	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)\src\liblua.a -Ilua\src \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
 		lua-cjson\lua_cjson.o lua-cjson\fpconv.o lua-cjson\strbuf.o \
 		zlib\libz.a lua-zlib\lua_zlib.o \
@@ -206,7 +202,7 @@ static-linux:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
 		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
 	cat bootstrap.lua >> $(STATIC_NAME).lua
-	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua lua/src/liblua.a -Ilua/src \
+	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)/src/liblua.a -Ilua/src \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
 		zlib/libz.a lua-zlib/lua_zlib.o \
