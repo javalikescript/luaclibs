@@ -3,14 +3,15 @@ GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
-	ifneq (,$(findstring arm,$(HOST)))
-		ARCH = arm
-	else ifneq (,$(findstring aarch64,$(HOST)))
-		ARCH = aarch64
-	else ifneq (,$(findstring x86_64,$(HOST)))
+	CROSS_SUFFIX = -cross
+	ifneq (,$(findstring x86_64,$(HOST)))
 		ARCH = x86_64
 	else ifneq (,$(findstring x86,$(HOST)))
 		ARCH = x86
+	else ifneq (,$(findstring arm,$(HOST)))
+		ARCH = arm
+	else ifneq (,$(findstring aarch64,$(HOST)))
+		ARCH = aarch64
 	else
 		$(error Unknown host $(HOST))
 	endif
@@ -72,10 +73,11 @@ EXE := $(EXE_$(PLAT))
 MAIN_MK := $(MK_$(PLAT))
 ZIP := $(ZIP_$(PLAT))
 
+DIST_TARGET=$(subst w64-mingw32,windows,$(GCC_NAME))$(RELEASE_SUFFIX)
 LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
-RELEASE_NAME ?= -$(LUA_VERSION)-$(GCC_NAME)$(RELEASE_SUFFIX).$(RELEASE_DATE)
+RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
 STATIC_NAME = luajls
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
@@ -90,7 +92,8 @@ endif
 
 LUAJLS_TESTS := $(patsubst $(LUAJLS)/%.lua,%.lua,$(wildcard $(LUAJLS)/tests/*/*.lua))
 LUAJLS_CMD := LUA_PATH=$(MK_DIR)$(LUA_DIST)/?.lua LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)$(LUA_DIST) $(MK_DIR)$(LUA_DIST)/lua$(EXE)
-LUADOC_CMD := LUA_PATH="$(MK_DIR)LDoc/?.lua;$(MK_DIR)Penlight/lua/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua" LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc.lua
+LUATEST_CMD := LUA_PATH="$(MK_DIR)/luaunit/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua" LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) LD_LIBRARY_PATH=$(MK_DIR)$(LUA_DIST) $(MK_DIR)$(LUA_DIST)/lua$(EXE)
+LUADOC_CMD := LUA_PATH="$(MK_DIR)LDoc/?.lua;$(MK_DIR)Penlight/lua/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua" LUA_CPATH=$(MK_DIR)/luafilesystem/?.$(SO) $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc.lua
 MD_CMD := LUA_PATH=$(MK_DIR)$(LUA_DIST)/?.lua $(MK_DIR)$(LUA_DIST)/lua$(EXE) $(MK_DIR)LDoc/ldoc/markdown.lua
 
 main: main-$(PLAT)
@@ -115,6 +118,7 @@ echo show:
 	@echo ARCH: $(ARCH)
 	@echo HOST: $(HOST)
 	@echo PLAT: $(PLAT)
+	@echo DIST_TARGET: $(DIST_TARGET)
 	@echo GCC_NAME: $(GCC_NAME)
 	@echo LUA_LIB: $(LUA_LIB)
 	@echo LUA_PATH: $(LUA_PATH)
@@ -137,7 +141,9 @@ versions-cross:
 	@printf "platform\t"
 	@echo $(PLAT)
 	@printf "target\t"
-	@echo $(GCC_NAME)$(RELEASE_SUFFIX)
+	@echo $(DIST_TARGET)
+	@printf "gcc-target\t"
+	@echo $(GCC_NAME)
 	@printf "os\t"
 	-@uname -s -r
 
@@ -178,7 +184,9 @@ test: $(LUAJLS_TESTS)
 
 $(LUAJLS_TESTS):
 	@echo Testing $@
-	-@cd $(LUAJLS) && $(LUAJLS_CMD) $@
+	-@cd $(LUAJLS) && $(LUATEST_CMD) $@
+
+test-cross:
 
 
 static: static-$(PLAT)
@@ -214,66 +222,42 @@ static-linux:
 
 
 clean-lua:
-	-$(RM) ./$(LUA_PATH)/src/*.o
-	-$(RM) ./$(LUA_PATH)/src/*.a ./lua/src/*.$(SO)
-	-$(RM) ./$(LUA_PATH)/src/lua$(EXE) ./lua/src/luac$(EXE)
+	-$(RM) ./$(LUA_PATH)/src/*.o ./$(LUA_PATH)/src/*.a
+	-$(RM) ./lua/src/*.$(SO) ./$(LUA_PATH)/src/lua$(EXE) ./lua/src/luac$(EXE)
 
 clean-luv:
-	-$(RM) ./luv/*.$(SO)
-	-$(RM) ./luv/src/*.o
+	-$(RM) ./luv/src/*.o ./luv/*.$(SO)
 
 clean-lua-openssl:
-	-$(RM) ./lua-openssl/src/*.o
-	-$(RM) ./lua-openssl/*.$(SO)
+	-$(RM) ./lua-openssl/src/*.o ./lua-openssl/*.$(SO)
 
 clean-lua-libs: clean-luv clean-lua-openssl
-	-$(RM) ./lua-cjson/*.o
-	-$(RM) ./lua-cjson/*.$(SO)
-	-$(RM) ./lua-buffer/*.o
-	-$(RM) ./lua-buffer/*.$(SO)
-	-$(RM) ./luafilesystem/src/*.o
-	-$(RM) ./luafilesystem/*.$(SO)
-	-$(RM) ./luasocket/src/*.o
-	-$(RM) ./luasocket/src/*.$(SO)
-	-$(RM) ./lpeg/*.o
-	-$(RM) ./lpeg/*.$(SO)
-	-$(RM) ./lpeglabel/*.o
-	-$(RM) ./lpeglabel/*.$(SO)
-	-$(RM) ./luaserial/*.o
-	-$(RM) ./luaserial/*.$(SO)
-	-$(RM) ./luabt/*.o
-	-$(RM) ./luabt/*.$(SO)
-	-$(RM) ./lua-zlib/*.o
-	-$(RM) ./lua-zlib/*.$(SO)
-	-$(RM) ./lua-jpeg/*.o
-	-$(RM) ./lua-jpeg/*.$(SO)
-	-$(RM) ./lua-exif/*.o
-	-$(RM) ./lua-exif/*.$(SO)
-	-$(RM) ./lua-webview/*.o
-	-$(RM) ./lua-webview/*.$(SO)
-	-$(RM) ./winapi/*.o
-	-$(RM) ./winapi/*.$(SO)
-	-$(RM) ./lua-llthreads2/src/*.o
-	-$(RM) ./lua-llthreads2/src/*.$(SO)
-	-$(RM) ./lua-win32/*.o
-	-$(RM) ./lua-win32/*.$(SO)
-	-$(RM) ./luachild/*.o
-	-$(RM) ./luachild/*.$(SO)
-	-$(RM) ./lua-struct/*.o
-	-$(RM) ./lua-struct/*.$(SO)
+	-$(RM) ./lua-cjson/*.o ./lua-cjson/*.$(SO)
+	-$(RM) ./lua-buffer/*.o ./lua-buffer/*.$(SO)
+	-$(RM) ./luafilesystem/src/*.o ./luafilesystem/*.$(SO)
+	-$(RM) ./luasocket/src/*.o ./luasocket/src/*.$(SO)
+	-$(RM) ./lpeg/*.o ./lpeg/*.$(SO)
+	-$(RM) ./lpeglabel/*.o ./lpeglabel/*.$(SO)
+	-$(RM) ./luaserial/*.o ./luaserial/*.$(SO)
+	-$(RM) ./luabt/*.o ./luabt/*.$(SO)
+	-$(RM) ./lua-zlib/*.o ./lua-zlib/*.$(SO)
+	-$(RM) ./lua-jpeg/*.o ./lua-jpeg/*.$(SO)
+	-$(RM) ./lua-exif/*.o ./lua-exif/*.$(SO)
+	-$(RM) ./lua-webview/*.o ./lua-webview/*.$(SO)
+	-$(RM) ./winapi/*.o ./winapi/*.$(SO)
+	-$(RM) ./lua-llthreads2/src/*.o ./lua-llthreads2/src/*.$(SO)
+	-$(RM) ./lua-win32/*.o ./lua-win32/*.$(SO)
+	-$(RM) ./luachild/*.o ./luachild/*.$(SO)
+	-$(RM) ./lua-struct/*.o ./lua-struct/*.$(SO)
 
 clean-libuv:
-	-$(RM) ./luv/deps/libuv/*.a
-	-$(RM) ./luv/deps/libuv/src/*.o
-	-$(RM) ./luv/deps/libuv/src/unix/*.o
-	-$(RM) ./luv/deps/libuv/src/win/*.o
+	-$(RM) ./luv/deps/libuv/*.a ./luv/deps/libuv/src/*.o
+	-$(RM) ./luv/deps/libuv/src/unix/*.o ./luv/deps/libuv/src/win/*.o
 
 clean-libs: clean-libuv
 	-$(MAKE) -C openssl clean
 	-$(RM) ./openssl/*/*.$(SO)
-	-$(RM) ./zlib/*.o
-	-$(RM) ./zlib/*.lo
-	-$(RM) ./zlib/*.a ./zlib/*.$(SO)*
+	-$(RM) ./zlib/*.o ./zlib/*.lo ./zlib/*.a ./zlib/*.$(SO)*
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
 
@@ -292,13 +276,6 @@ dist-clean:
 
 dist-prepare:
 	-mkdir $(LUA_DIST)
-	mkdir $(LUA_CDIST)/mime
-	mkdir $(LUA_DIST)/socket
-	-mkdir $(LUA_CDIST)/socket
-	mkdir $(LUA_DIST)/bitop
-	mkdir $(LUA_DIST)/sha1
-	mkdir $(LUA_DIST)/luacov
-
 
 dist-copy-openssl-dynamic-linux:
 	-cp -uP openssl/libcrypto.$(SO)* $(LUA_CDIST)/
@@ -320,49 +297,55 @@ dist-copy-windows:
 	-cp -u lua-win32/win32.$(SO) $(LUA_CDIST)/
 	-cp -u lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll $(LUA_CDIST)/
 
-dist-copy: dist-copy-$(PLAT)  dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
-	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_EDIST)/
-	cp -u $(LUA_PATH)/src/luac$(EXE) $(LUA_EDIST)/
-	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
-	cp -u lua-buffer/buffer.$(SO) $(LUA_CDIST)/
+dist-dup-copy:
 	cp -u luafilesystem/lfs.$(SO) $(LUA_CDIST)/
-	-cp -u lua-struct/struct.$(SO) $(LUA_CDIST)/
-	-cp -u luv/luv.$(SO) $(LUA_CDIST)/
-	cp -u lpeg/lpeg.$(SO) $(LUA_CDIST)/
-	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
-	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	cp -u dkjson/dkjson.lua $(LUA_DIST)/
-	-cp -u luachild/luachild.$(SO) $(LUA_CDIST)/
-	-cp -u lpeglabel/lpeglabel.$(SO) $(LUA_CDIST)/
-	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
-	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
-	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
-	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
-	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
-	-cp -u lua-webview/webview.$(SO) $(LUA_CDIST)/
-	-cp -u lua-webview/webview-launcher.lua $(LUA_CDIST)/
-	-cp -u lua-llthreads2/src/llthreads.$(SO) $(LUA_CDIST)/
+	cp -u luachild/luachild.$(SO) $(LUA_CDIST)/
+	cp -u lua-llthreads2/src/llthreads.$(SO) $(LUA_CDIST)/
+	mkdir $(LUA_CDIST)/mime
+	mkdir $(LUA_DIST)/socket
+	-mkdir $(LUA_CDIST)/socket
 	cp -u luasocket/src/mime-1.0.3.$(SO) $(LUA_CDIST)/mime/core.$(SO)
 	cp -u luasocket/src/socket-3.0.0.$(SO) $(LUA_CDIST)/socket/core.$(SO)
-	cp -u luasocket/src/ltn12.lua $(LUA_DIST)/
-	cp -u luasocket/src/mime.lua $(LUA_DIST)/
-	cp -u luasocket/src/socket.lua $(LUA_DIST)/
-	cp -u luasocket/src/ftp.lua $(LUA_DIST)/socket/
-	cp -u luasocket/src/headers.lua $(LUA_DIST)/socket/
-	cp -u luasocket/src/http.lua $(LUA_DIST)/socket/
-	cp -u luasocket/src/smtp.lua $(LUA_DIST)/socket/
-	cp -u luasocket/src/tp.lua $(LUA_DIST)/socket/
-	cp -u luasocket/src/url.lua $(LUA_DIST)/socket/
-	cp -u bitop-lua/src/bitop/funcs.lua $(LUA_DIST)/bitop/
-	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
+	cp -u luasocket/src/ltn12.lua luasocket/src/mime.lua luasocket/src/socket.lua $(LUA_DIST)/
+	cp -u luasocket/src/ftp.lua luasocket/src/headers.lua luasocket/src/http.lua \
+		luasocket/src/smtp.lua luasocket/src/tp.lua luasocket/src/url.lua $(LUA_DIST)/socket/
+	mkdir $(LUA_DIST)/sha1
 	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
-	cp -u luacov/src/luacov.lua $(LUA_DIST)/
-	cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
-	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
-	cp -u lua-cbor/cbor.lua $(LUA_DIST)/
 	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
+dist-ext-copy:
+	cp -u luaunit/luaunit.lua $(LUA_DIST)/
+	-cp -u lua-struct/struct.$(SO) $(LUA_CDIST)/
+	mkdir $(LUA_DIST)/bitop
+	-cp -u bitop-lua/src/bitop/funcs.lua $(LUA_DIST)/bitop/
+	mkdir $(LUA_DIST)/luacov
+	-cp -u luacov/src/luacov.lua $(LUA_DIST)/
+	-cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
+	-cp -u lua-cbor/cbor.lua $(LUA_DIST)/
+	-cp -u lpeglabel/lpeglabel.$(SO) $(LUA_CDIST)/
+
+dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
+	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_PATH)/src/luac$(EXE) $(LUA_EDIST)/
+	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
+	cp -u luv/luv.$(SO) $(LUA_CDIST)/
+	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
+	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
+	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
+	-cp -u lpeg/lpeg.$(SO) $(LUA_CDIST)/
+	-cp -u lpeg/re.lua $(LUA_DIST)/
+	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/
+	-cp -u lua-openssl/openssl.$(SO) $(LUA_CDIST)/
+	-cp -u lua-webview/webview.$(SO) lua-webview/webview-launcher.lua $(LUA_CDIST)/
+	-cp -u lua-jpeg/jpeg.$(SO) $(LUA_CDIST)/
+	-cp -u lua-exif/exif.$(SO) $(LUA_CDIST)/
+	-cp -u lua-buffer/buffer.$(SO) $(LUA_CDIST)/
+	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
+
 dist: dist-clean dist-prepare dist-copy
+
+dist-all: dist-clean dist-prepare dist-copy dist-dup-copy dist-ext-copy
+
 
 ldoc:
 	cd $(LUAJLS) && $(LUADOC_CMD) -i -d $(LDOC_DIR) .
@@ -389,28 +372,27 @@ ldoc-all: ldoc-clean ldoc md-ldoc
 	mkdir $(JLSDOC_DIR)/luacov
 	cp -ur luacov/docs/* $(JLSDOC_DIR)/luacov/
 
-ldoc.zip: ldoc-all
+dist-doc: ldoc-all
 	rm -f $(LUA_DIST)/docs.zip
 	cd $(JLSDOC_DIR) && zip -r ../$(LUA_DIST)/docs.zip *
+
+dist-doc-cross:
 
 dist-jls-lua51:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
 		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a copy -strip true -t 5.1 -outdir $(LUA_DIST)
-	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
-	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 
 dist-jls-lua54:
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
+
+dist-jls-do: dist-jls-$(LUA_LIB)
 	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 
-dist-jls: dist dist-jls-$(LUA_LIB)
+dist-jls: dist dist-jls-do
 
-dist-jls-full: dist-jls ldoc.zip
-	-@$(MAKE) --quiet versions >$(LUA_DIST)/versions.txt
-
-dist-jls-cross: dist-jls
-	-@$(MAKE) --quiet versions-cross >$(LUA_DIST)/versions.txt
+dist-versions:
+	-@$(MAKE) --quiet versions$(CROSS_SUFFIX) >$(LUA_DIST)/versions.txt
 
 
 luajls.tar.gz:
@@ -423,9 +405,13 @@ luajls-archive: luajls$(ZIP)
 
 dist-archive: luajls-archive
 
-release-cross: dist-jls-cross luajls-archive
 
-release: dist-jls-full test luajls-archive
+release-do: dist-versions dist-doc$(CROSS_SUFFIX) test$(CROSS_SUFFIX) luajls-archive
+
+release-all: dist-all dist-jls-do release-do
+
+release: dist-jls release-do
+
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
 	lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg lpeglabel zlib lua-zlib \
