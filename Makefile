@@ -78,7 +78,7 @@ LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
-STATIC_NAME = luajls
+STATIC_NAME = $(LUA_LIB)jls
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
