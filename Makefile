@@ -348,14 +348,14 @@ dist-all: dist-clean dist-prepare dist-copy dist-dup-copy dist-ext-copy
 
 
 ldoc:
-	cd $(LUAJLS) && $(LUADOC_CMD) -i -d $(LDOC_DIR) .
+	cd $(LUAJLS) && $(LUADOC_CMD) -i --date "" -d $(LDOC_DIR) .
 
 ldoc-dev-content:
 	grep -E "^##* .*$$" ../$(LUAJLS)/doc_topics/manual.md
 	grep -E "^## .*$$" ../$(LUAJLS)/doc_topics/manual.md | sed -E 's/^##*  *//g' | sed 's/[^A-Za-z][^A-Za-z]*/_/g' | sed 's/_$$//g' | sed -E 's/^(.*)$$/@{manual.md.\1|\1}/g'
 
 ldoc-dev:
-	cd ../$(LUAJLS) && $(LUADOC_CMD) -i -d doc .
+	cd ../$(LUAJLS) && $(LUADOC_CMD) -i --date "" -d doc .
 
 md-ldoc:
 	$(MD_CMD) LDoc/doc/doc.md
