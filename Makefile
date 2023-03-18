@@ -342,7 +342,7 @@ dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	-cp -u lua-buffer/buffer.$(SO) $(LUA_CDIST)/
 	-cp -u luabt/bt.$(SO) $(LUA_CDIST)/
 
-dist: dist-clean dist-prepare dist-copy
+dist-min: dist-clean dist-prepare dist-copy
 
 dist-all: dist-clean dist-prepare dist-copy dist-dup-copy dist-ext-copy
 
@@ -388,7 +388,7 @@ dist-jls-lua54:
 dist-jls-do: dist-jls-$(LUA_LIB)
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 
-dist-jls: dist dist-jls-do
+dist-jls: dist-min dist-jls-do
 
 dist-versions:
 	-@$(MAKE) --quiet versions$(CROSS_SUFFIX) >$(LUA_DIST)/versions.txt
@@ -409,7 +409,9 @@ release-do: dist-versions dist-doc$(CROSS_SUFFIX) test$(CROSS_SUFFIX) luajls-arc
 
 release-all: dist-all dist-jls-do release-do
 
-release: dist-jls release-do
+release-min: dist-jls release-do
+
+release: release-all
 
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
