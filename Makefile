@@ -386,7 +386,6 @@ dist-jls-lua54:
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 
 dist-jls-do: dist-jls-$(LUA_LIB)
-	test -f $(LUA_DIST)/jls/net/URL.lua || printf "return require('jls.net.Url')" > $(LUA_DIST)/jls/net/URL.lua
 	cp -ur $(LUAJLS)/examples $(LUA_DIST)/
 
 dist-jls: dist dist-jls-do
