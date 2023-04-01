@@ -386,6 +386,8 @@ dist-jls: dist-min dist-jls-do
 dist-versions:
 	-@$(MAKE) --quiet versions$(CROSS_SUFFIX) >$(LUA_DIST)/versions.txt
 
+dist: dist-all dist-jls-do dist-versions
+
 
 luajls.tar.gz:
 	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(RELEASE_NAME).tar.gz *
