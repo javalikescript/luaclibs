@@ -190,35 +190,28 @@ test-cross:
 
 
 static: static-$(PLAT)
-
-static-windows:
-	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
-		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
-	cat bootstrap.lua >> $(STATIC_NAME).lua
-	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)\src\liblua.a -Ilua\src \
-		luv\src\luv.o luv\deps\libuv\libuv.a \
-		lua-cjson\lua_cjson.o lua-cjson\fpconv.o lua-cjson\strbuf.o \
-		zlib\libz.a lua-zlib\lua_zlib.o \
-		lua-webview\webview.o \
-		-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
 	rm $(STATIC_NAME).lua
 	rm $(STATIC_NAME).luastatic.c
-
 #	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
 
-static-linux:
+static-lua54:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
-		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a preload -strip true -pretty false -o -f $(STATIC_NAME).lua
+		$(LUAJLS)/examples/package.lua -a preload -strip true -pretty false -dependency none \
+		-d $(LUAJLS)/jls -includeDir true \
+		-files dkjson/dkjson.lua \
+		-files xml2lua/XmlParser.lua \
+		-o -f $(STATIC_NAME).lua
 	cat bootstrap.lua >> $(STATIC_NAME).lua
+
+static-windows: static-$(LUA_LIB)
+	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)\src\liblua.a -Ilua\src \
+		luv\src\luv.o luv\deps\libuv\libuv.a \
+		-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32
+
+static-linux: static-$(LUA_LIB)
 	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)/src/liblua.a -Ilua/src \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
-		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
-		zlib/libz.a lua-zlib/lua_zlib.o \
-		lua-webview/webview.o \
-		-lrt -pthread -lpthread \
-		$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
-	rm $(STATIC_NAME).lua
-	rm $(STATIC_NAME).luastatic.c
+		-lrt -pthread -lpthread
 
 
 clean-lua:
@@ -315,7 +308,6 @@ dist-dup-copy:
 	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
 dist-ext-copy:
-	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	-cp -u lua-struct/struct.$(SO) $(LUA_CDIST)/
 	mkdir $(LUA_DIST)/bitop
 	-cp -u bitop-lua/src/bitop/funcs.lua $(LUA_DIST)/bitop/
@@ -332,6 +324,7 @@ dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
 	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
+	cp -u luaunit/luaunit.lua $(LUA_DIST)/
 	-cp -u lpeg/lpeg.$(SO) $(LUA_CDIST)/
 	-cp -u lpeg/re.lua $(LUA_DIST)/
 	-cp -u luaserial/serial.$(SO) $(LUA_CDIST)/

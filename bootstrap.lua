@@ -22,10 +22,7 @@ if scriptName == '-h' or scriptName == '--help' then
   print('with "--" or no Lua script, the Lua script with the executable name, "'..binName..'.lua", will be loaded.')
   os.exit(22)
 elseif scriptName == '-v' or scriptName == '--version' then
-  print('lua-cjson', require('cjson')._VERSION)
   print('luv', require('luv').version_string())
-  print('webview', require('webview')._VERSION)
-  print(require('zlib')._VERSION)
   os.exit(0)
 elseif not scriptName or scriptName == '--' or scriptName == '' then
   scriptName = binName..'.lua'
