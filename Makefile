@@ -211,7 +211,7 @@ static-windows: static-$(LUA_LIB)
 
 static-linux: static-$(LUA_LIB)
 	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)/src/liblua.a -Ilua/src \
-		lua-linux\linux.o \
+		lua-linux/linux.o \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		-lrt -pthread -lpthread
 
