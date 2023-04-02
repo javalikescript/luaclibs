@@ -205,11 +205,13 @@ static-lua54:
 
 static-windows: static-$(LUA_LIB)
 	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)\src\liblua.a -Ilua\src \
+		lua-win32\win32.o -lcomdlg32 \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
 		-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32
 
 static-linux: static-$(LUA_LIB)
 	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)/src/liblua.a -Ilua/src \
+		lua-linux\linux.o \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		-lrt -pthread -lpthread
 

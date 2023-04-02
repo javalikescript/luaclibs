@@ -22,6 +22,7 @@ if scriptName == '-h' or scriptName == '--help' then
   print('with "--" or no Lua script, the Lua script with the executable name, "'..binName..'.lua", will be loaded.')
   os.exit(22)
 elseif scriptName == '-v' or scriptName == '--version' then
+  print(_VERSION)
   print('luv', require('luv').version_string())
   os.exit(0)
 elseif not scriptName or scriptName == '--' or scriptName == '' then
