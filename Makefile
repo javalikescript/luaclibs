@@ -324,6 +324,7 @@ dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
 	cp -u luv/luv.$(SO) $(LUA_CDIST)/
 	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
+	cp -u xml2lua/xml2lua.lua $(LUA_DIST)/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
 	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
 	cp -u luaunit/luaunit.lua $(LUA_DIST)/

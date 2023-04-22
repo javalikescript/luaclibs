@@ -1,28 +1,56 @@
 
-local function printVersion(name, fn)
+local function printVersion(name, key)
   local status, m = pcall(require, name)
   if status then
+    if key == nil then
+      key = '_VERSION'
+    end
     local version = '?'
-    if fn then
-      version = fn(m, name)
-    elseif m._VERSION then
-      version = m._VERSION
+    if type(key) == 'function' then
+      version = key(m, name)
+    elseif type(key) == 'string' then
+      local value = m[key]
+      if type(value) == 'function' then
+        version = value()
+      elseif type(value) == 'string' then
+        version = value
+      end
     end
     print(name, version)
   end
 end
 
-local bits = math.floor(#(string.match(tostring({}), '%w+: (%w+)')) / 2) * 8
+local bits
+if string.pack then
+  bits = #string.pack('T', 0) * 8
+else
+  bits = 0xfffffffff == 0xfffffffff and 64 or 32
+end
 print(_VERSION, tostring(bits)..' bits')
 
 printVersion('lfs')
 printVersion('socket')
 printVersion('cjson')
 printVersion('zlib')
-printVersion('luv', function(m) return m.version_string(); end)
-printVersion('openssl', function(m) return m.version(); end)
-printVersion('lpeg', function(m) return m.version(); end)
-printVersion('lpeglabel', function(m) return m.version; end)
+printVersion('luv', 'version_string')
+printVersion('openssl', 'version')
+printVersion('lpeg', 'version')
+printVersion('lpeglabel', 'version')
 printVersion('luaunit')
+printVersion('dumbParser', 'VERSION')
+printVersion('xml2lua') -- XmlParser
+printVersion('webview')
+printVersion('llthreads')
+--printVersion('luachild') -- not available
+printVersion('sha1')
+printVersion('luacov.runner', 'version')
+--printVersion('struct') -- not available 1.8
+printVersion('dkjson', 'version')
+--printVersion('winapi') -- not available
+
 printVersion('exif')
 printVersion('jpeg')
+printVersion('serial')
+printVersion('win32')
+printVersion('linux')
+printVersion('buffer')
