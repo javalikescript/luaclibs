@@ -419,7 +419,7 @@ release: release-all
 
 
 lua-5.1.5:
-	wget -q https://www.lua.org/ftp/lua-5.1.5.tar.gz
+	wget -q --no-check-certificate https://www.lua.org/ftp/lua-5.1.5.tar.gz
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
