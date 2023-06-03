@@ -37,7 +37,7 @@ LIBOPT = $(LIBOPT_$(LIBEXT))
 
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
-SOURCES = luaserial.c luaserial_windows.c luaserial_linux.c
+SOURCES = luaserial.c luaserial_windows.c luaserial_linux.c lua-compat/luamod.h lua-compat/compat.h
 
 OBJS = luaserial.o
 

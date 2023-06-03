@@ -44,7 +44,7 @@ LIBOPT = $(LIBOPT_$(LIBEXT))
 
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
-SOURCES = exif.c luamod.h
+SOURCES = exif.c lua-compat/luamod.h lua-compat/compat.h
 
 OBJS = exif.o
 
