@@ -72,8 +72,8 @@ lua51:
 		CC="$(CC) -std=gnu99" \
 		AR="$(AR) rcu" \
 		RANLIB=$(RANLIB) \
-		MYCFLAGS="-DLUA_USE_LINUX $(LUA_MYCFLAGS)" \
-		MYLIBS="-Wl,-E -ldl -lreadline -lhistory -lncurses" \
+		MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN $(LUA_MYCFLAGS)" \
+		MYLIBS="-Wl,-E -ldl" \
 		SYSLIBS="-Wl,-E -ldl"
 
 lua54:
