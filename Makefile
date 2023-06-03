@@ -224,7 +224,7 @@ clean-luv:
 	-$(RM) ./luv/src/*.o ./luv/*.$(SO)
 
 clean-lua-openssl:
-	-$(RM) ./lua-openssl/src/*.o ./lua-openssl/*.$(SO)
+	-$(RM) ./lua-openssl/src/*.o ./lua-openssl/deps/auxiliar/*.o ./lua-openssl/*.$(SO)
 
 clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./lua-cjson/*.o ./lua-cjson/*.$(SO)
@@ -344,7 +344,8 @@ dist-all: dist-clean dist-prepare dist-copy dist-dup-copy dist-ext-copy
 
 
 ldoc:
-	cd $(LUAJLS) && $(LUADOC_CMD) -i --date "" -d $(LDOC_DIR) .
+	mkdir $(JLSDOC_DIR)
+	-cd $(LUAJLS) && $(LUADOC_CMD) -i --date "" -d $(LDOC_DIR) .
 
 ldoc-dev-content:
 	grep -E "^##* .*$$" ../$(LUAJLS)/doc_topics/manual.md
@@ -375,8 +376,13 @@ dist-doc: ldoc-all
 dist-doc-cross:
 
 dist-jls-lua51:
+	mv $(LUA_DIST)/luaunit.lua $(LUA_DIST)/luaunit-.lua
+	cp -u luaunit-patch.lua $(LUA_DIST)/luaunit.lua
+	mkdir $(LUA_DIST)/luvit
+	printf "return require('uv')" > $(LUA_DIST)/luvit/luv.lua
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
 		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a copy -strip true -t 5.1 -outdir $(LUA_DIST)
+	echo "export LUA_PATH=\"$(MK_DIR)$(LUA_DIST)/luvit/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua\""
 
 dist-jls-lua54:
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
@@ -410,6 +416,23 @@ release-all: dist-all dist-jls-do release-do
 release-min: dist-jls release-do
 
 release: release-all
+
+
+lua-5.1.5:
+	wget -q https://www.lua.org/ftp/lua-5.1.5.tar.gz
+	tar -xf lua-5.1.5.tar.gz
+	rm lua-5.1.5.tar.gz
+
+sync-git:
+	git fetch && git rebase
+	git submodule update --init --recursive
+
+sync-release: lua-5.1.5
+	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release
+	$(MAKE) clean all release
+
+
+sync: sync-git sync-release
 
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
