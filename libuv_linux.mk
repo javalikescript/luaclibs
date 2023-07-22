@@ -61,6 +61,7 @@ OBJS = src/fs-poll.o \
 	src/random.o \
 	src/strscpy.o \
 	src/strtok.o \
+	src/thread-common.o \
 	src/threadpool.o \
 	src/timer.o \
 	src/uv-data-getter-setters.o \
@@ -86,14 +87,11 @@ OBJS += src/unix/async.o \
 	src/unix/tty.o \
 	src/unix/udp.o
 
-OBJS += src/unix/linux-core.o \
-	src/unix/linux-inotify.o \
-	src/unix/linux-syscalls.o \
+OBJS += src/unix/linux.o \
 	src/unix/procfs-exepath.o \
 	src/unix/proctitle.o \
 	src/unix/random-getrandom.o \
-	src/unix/random-sysctl-linux.o \
-	src/unix/epoll.o
+	src/unix/random-sysctl-linux.o
 
 all: libuv.a
 

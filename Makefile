@@ -424,13 +424,17 @@ lua-5.1.5:
 	rm lua-5.1.5.tar.gz
 
 sync-git:
-	git fetch && git rebase
+	git fetch
+	git rebase
 	git submodule update --init --recursive
 
-sync-release: lua-5.1.5
+sync-release-5.1: lua-5.1.5
 	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release
+
+sync-release:
 	$(MAKE) clean all release
 
+sync-all: sync-git sync-release-5.1 sync-release
 
 sync: sync-git sync-release
 

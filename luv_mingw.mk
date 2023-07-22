@@ -15,7 +15,7 @@ LIB_OPTION += -shared \
 	-Wl,-s \
 	-L..\$(LUA_PATH)\src -l$(LUA_LIB) \
 	$(LIB_UV_LIB) \
-	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32
+	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
 
 ##-lws2_32 -lpsapi -liphlpapi -luserenv
 

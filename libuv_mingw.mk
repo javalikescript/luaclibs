@@ -49,6 +49,7 @@ OBJS = src/fs-poll.o \
 	src/random.o \
 	src/strscpy.o \
 	src/strtok.o \
+	src/thread-common.o \
 	src/threadpool.o \
 	src/timer.o \
 	src/uv-data-getter-setters.o \
