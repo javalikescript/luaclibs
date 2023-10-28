@@ -1,6 +1,3 @@
-# This Makefile is based on LuaSec's Makefile. Thanks to the LuaSec developers.
-# Inform the location to intall the modules
-
 LUA_PATH = lua
 LUA_LIB = lua53
 
