@@ -190,8 +190,7 @@ test-cross:
 
 
 static: static-$(PLAT)
-	rm $(STATIC_NAME).lua
-	rm $(STATIC_NAME).luastatic.c
+	rm $(STATIC_NAME).lua addlibs.o addlibs-custom.c
 #	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
 
 static-lua54:
@@ -201,20 +200,28 @@ static-lua54:
 		-files dkjson/dkjson.lua \
 		-files xml2lua/XmlParser.lua \
 		-o -f $(STATIC_NAME).lua
-	cat bootstrap.lua >> $(STATIC_NAME).lua
 
 static-windows: static-$(LUA_LIB)
-	$(LUA_APP) luastatic\luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)\src\liblua.a -Ilua\src \
-		lua-win32\win32.o -lcomdlg32 \
+	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua luv win32 > addlibs-custom.c
+	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
+	$(CC) -std=gnu99 -o $(STATIC_NAME).exe -s addlibs.o \
+		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
+		lua-zlib\lua_zlib.o zlib\libz.a \
+		lua-win32\win32.o \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
-		-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
+		-lm -Ilua\src \
+		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
 
 static-linux: static-$(LUA_LIB)
-	$(LUA_APP) luastatic/luastatic.lua $(STATIC_NAME).lua $(LUA_PATH)/src/liblua.a -Ilua/src \
+	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua luv linux > addlibs-custom.c
+	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
+	$(CC) -std=gnu99 -o $(STATIC_NAME) -s addlibs.o \
+		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
+		lua-zlib/lua_zlib.o zlib/libz.a \
 		lua-linux/linux.o \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
+		-lm -Ilua/src \
 		-lrt -pthread -lpthread
-
 
 clean-lua:
 	-$(RM) ./$(LUA_PATH)/src/*.o ./$(LUA_PATH)/src/*.a
