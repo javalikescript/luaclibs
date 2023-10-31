@@ -84,10 +84,10 @@ SRCS=$(AUXDIR)/auxiliar.c $(AUXDIR)/subsidiar.c src/asn1.c src/bio.c src/cipher.
 	src/engine.c src/hmac.c src/kdf.c src/lbn.c src/lhash.c src/mac.c src/misc.c src/param.c src/ocsp.c src/openssl.c src/ots.c src/pkcs12.c src/pkcs7.c src/pkey.c \
 	src/rsa.c src/srp.c src/ssl.c src/th-lock.c src/util.c src/x509.c src/xattrs.c src/xexts.c src/xname.c src/xstore.c src/xalgor.c src/callback.c 
 
-lib: $(TARGET)
+lib: $(TARGET) lib$(LIBNAME).a
 
-#lib$(LIBNAME).a: $(OBJS)
-#	$(AR) rcs lib$(LIBNAME).a $(OBJS)
+lib$(LIBNAME).a: $(OBJS)
+	$(AR) rcs lib$(LIBNAME).a $(OBJS)
 
 #$(TARGET)NO: lib$(LIBNAME).a
 #	$(CC) -o $(TARGET) src/$(LIBNAME).o -L. -l$(LIBNAME) -L$(LUADIR) -llua

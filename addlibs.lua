@@ -61,3 +61,5 @@ table.insert(lines, [[
 ]])
 
 io.stdout:write(table.concat(lines))
+
+io.stderr:write(string.format('addlibs generated with name "%s", deflate ratio is %s\n', chunk_name, (chunk_inflated_size * 10 // chunk_deflated_size) / 10))

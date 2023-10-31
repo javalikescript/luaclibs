@@ -197,30 +197,40 @@ static-lua54:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
 		$(LUAJLS)/examples/package.lua -a preload -strip true -pretty false -dependency none \
 		-d $(LUAJLS)/jls -includeDir true \
-		-files dkjson/dkjson.lua \
 		-files xml2lua/XmlParser.lua \
+		-files DumbLuaParser/dumbParser.lua \
 		-o -f $(STATIC_NAME).lua
 
 static-windows: static-$(LUA_LIB)
-	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua luv win32 > addlibs-custom.c
+	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv win32 cjson serial openssl webview > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -o $(STATIC_NAME).exe -s addlibs.o \
+	$(CC) -std=gnu99 -static-libgcc -o $(STATIC_NAME).exe -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib\lua_zlib.o zlib\libz.a \
 		lua-win32\win32.o \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
+		lua-cjson\lua_cjson.o lua-cjson\fpconv.o lua-cjson\strbuf.o \
+		luaserial\luaserial.o \
+		lua-openssl\libopenssl.a openssl\libssl.a openssl\libcrypto.a \
+		lua-webview\webview.o \
 		-lm -Ilua\src \
+    -lcomctl32 -loleaut32 -lgdi32 \
 		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
 
 static-linux: static-$(LUA_LIB)
-	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua luv linux > addlibs-custom.c
+	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv linux cjson serial openssl webview > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -o $(STATIC_NAME) -s addlibs.o \
+	$(CC) -std=gnu99 -static-libgcc -o $(STATIC_NAME) -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		lua-linux/linux.o \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
+		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
+		luaserial/luaserial.o \
+		lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a \
+		lua-webview/webview.o \
 		-lm -Ilua/src \
+		$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0) \
 		-lrt -pthread -lpthread
 
 clean-lua:
