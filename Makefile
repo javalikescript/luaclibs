@@ -65,12 +65,12 @@ EXE := $(EXE_$(PLAT))
 MAIN_MK := $(MK_$(PLAT))
 ZIP := $(ZIP_$(PLAT))
 
-DIST_TARGET=$(subst w64-mingw32,windows,$(GCC_NAME))$(RELEASE_SUFFIX)
+DIST_TARGET = $(subst w64-mingw32,windows,$(GCC_NAME))$(RELEASE_SUFFIX)
 LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
-STATIC_NAME = $(LUA_LIB)jls
+STATIC_NAME := luajls
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
@@ -430,16 +430,20 @@ release-min: dist-jls release-do
 release: release-all
 
 
+STATIC_FILES := docs.zip examples licenses.txt versions.txt
+
 static.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz $(STATIC_NAME)$(EXE) licenses.txt versions.txt
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz $(STATIC_NAME) $(STATIC_FILES)
 
 static.zip:
-	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip $(STATIC_NAME)$(EXE) licenses.txt versions.txt WebView2Loader.dll
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip $(STATIC_NAME)$(EXE) $(STATIC_FILES) WebView2Loader.dll
 
 static-release: static static$(ZIP)
 
+static-release-cross:
 
-releases: release static-release
+
+releases: release static-release$(CROSS_SUFFIX)
 
 
 lua-5.1.5:
@@ -447,10 +451,10 @@ lua-5.1.5:
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
-sync-releases-5.1: lua-5.1.5
-	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all releases
+sync-release-5.1: lua-5.1.5
+	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release
 
-sync-releases:
+sync-release:
 	$(MAKE) clean all releases
 
 sync-git:
@@ -458,9 +462,9 @@ sync-git:
 	git rebase
 	git submodule update --init --recursive
 
-sync-all: sync-git sync-releases-5.1 sync-releases
+sync-all: sync-git sync-release-5.1 sync-release
 
-sync: sync-git sync-releases
+sync: sync-git sync-release
 
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \

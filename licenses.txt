@@ -1,51 +1,93 @@
 Lua
+Copyright © 1994–2023 Lua.org, PUC-Rio
 MIT license
 https://www.lua.org/about.html
 
 lua-zlib
+Copyright (c) 2009 Brian Maher
 MIT License
 https://github.com/brimworks/lua-zlib
 
 zlib
+(C) 1995-2022 Jean-loup Gailly and Mark Adler
 Licence zlib
 https://github.com/madler/zlib
 
 luv
+Copyright 2014 The Luvit Authors
 Apache-2.0 license
 https://github.com/luvit/luv
 
 libuv
+Copyright (c) 2015-present libuv project contributors
 MIT License
 https://github.com/libuv/libuv
 
 lua-cjson
+Copyright (c) 2010-2012  Mark Pulford <mark@kyne.com.au>
 MIT License
-https://github.com/javalikescript/lua-cjson
+https://github.com/mpx/lua-cjson
 
 lua-openssl
+Copyright (c) 2011 - 2023 zhaozg, zhaozg(at)gmail.com
 MIT License
 https://github.com/zhaozg/lua-openssl
 
 openssl
-Apache-2.0 license
+Copyright (c) 1998-2019 The OpenSSL Project
+OpenSSL and SSLeay license
 https://github.com/openssl/openssl
 
-lua-webview
+webview-c
+Copyright (c) 2017 Serge Zaitsev
 MIT License
-https://github.com/javalikescript/lua-webview
+https://github.com/javalikescript/webview-c
 
 winapi
+Copyright (C) 2011 Steve Donovan
 MIT License
 https://github.com/stevedonovan/winapi
 
 xml2lua
+Copyright (c) 2016 Manoel Campos da Silva Filho
 MIT License
 https://github.com/manoelcampos/xml2lua
 
 DumbLuaParser
+Copyright © 2020-2021 Marcus 'ReFreezed' Thunström
 MIT License
 https://github.com/ReFreezed/DumbLuaParser
 
+WebView2
+Copyright (C) Microsoft Corporation
+https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.2045.28/License
+
+lua-llthreads2
+Copyright (c) 2013-2017 Alexey Melnichuk
+MIT License
+https://github.com/moteus/lua-llthreads2
+
+luasocket
+Copyright (C) 2004-2022 Diego Nehab
+MIT License
+https://github.com/lunarmodules/luasocket
+
+luafilesystem
+Copyright © 2010-2022 The LuaFileSystem authors
+MIT License
+https://github.com/lunarmodules/luafilesystem
+
+luachild
+Copyright 2007 Mark Edgar
+MIT and Unlicense license
+https://github.com/pocomane/luachild
+
+sha1
+Copyright (c) 2018 Peter Melnichenko
+MIT License
+https://github.com/mpeterv/sha1
+
 luajls
+Copyright 2018-2023 SPYL, javalikescript@free.fr
 MIT License
 https://github.com/javalikescript/luajls
