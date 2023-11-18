@@ -1,0 +1,51 @@
+Lua
+MIT license
+https://www.lua.org/about.html
+
+lua-zlib
+MIT License
+https://github.com/brimworks/lua-zlib
+
+zlib
+Licence zlib
+https://github.com/madler/zlib
+
+luv
+Apache-2.0 license
+https://github.com/luvit/luv
+
+libuv
+MIT License
+https://github.com/libuv/libuv
+
+lua-cjson
+MIT License
+https://github.com/javalikescript/lua-cjson
+
+lua-openssl
+MIT License
+https://github.com/zhaozg/lua-openssl
+
+openssl
+Apache-2.0 license
+https://github.com/openssl/openssl
+
+lua-webview
+MIT License
+https://github.com/javalikescript/lua-webview
+
+winapi
+MIT License
+https://github.com/stevedonovan/winapi
+
+xml2lua
+MIT License
+https://github.com/manoelcampos/xml2lua
+
+DumbLuaParser
+MIT License
+https://github.com/ReFreezed/DumbLuaParser
+
+luajls
+MIT License
+https://github.com/javalikescript/luajls

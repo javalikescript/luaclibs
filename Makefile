@@ -183,7 +183,6 @@ test-cross:
 
 static: static-$(PLAT)
 	rm $(STATIC_NAME).lua addlibs.o addlibs-custom.c
-	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
 
 static-lua54:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
@@ -194,9 +193,9 @@ static-lua54:
 		-o -f $(STATIC_NAME).lua
 
 static-windows: static-$(LUA_LIB)
-	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv win32 cjson serial openssl webview > addlibs-custom.c
+	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv win32 cjson serial openssl webview winapi > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(STATIC_NAME).exe -s addlibs.o \
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)\$(STATIC_NAME).exe -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib\lua_zlib.o zlib\libz.a \
 		lua-win32\win32.o \
@@ -205,14 +204,16 @@ static-windows: static-$(LUA_LIB)
 		luaserial\luaserial.o \
 		lua-openssl\libopenssl.a openssl\libssl.a openssl\libcrypto.a \
 		lua-webview\webview.o \
+		winapi\winapi.o winapi\wutils.o \
 		-lm -Ilua\src \
-    -lcomctl32 -loleaut32 -lgdi32 \
-		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
+		-lcomctl32 -loleaut32 -lgdi32 \
+		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
+		-lkernel32 -ladvapi32 -lMpr
 
 static-linux: static-$(LUA_LIB)
 	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv linux cjson serial openssl webview > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(STATIC_NAME) -s addlibs.o \
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME) -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		lua-linux/linux.o \
@@ -329,6 +330,7 @@ dist-ext-copy:
 	-cp -u lpeglabel/lpeglabel.$(SO) $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
+	cp -u licenses.txt $(LUA_DIST)/
 	cp -u $(LUA_PATH)/src/lua$(EXE) $(LUA_PATH)/src/luac$(EXE) $(LUA_EDIST)/
 	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
 	cp -u luv/luv.$(SO) $(LUA_CDIST)/
@@ -428,25 +430,37 @@ release-min: dist-jls release-do
 release: release-all
 
 
+static.tar.gz:
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz $(STATIC_NAME)$(EXE) licenses.txt versions.txt
+
+static.zip:
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip $(STATIC_NAME)$(EXE) licenses.txt versions.txt WebView2Loader.dll
+
+static-release: static static$(ZIP)
+
+
+releases: release static-release
+
+
 lua-5.1.5:
 	wget -q --no-check-certificate https://www.lua.org/ftp/lua-5.1.5.tar.gz
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
-sync-release-5.1: lua-5.1.5
-	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release static
+sync-releases-5.1: lua-5.1.5
+	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all releases
 
-sync-release:
-	$(MAKE) clean all release static
+sync-releases:
+	$(MAKE) clean all releases
 
 sync-git:
 	git fetch
 	git rebase
 	git submodule update --init --recursive
 
-sync-all: sync-git sync-release-5.1 sync-release
+sync-all: sync-git sync-releases-5.1 sync-releases
 
-sync: sync-git sync-release
+sync: sync-git sync-releases
 
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
