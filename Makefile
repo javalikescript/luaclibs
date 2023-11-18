@@ -224,7 +224,7 @@ static-linux: static-$(LUA_LIB)
 		lua-webview/webview.o \
 		-lm -Ilua/src \
 		$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0) \
-		-lrt -pthread -lpthread
+		-lrt -pthread -lpthread -ldl
 
 clean-lua:
 	-$(RM) ./$(LUA_PATH)/src/*.o ./$(LUA_PATH)/src/*.a
