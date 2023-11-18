@@ -97,9 +97,6 @@
 [submodule "luachild"]
 	path = luachild
 	url = https://github.com/javalikescript/luachild.git
-[submodule "luastatic"]
-	path = luastatic
-	url = https://github.com/javalikescript/luastatic.git
 [submodule "lua-struct"]
 	path = lua-struct
 	url = https://github.com/javalikescript/lua-struct.git

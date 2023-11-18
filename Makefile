@@ -4,29 +4,21 @@ GCC_NAME ?= $(shell $(CROSS_PREFIX)gcc -dumpmachine)
 ifdef HOST
 	CROSS_PREFIX ?= $(HOST)-
 	CROSS_SUFFIX = -cross
-	ifneq (,$(findstring x86_64,$(HOST)))
-		ARCH = x86_64
-	else ifneq (,$(findstring x86,$(HOST)))
-		ARCH = x86
-	else ifneq (,$(findstring arm,$(HOST)))
-		ARCH = arm
-	else ifneq (,$(findstring aarch64,$(HOST)))
-		ARCH = aarch64
-	else
-		$(error Unknown host $(HOST))
-	endif
+	ARCH_NAME := $(HOST)
 else
-	ifneq (,$(findstring x86_64,$(GCC_NAME)))
-		ARCH = x86_64
-	else ifneq (,$(findstring x86,$(GCC_NAME)))
-		ARCH = x86
-	else ifneq (,$(findstring arm,$(GCC_NAME)))
-		ARCH = arm
-	else ifneq (,$(findstring aarch64,$(GCC_NAME)))
-		ARCH = aarch64
-	else
-		$(error Unknown compiler target $(GCC_NAME))
-	endif
+	ARCH_NAME := $(GCC_NAME)
+endif
+
+ifneq (,$(findstring x86_64,$(ARCH_NAME)))
+	ARCH = x86_64
+else ifneq (,$(findstring x86,$(ARCH_NAME)))
+	ARCH = x86
+else ifneq (,$(findstring arm,$(ARCH_NAME)))
+	ARCH = arm
+else ifneq (,$(findstring aarch64,$(ARCH_NAME)))
+	ARCH = aarch64
+else
+	$(error Unknown architecture name $(ARCH_NAME))
 endif
 
 ifeq ($(ARCH),x86_64)
@@ -191,7 +183,7 @@ test-cross:
 
 static: static-$(PLAT)
 	rm $(STATIC_NAME).lua addlibs.o addlibs-custom.c
-#	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
+	mv $(STATIC_NAME)$(EXE) $(LUA_DIST)/
 
 static-lua54:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
@@ -366,7 +358,8 @@ ldoc:
 
 ldoc-dev-content:
 	grep -E "^##* .*$$" ../$(LUAJLS)/doc_topics/manual.md
-	grep -E "^## .*$$" ../$(LUAJLS)/doc_topics/manual.md | sed -E 's/^##*  *//g' | sed 's/[^A-Za-z][^A-Za-z]*/_/g' | sed 's/_$$//g' | sed -E 's/^(.*)$$/@{manual.md.\1|\1}/g'
+	grep -E "^## .*$$" ../$(LUAJLS)/doc_topics/manual.md | sed -E 's/^##*  *//g' | \
+		sed 's/[^A-Za-z][^A-Za-z]*/_/g' | sed 's/_$$//g' | sed -E 's/^(.*)$$/@{manual.md.\1|\1}/g'
 
 ldoc-dev:
 	cd ../$(LUAJLS) && $(LUADOC_CMD) -i --date "" -d doc .
@@ -440,16 +433,16 @@ lua-5.1.5:
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
+sync-release-5.1: lua-5.1.5
+	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release static
+
+sync-release:
+	$(MAKE) clean all release static
+
 sync-git:
 	git fetch
 	git rebase
 	git submodule update --init --recursive
-
-sync-release-5.1: lua-5.1.5
-	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release
-
-sync-release:
-	$(MAKE) clean all release
 
 sync-all: sync-git sync-release-5.1 sync-release
 
