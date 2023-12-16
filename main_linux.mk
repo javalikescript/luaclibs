@@ -29,6 +29,16 @@ else
 	LUA_OPENSSL_VARS = OPENSSL_STATIC=1
 endif
 
+ifeq ($(RELEASE_SUFFIX),-wd)
+	LIB_UV_TAG := v1.44.2
+endif
+
+ifdef LIB_UV_TAG
+	LIB_UV_PATH=../libuv-$(LIB_UV_TAG)
+else
+	LIB_UV_PATH=deps/libuv
+endif
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
@@ -101,11 +111,17 @@ lpeg: lua
 lpeglabel: lua
 	$(MAKE) -C lpeglabel lpeglabel.$(SO) LUADIR=../$(LUA_PATH)/src/ DLLFLAGS="-shared -fPIC"
 
+libuv-$(LIB_UV_TAG):
+	git clone --depth 1 --branch $(LIB_UV_TAG) https://github.com/libuv/libuv libuv-$(LIB_UV_TAG)
+
+libuv$(LIB_UV_TAG): libuv-$(LIB_UV_TAG)
+	$(MAKE) -C libuv-$(LIB_UV_TAG) -f ../libuv-$(LIB_UV_TAG)_linux.mk CC=$(CC)
+
 libuv:
 	$(MAKE) -C luv/deps/libuv -f ../../../libuv_linux.mk CC=$(CC)
 
-luv: lua libuv
-	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)
+luv: lua libuv$(LIB_UV_TAG)
+	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) LIB_UV_PATH=$(LIB_UV_PATH) $(LUA_VARS)
 
 luafilesystem lua-buffer luaserial lua-webview lua-linux luachild lua-struct: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
