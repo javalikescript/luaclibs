@@ -181,8 +181,11 @@ $(LUAJLS_TESTS):
 test-cross:
 
 
-static: static-$(PLAT)
+static: static-$(PLAT) static-test
 	rm $(STATIC_NAME).lua addlibs.o addlibs-custom.c
+
+static-test:
+	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-lua54:
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
