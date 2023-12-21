@@ -31,12 +31,9 @@ endif
 
 ifeq ($(RELEASE_SUFFIX),-wd)
 	LIB_UV_TAG := v1.44.2
-endif
-
-ifdef LIB_UV_TAG
-	LIB_UV_PATH=../libuv-$(LIB_UV_TAG)
+	LIB_UV_TARGET := tag
 else
-	LIB_UV_PATH=deps/libuv
+	LIB_UV_TARGET := dep
 endif
 
 all: full
@@ -114,14 +111,21 @@ lpeglabel: lua
 libuv-$(LIB_UV_TAG):
 	git clone --depth 1 --branch $(LIB_UV_TAG) https://github.com/libuv/libuv libuv-$(LIB_UV_TAG)
 
-libuv$(LIB_UV_TAG): libuv-$(LIB_UV_TAG)
+libuv-tag: libuv-$(LIB_UV_TAG)
 	$(MAKE) -C libuv-$(LIB_UV_TAG) -f ../libuv-$(LIB_UV_TAG)_linux.mk CC=$(CC)
 
-libuv:
+libuv-dep:
 	$(MAKE) -C luv/deps/libuv -f ../../../libuv_linux.mk CC=$(CC)
 
-luv: lua libuv$(LIB_UV_TAG)
-	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) LIB_UV_PATH=$(LIB_UV_PATH) $(LUA_VARS)
+libuv: libuv-$(LIB_UV_TARGET)
+
+luv-tag:
+	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) LIB_UV_PATH=../libuv-$(LIB_UV_TAG) $(LUA_VARS)
+
+luv-dep:
+	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)
+
+luv: lua luv-$(LIB_UV_TARGET) libuv
 
 luafilesystem lua-buffer luaserial lua-webview lua-linux luachild lua-struct: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
