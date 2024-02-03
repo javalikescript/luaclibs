@@ -249,7 +249,7 @@ clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./luafilesystem/src/*.o ./luafilesystem/*.$(SO)
 	-$(RM) ./luasocket/src/*.o ./luasocket/src/*.$(SO)
 	-$(RM) ./lua-zlib/*.o ./lua-zlib/*.$(SO)
-	-$(RM) ./luaexpat/src/*.o ./luaexpat/src/*.$(SO)
+	-$(RM) ./luaexpat/src/*.o ./luaexpat/*.$(SO)
 	-$(RM) ./lpeg/*.o ./lpeg/*.$(SO)
 	-$(RM) ./lpeglabel/*.o ./lpeglabel/*.$(SO)
 	-$(RM) ./luaserial/*.o ./luaserial/*.$(SO)
@@ -344,7 +344,7 @@ dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
 	cp -u luv/luv.$(SO) $(LUA_CDIST)/
 	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
-	cp -u luaexpat/src/lxp.$(SO) $(LUA_CDIST)/
+	cp -u luaexpat/lxp.$(SO) $(LUA_CDIST)/
 	cp -u xml2lua/xml2lua.lua $(LUA_DIST)/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
 	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/

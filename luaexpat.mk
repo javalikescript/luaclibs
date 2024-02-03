@@ -29,7 +29,7 @@ LIBOPT_so = -O \
   -static-libgcc \
   -Wl,-s \
   -L..\$(LUA_PATH)\src \
-  ../$(EXPAT)/lib/libexpat.la
+  $(EXPAT)/lib/.libs/libexpat.a
 
 CFLAGS_so = -pedantic \
   -fPIC \
