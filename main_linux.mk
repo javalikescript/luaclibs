@@ -56,11 +56,11 @@ any: full
 
 configure: configure-$(ARCH_SUFFIX)
 
-configure-default: configure-libjpeg configure-libexif configure-openssl configure-libexpat
+configure-default: configure-libjpeg configure-libexif configure-openssl configure-libexpat-default
 
-configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm
+configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm configure-libexpat-arm
 
-configure-aarch64: configure-libjpeg-aarch64 configure-libexif-aarch64 configure-openssl-aarch64
+configure-aarch64: configure-libjpeg-aarch64 configure-libexif-aarch64 configure-openssl-aarch64 configure-libexpat-aarch64
 
 show:
 	@echo Make command goals: $(MAKECMDGOALS)
@@ -162,8 +162,13 @@ openssl:
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_OPENSSL_VARS) $(LUA_VARS)
 
-configure-libexpat:
+configure-libexpat-default:
 	cd $(EXPAT) && sh configure
+
+configure-libexpat-arm configure-libexpat-aarch64:
+	cd $(EXPAT) && sh configure --host=$(HOST) CC=$(HOST)-gcc LD=$(HOST)-gcc
+
+configure-libexpat: configure-libexpat-$(ARCH_SUFFIX)
 
 libexpat:
 	$(MAKE) -C $(EXPAT)/lib
