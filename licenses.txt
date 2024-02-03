@@ -53,8 +53,19 @@ Copyright (c) 2016 Manoel Campos da Silva Filho
 MIT License
 https://github.com/manoelcampos/xml2lua
 
+luaexpat
+Copyright (c) 2003-2007 The Kepler Project, 2013-2022 Matthew Wild.
+MIT License
+https://lunarmodules.github.io/luaexpat
+
+Expat
+Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper
+Copyright (c) 2001-2022 Expat maintainers
+MIT License
+https://libexpat.github.io/
+
 DumbLuaParser
-Copyright © 2020-2021 Marcus 'ReFreezed' Thunström
+Copyright (c) 2020-2021 Marcus 'ReFreezed' Thunström
 MIT License
 https://github.com/ReFreezed/DumbLuaParser
 
@@ -73,7 +84,7 @@ MIT License
 https://github.com/lunarmodules/luasocket
 
 luafilesystem
-Copyright © 2010-2022 The LuaFileSystem authors
+Copyright (c) 2010-2022 The LuaFileSystem authors
 MIT License
 https://github.com/lunarmodules/luafilesystem
 
@@ -82,12 +93,7 @@ Copyright 2007 Mark Edgar
 MIT and Unlicense license
 https://github.com/pocomane/luachild
 
-sha1
-Copyright (c) 2018 Peter Melnichenko
-MIT License
-https://github.com/mpeterv/sha1
-
 luajls
-Copyright 2018-2023 SPYL, javalikescript@free.fr
+Copyright 2018-2024 SPYL, javalikescript@free.fr
 MIT License
 https://github.com/javalikescript/luajls
