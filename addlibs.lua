@@ -94,16 +94,14 @@ end
 
 table.insert(lines, [[
 
-static void load_custom_libs(lua_State *L) {
-  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);]])
+static const luaL_Reg custom_libs[] = {
+]])
 for _, libname in ipairs(libnames) do
-  table.insert(lines, string.format([[
-  lua_pushcfunction(L, luaopen_%s);
-  lua_setfield(L, -2, "%s");
-]], libname, libname))
+  table.insert(lines, string.format('  {"%s", luaopen_%s},\n', libname, libname))
 end
-table.insert(lines, [[  lua_pop(L, 1);
-}
+table.insert(lines, [[
+	{NULL, NULL}
+};
 
 ]])
 
@@ -136,7 +134,7 @@ end
 
 local lua = stripLua(table.concat(luaPreloads))
 local deflated = assert(deflate(lua))
-table.insert(lines, string.format('  {"%s", %d, %d},\n', "preloads", index, #lua))
+table.insert(lines, string.format('  {"%s", %d, %d},\n', ":preloads:", index, #lua))
 table.insert(preloads, deflated)
 index = index + #deflated
 total = total + #lua
@@ -148,18 +146,15 @@ table.insert(lines, string.format('#define PRELOADS_INDEX %d\n', count))
 
 table.insert(lines, [[
 
-static void load_custom_mods(lua_State *L) {
-  luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);]])
-for _, modname in ipairs(deflatedNames) do
-  table.insert(lines, string.format([[
-  lua_pushcfunction(L, preload_custom_get);
-  lua_setfield(L, -2, "%s");
-]], modname))
-end
-table.insert(lines, [[  lua_pop(L, 1);
-}
-
+static const char *custom_names[] = {
 ]])
+for _, modname in ipairs(deflatedNames) do
+  table.insert(lines, string.format('  "%s",\n', modname))
+end
+table.insert(lines, string.format([[
+  NULL
+};
+]], #deflatedNames))
 
 if false then
   table.insert(lines, '/*\n')

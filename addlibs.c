@@ -5,7 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void load_deflated_chunk(lua_State *L, const char *name, int window_bits, const unsigned char* deflated, int deflated_size, int inflated_size) {
+#ifdef JLS_LUA_MOD_TRACE
+#include <stdio.h>
+#define trace(...) printf(__VA_ARGS__)
+#else
+#define trace(...) ((void)0)
+#endif
+
+struct custom_preload {
+  unsigned char *name;
+  int index;
+  int size;
+};
+
+#include "addlibs-custom.c"
+
+static void load_deflated_chunk(lua_State *L, const char *name, const unsigned char* deflated, int deflated_size, int inflated_size) {
   int ret;
   z_stream strm;
   unsigned char* inflated;
@@ -16,7 +31,7 @@ static void load_deflated_chunk(lua_State *L, const char *name, int window_bits,
   strm.avail_in = 0;
   strm.next_in = Z_NULL;
 
-  ret = inflateInit2(&strm, window_bits);
+  ret = inflateInit2(&strm, WINDOW_BITS);
   if ((ret != Z_OK) && (ret != Z_STREAM_END)) {
 	  luaL_error(L, "inflate init error!");
     return;
@@ -47,48 +62,36 @@ static void load_deflated_chunk(lua_State *L, const char *name, int window_bits,
   }
 }
 
-struct custom_preload {
-  unsigned char *name;
-  int index;
-  int size;
-};
-
-static int preload_custom_get(lua_State *L);
-
-#include "addlibs-custom.c"
-
-static void preload_custom_rawget(lua_State *L, int index) {
-  const struct custom_preload* cp = custom_preloads + index;
-  const struct custom_preload* cpn = cp + 1;
-  //printf("preload_custom_rawget(%d) at %d, size: %d - %d\n", index, cp->index, cpn->index - cp->index, cp->size);
-  load_deflated_chunk(L, cp->name, WINDOW_BITS, custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
-}
-
-static int preload_custom_find_index(const char *name) {
-  const struct custom_preload* cp;
-  for (int index = 0; ; index++) {
-    cp = custom_preloads + index;
-    if (cp->name == NULL) {
-      break;
-    }
-    if (strcmp(name, cp->name) == 0) {
-      return index;
-    }
-  }
-  return -1;
-}
-
-static int preload_custom_get(lua_State *L) {
-  const char *name = luaL_checkstring(L, 1);
-  int index = preload_custom_find_index(name);
-  //printf("preload_custom_get(%s) => %d\n", name, index);
+static int preload_custom_rawget(lua_State *L, int index, int nresults) {
   if ((index < 0) || (index > PRELOADS_INDEX)) {
 	  luaL_error(L, "invalid preload index!");
     return 0;
   }
-  preload_custom_rawget(L, index);
-  lua_call(L, 0, 1);
-  return 1;
+  const struct custom_preload* cp = custom_preloads + index;
+  const struct custom_preload* cpn = cp + 1;
+  trace("preload_custom_rawget(%d, %d) at %d, size: %d - %d\n", index, nresults, cp->index, cpn->index - cp->index, cp->size);
+  load_deflated_chunk(L, cp->name, custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
+  lua_pushstring(L, cp->name);
+  lua_call(L, 1, nresults);
+  return nresults;
+}
+
+static int preload_custom_get(lua_State *L) {
+  const char *name = luaL_checkstring(L, 1);
+  const struct custom_preload* cp;
+  int index;
+  for (index = 0; ; index++) {
+    cp = custom_preloads + index;
+    if (cp->name == NULL) {
+      index = -1;
+      break;
+    }
+    if (strcmp(name, cp->name) == 0) {
+      break;
+    }
+  }
+  trace("preload_custom_get('%s') => %d\n", name, index);
+  return preload_custom_rawget(L, index, 1);
 }
 
 /* override Lua openlibs to add user libraries */
@@ -108,6 +111,7 @@ static const luaL_Reg loadedlibs[] = {
 };
 
 LUALIB_API void luaL_openlibs(lua_State *L) {
+  const char **name;
   const luaL_Reg *lib;
   for (lib = loadedlibs; lib->func; lib++) {
     luaL_requiref(L, lib->name, lib->func, 1);
@@ -115,12 +119,23 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
   }
   /* custom part */
   if (getenv("JLS_STATIC_NO_LIBS") == NULL) {
-    load_custom_libs(L);
+    luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
+    for (lib = custom_libs; lib->func; lib++) {
+      trace("preload lib '%s'\n", lib->name);
+      lua_pushcfunction(L, lib->func);
+      lua_setfield(L, -2, lib->name);
+    }
+    lua_pop(L, 1);
   }
   if (getenv("JLS_STATIC_NO_PRELOADS") == NULL) {
-    load_custom_mods(L);
-    preload_custom_rawget(L, PRELOADS_INDEX);
-    lua_call(L, 0, 0);
+    luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
+    for (name = custom_names; *name; name++) {
+      trace("preload lua '%s'\n", *name);
+      lua_pushcfunction(L, preload_custom_get);
+      lua_setfield(L, -2, *name);
+    }
+    lua_pop(L, 1);
+    preload_custom_rawget(L, PRELOADS_INDEX, 0);
   }
   /* end custom part */
 }
