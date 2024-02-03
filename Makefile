@@ -72,6 +72,8 @@ LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
 STATIC_NAME := luajls
 
+EXPAT=expat-2.5.0
+
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
 ifdef HOST
@@ -92,10 +94,11 @@ main: main-$(PLAT)
 
 all: full
 
-core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl:
+core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl configure-libexpat:
+	@$(MAKE) $(EXPAT)
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -171,6 +174,12 @@ main-windows:
 		$(MAIN_TARGET)
 
 
+expat-2.5.0:
+	wget -q --no-check-certificate https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+	tar -xf expat-2.5.0.tar.gz
+	rm expat-2.5.0.tar.gz
+
+
 test: $(LUAJLS_TESTS)
 	@echo $(words $(LUAJLS_TESTS)) test files passed
 
@@ -182,21 +191,14 @@ test-cross:
 
 
 static: static-$(PLAT) static-test
-	rm $(STATIC_NAME).lua addlibs.o addlibs-custom.c
+	rm addlibs.o addlibs-custom.c
 
 static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
-static-lua54:
-	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
-		$(LUAJLS)/examples/package.lua -a preload -strip true -pretty false -dependency none \
-		-d $(LUAJLS)/jls -includeDir true \
-		-files xml2lua/XmlParser.lua \
-		-files DumbLuaParser/dumbParser.lua \
-		-o -f $(STATIC_NAME).lua
-
-static-windows: static-$(LUA_LIB)
-	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv win32 cjson serial openssl webview winapi > addlibs-custom.c
+static-windows:
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls DumbLuaParser/dumbParser.lua \
+		-c zlib luv win32 cjson lxp serial openssl webview winapi > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)\$(STATIC_NAME).exe -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
@@ -204,6 +206,7 @@ static-windows: static-$(LUA_LIB)
 		lua-win32\win32.o \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
 		lua-cjson\lua_cjson.o lua-cjson\fpconv.o lua-cjson\strbuf.o \
+		luaexpat\src\lxplib.o $(EXPAT)\lib\.libs\libexpat.a \
 		luaserial\luaserial.o \
 		lua-openssl\libopenssl.a openssl\libssl.a openssl\libcrypto.a \
 		lua-webview\webview.o \
@@ -213,8 +216,9 @@ static-windows: static-$(LUA_LIB)
 		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
 		-lkernel32 -ladvapi32 -lMpr
 
-static-linux: static-$(LUA_LIB)
-	LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua $(STATIC_NAME).lua zlib luv linux cjson serial openssl webview > addlibs-custom.c
+static-linux:
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls DumbLuaParser/dumbParser.lua xml2lua/XmlParser.lua \
+		-c zlib luv linux cjson serial openssl webview > addlibs-custom.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME) -s addlibs.o \
 		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
@@ -244,11 +248,12 @@ clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./lua-buffer/*.o ./lua-buffer/*.$(SO)
 	-$(RM) ./luafilesystem/src/*.o ./luafilesystem/*.$(SO)
 	-$(RM) ./luasocket/src/*.o ./luasocket/src/*.$(SO)
+	-$(RM) ./lua-zlib/*.o ./lua-zlib/*.$(SO)
+	-$(RM) ./luaexpat/src/*.o ./luaexpat/src/*.$(SO)
 	-$(RM) ./lpeg/*.o ./lpeg/*.$(SO)
 	-$(RM) ./lpeglabel/*.o ./lpeglabel/*.$(SO)
 	-$(RM) ./luaserial/*.o ./luaserial/*.$(SO)
 	-$(RM) ./luabt/*.o ./luabt/*.$(SO)
-	-$(RM) ./lua-zlib/*.o ./lua-zlib/*.$(SO)
 	-$(RM) ./lua-jpeg/*.o ./lua-jpeg/*.$(SO)
 	-$(RM) ./lua-exif/*.o ./lua-exif/*.$(SO)
 	-$(RM) ./lua-webview/*.o ./lua-webview/*.$(SO)
@@ -266,6 +271,7 @@ clean-libs: clean-libuv
 	-$(MAKE) -C openssl clean
 	-$(RM) ./openssl/*/*.$(SO)
 	-$(RM) ./zlib/*.o ./zlib/*.lo ./zlib/*.a ./zlib/*.$(SO)*
+	-$(MAKE) -C $(EXPAT) clean
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
 
@@ -338,6 +344,7 @@ dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u lua-cjson/cjson.$(SO) $(LUA_CDIST)/
 	cp -u luv/luv.$(SO) $(LUA_CDIST)/
 	cp -u lua-zlib/zlib.$(SO) $(LUA_CDIST)/
+	cp -u luaexpat/src/lxp.$(SO) $(LUA_CDIST)/
 	cp -u xml2lua/xml2lua.lua $(LUA_DIST)/
 	cp -u xml2lua/XmlParser.lua $(LUA_DIST)/
 	cp -u DumbLuaParser/dumbParser.lua $(LUA_DIST)/
@@ -436,12 +443,20 @@ release: release-all
 STATIC_FILES := docs.zip examples licenses.txt versions.txt
 
 static.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz $(STATIC_NAME) $(STATIC_FILES)
+	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz lua$(EXE) $(STATIC_FILES)
 
 static.zip:
-	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip $(STATIC_NAME)$(EXE) $(STATIC_FILES) WebView2Loader.dll
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) WebView2Loader.dll
 
-static-release: static static$(ZIP)
+static-pre:
+	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/lua-pre$(EXE)
+	mv $(LUA_DIST)/$(STATIC_NAME)$(EXE) $(LUA_DIST)/lua$(EXE)
+
+static-post:
+	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/$(STATIC_NAME)$(EXE)
+	mv $(LUA_DIST)/lua-pre$(EXE) $(LUA_DIST)/lua$(EXE)
+
+static-release: static static-pre static$(ZIP) static-post
 
 static-release-cross:
 
@@ -473,5 +488,5 @@ sync: sync-git sync-release
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
 	lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg lpeglabel zlib lua-zlib \
 	openssl lua-openssl luaserial luabt libjpeg lua-jpeg libexif lua-exif lua-webview \
-	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct
+	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct luaexpat
 

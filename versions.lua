@@ -38,6 +38,8 @@ printVersion('lpeg', 'version')
 printVersion('lpeglabel', 'version')
 printVersion('luaunit')
 printVersion('dumbParser', 'VERSION')
+printVersion('lxp') -- LuaExpat
+printVersion('lxp', '_EXPAT_VERSION')
 printVersion('xml2lua') -- XmlParser
 printVersion('webview')
 printVersion('llthreads')

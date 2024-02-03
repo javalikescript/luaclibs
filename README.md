@@ -16,7 +16,9 @@ This repository mainly contains submodule and so needs to be initialized before 
 git submodule update --init --recursive
 ```
 
-The OpenSSL, JPEG and EXIF libraries need to be configured prior the build.
+The OpenSSL, Expat, JPEG and EXIF libraries need to be configured prior the build.
+
+Some dependent modules are retrieved using wget without checking the certificate, it is recommended to download these dependencies manually using an up-to-date browser.
 
 ## How to build?
 
