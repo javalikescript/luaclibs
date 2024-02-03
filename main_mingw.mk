@@ -22,11 +22,13 @@ else
 	LUA_OPENSSL_VARS = OPENSSL_STATIC=1
 endif
 
+EXPAT=expat-2.5.0
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
 
-quick: core luaserial lua-jpeg lua-exif
+quick: core luaserial lua-jpeg lua-exif luaexpat
 
 full: quick lua-openssl lua-webview winapi lua-win32
 
@@ -34,7 +36,7 @@ extras: luabt
 
 any: full
 
-configure: configure-libjpeg configure-libexif configure-openssl
+configure: configure-libjpeg configure-libexif configure-openssl configure-libexpat
 
 show show-main:
 	@echo Make command goals: $(MAKECMDGOALS)
@@ -115,6 +117,15 @@ openssl:
 lua-openssl: lua openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk $(LUA_OPENSSL_VARS) PLAT=$(PLAT) $(LUA_VARS)
 
+configure-libexpat:
+	cd $(EXPAT) && sh configure
+
+libexpat:
+	$(MAKE) -C $(EXPAT)
+
+luaexpat: lua libexpat
+	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) EXPAT=../$(EXPAT) $(LUA_VARS)
+
 configure-libjpeg:
 	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
@@ -134,5 +145,5 @@ lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 .PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
-	luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
+	luaexpat luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
 	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel

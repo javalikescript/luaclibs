@@ -100,3 +100,6 @@
 [submodule "lua-struct"]
 	path = lua-struct
 	url = https://github.com/javalikescript/lua-struct.git
+[submodule "luaexpat"]
+	path = luaexpat
+	url = https://github.com/lunarmodules/luaexpat.git

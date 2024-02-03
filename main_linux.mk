@@ -36,11 +36,13 @@ else
 	LIB_UV_TARGET := dep
 endif
 
+EXPAT=expat-2.5.0
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
 
-quick: core luaserial lua-jpeg lua-exif
+quick: core luaserial lua-jpeg lua-exif luaexpat
 
 full: quick lua-openssl lua-linux full-$(ARCH_SUFFIX)
 
@@ -54,7 +56,7 @@ any: full
 
 configure: configure-$(ARCH_SUFFIX)
 
-configure-default: configure-libjpeg configure-libexif configure-openssl
+configure-default: configure-libjpeg configure-libexif configure-openssl configure-libexpat
 
 configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm
 
@@ -160,6 +162,15 @@ openssl:
 lua-openssl: openssl
 	$(MAKE) -C lua-openssl -f ../lua-openssl.mk PLAT=$(PLAT) OPENSSLDIR=../openssl CC=$(CC) LD=$(LD) AR=$(AR) $(LUA_OPENSSL_VARS) $(LUA_VARS)
 
+configure-libexpat:
+	cd $(EXPAT) && sh configure
+
+libexpat:
+	$(MAKE) -C $(EXPAT)/lib
+
+luaexpat: lua libexpat
+	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) EXPAT=../$(EXPAT) $(LUA_VARS)
+
 configure-libjpeg:
 	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
@@ -185,6 +196,6 @@ lua-exif: lua libexif
 	$(MAKE) -C lua-exif -f ../lua-exif.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 
-.PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaserial luabt \
+.PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaexpat luaserial luabt \
 	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2 lua-linux luachild lpeglabel
 
