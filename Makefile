@@ -406,7 +406,7 @@ dist-jls-lua51:
 	mkdir $(LUA_DIST)/luvit
 	printf "return require('uv')" > $(LUA_DIST)/luvit/luv.lua
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
-		$(LUAJLS)/examples/package.lua -d $(LUAJLS)/jls -a copy -strip true -t 5.1 -outdir $(LUA_DIST)
+		compat.lua -pretty "-t=$(LUA_DIST)" $(LUAJLS)/jls
 	echo "export LUA_PATH=\"$(MK_DIR)$(LUA_DIST)/luvit/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua\""
 
 dist-jls-lua54:
