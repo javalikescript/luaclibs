@@ -45,7 +45,7 @@ local function readFile(filename)
   local data
   local f = io.open(filename, 'r')
   if f then
-    data = f:read('a')
+    data = f:read('*a')
     f:close()
   end
   return data

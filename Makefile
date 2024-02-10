@@ -472,20 +472,19 @@ lua-5.1.5:
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
-sync-release-5.1: lua-5.1.5
-	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) clean all release
-
-sync-release:
-	$(MAKE) clean all releases
+release-5.1: lua-5.1.5 clean
+	$(MAKE) LUA_PATH=lua-5.1.5 LUA_LIB=lua51 LUA_DIST=dist-5.1 LUAJLS=$(LUAJLS) all release clean
 
 sync-git:
 	git fetch
 	git rebase
 	git submodule update --init --recursive
 
-sync-all: sync-git sync-release-5.1 sync-release
+sync-5.1: sync-git release-5.1
+	$(MAKE) all releases
 
-sync: sync-git sync-release
+sync: sync-git
+	$(MAKE) all releases
 
 
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
