@@ -1,3 +1,13 @@
+--[[
+This Lua script generates the content of the "addlibs-custom.c" file.
+The syntax is "-c <C module name> ... -l <Lua file or directory> ...".
+The "addlibs-custom.c" file is used in conjonction with the "addlibs.c" C file to add custom Lua loaders.
+The Lua function "luaL_openlibs" is overrided in order to add loaders in the table "package.preload".
+The loaders consists in C functions available in the executable and external Lua files.
+
+It is possible to run a preloaded Lua script by using the argument "-e" or "-l".
+]]
+
 local lz = require('zlib')
 local fs = require('lfs')
 local dumbParser = require('dumbParser')
@@ -21,10 +31,6 @@ local function getFilename(filename)
   return (string.gsub(filename, '^.*[/\\]', '', 1))
 end
 
-local function getPathname(pathname)
-  return (string.gsub(pathname, '\\', '/'))
-end
-
 local function getBaseName(filename)
   local n, e = string.match(filename, '^(.+)%.([^/\\%.]*)$')
   return n or filename, e
@@ -37,13 +43,17 @@ local function forEach(filename, fn, path)
   else
     path = ''
   end
+  local fname = getFilename(filename)
   if mode == 'file' then
-    fn(filename, path..getBaseName(getFilename(filename)))
+    local bname, ext = getBaseName(fname)
+    if ext == 'lua' then
+      fn(filename, path..bname)
+    end
   elseif mode == 'directory' then
-    path = path..getFilename(filename)
-    for name in fs.dir(filename) do
-      if name ~= '.' and name ~= '..' then
-        forEach(filename..'/'..name, fn, path)
+    path = path..fname
+    for n in fs.dir(filename) do
+      if n ~= '.' and n ~= '..' then
+        forEach(filename..'/'..n, fn, path)
       end
     end
   end
@@ -168,8 +178,10 @@ for _, preload in ipairs(preloads) do
 end
 table.insert(lines, '\n};\n')
 
+local fd = assert(io.open('addlibs-custom.c', 'wb'))
 for _, line in ipairs(lines) do
-  io.stdout:write(line)
+  fd:write(line)
 end
+fd:close()
 
-io.stderr:write(string.format('addlibs generated, deflate ratio is %s for %d modules\n', (total * 10 // index) / 10, count))
+print(string.format('addlibs generated, deflate ratio is %s for %d modules\n', (total * 10 // index) / 10, count))

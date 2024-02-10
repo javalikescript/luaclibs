@@ -191,17 +191,18 @@ test-cross:
 
 
 static: static-$(PLAT) static-test
-	rm addlibs.o addlibs-custom.c
+	rm addlibs.o addlibs-custom.c addlibs-main.c
 
 static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-windows:
 	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls DumbLuaParser/dumbParser.lua \
-		-c zlib luv win32 cjson lxp serial openssl webview winapi > addlibs-custom.c
+		-c zlib luv win32 cjson lxp serial openssl webview winapi
+	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)\$(STATIC_NAME).exe -s addlibs.o \
-		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
+		addlibs-main.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib\lua_zlib.o zlib\libz.a \
 		lua-win32\win32.o \
 		luv\src\luv.o luv\deps\libuv\libuv.a \
@@ -217,15 +218,17 @@ static-windows:
 		-lkernel32 -ladvapi32 -lMpr
 
 static-linux:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls DumbLuaParser/dumbParser.lua xml2lua/XmlParser.lua \
-		-c zlib luv linux cjson serial openssl webview > addlibs-custom.c
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls DumbLuaParser/dumbParser.lua \
+		-c zlib luv linux cjson lxp serial openssl webview
+	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME) -s addlibs.o \
-		$(LUA_PATH)/src/lua.c $(LUA_PATH)/src/liblua.a \
+		addlibs-main.c $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		lua-linux/linux.o \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
+		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a \
 		luaserial/luaserial.o \
 		lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a \
 		lua-webview/webview.o \

@@ -1,3 +1,5 @@
+// see addlibs.lua
+
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
@@ -20,7 +22,7 @@ struct custom_preload {
 
 #include "addlibs-custom.c"
 
-static void load_deflated_chunk(lua_State *L, const char *name, const unsigned char* deflated, int deflated_size, int inflated_size) {
+static unsigned char* inflate_chunk(const unsigned char* deflated, int deflated_size, int inflated_size) {
   int ret;
   z_stream strm;
   unsigned char* inflated;
@@ -33,8 +35,7 @@ static void load_deflated_chunk(lua_State *L, const char *name, const unsigned c
 
   ret = inflateInit2(&strm, WINDOW_BITS);
   if ((ret != Z_OK) && (ret != Z_STREAM_END)) {
-	  luaL_error(L, "inflate init error!");
-    return;
+    return NULL;
   }
 
   inflated = malloc(inflated_size + 1);
@@ -48,11 +49,22 @@ static void load_deflated_chunk(lua_State *L, const char *name, const unsigned c
   ret = inflate(&strm, Z_NO_FLUSH);
   if (ret != Z_STREAM_END) {
     free(inflated);
-	  luaL_error(L, "inflate error!");
-    return;
+    return NULL;
   }
   (void) inflateEnd(&strm);
 
+  return inflated;
+}
+
+static void load_deflated_chunk(lua_State *L, const char *name, const unsigned char* deflated, int deflated_size, int inflated_size) {
+  int ret;
+  unsigned char* inflated;
+
+  inflated = inflate_chunk(deflated, deflated_size, inflated_size);
+  if (inflated == NULL) {
+	  luaL_error(L, "inflate error!");
+    return;
+  }
   ret = luaL_loadbuffer(L, (const char*)inflated, inflated_size, name);
   free(inflated);
   if (ret != LUA_OK) {
@@ -111,14 +123,19 @@ static const luaL_Reg loadedlibs[] = {
 };
 
 LUALIB_API void luaL_openlibs(lua_State *L) {
-  const char **name;
+  const struct custom_preload* cp;
+  const struct custom_preload* cpn;
+  unsigned char* inflated;
+  const char **pname;
   const luaL_Reg *lib;
+  char *env;
   for (lib = loadedlibs; lib->func; lib++) {
     luaL_requiref(L, lib->name, lib->func, 1);
     lua_pop(L, 1);
   }
   /* custom part */
-  if (getenv("JLS_STATIC_NO_LIBS") == NULL) {
+  env = getenv("JLS_STATIC_PRELOADS");
+  if (env == NULL || strstr(env, "lib")) {
     luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
     for (lib = custom_libs; lib->func; lib++) {
       trace("preload lib '%s'\n", lib->name);
@@ -127,15 +144,33 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
     }
     lua_pop(L, 1);
   }
-  if (getenv("JLS_STATIC_NO_PRELOADS") == NULL) {
+  if (env == NULL || strstr(env, "lua")) {
     luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
-    for (name = custom_names; *name; name++) {
-      trace("preload lua '%s'\n", *name);
+    for (pname = custom_names; *pname; pname++) {
+      trace("preload lua '%s'\n", *pname);
       lua_pushcfunction(L, preload_custom_get);
-      lua_setfield(L, -2, *name);
+      lua_setfield(L, -2, *pname);
     }
     lua_pop(L, 1);
     preload_custom_rawget(L, PRELOADS_INDEX, 0);
+  }
+  if (env != NULL && strstr(env, "show")) {
+    printf("--[[\npreload C modules:\n");
+    for (lib = custom_libs; lib->func; lib++) {
+      printf("  \"%s\"\n", lib->name);
+    }
+    printf("]]\n");
+    for (cp = custom_preloads; cp->name; cp++) {
+      printf("package.preload[\"%s\"] = function(...)\n", cp->name);
+      cpn = cp + 1;
+      inflated = inflate_chunk(custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
+      if (inflated) {
+        fwrite(inflated, cp->size, 1, stdout);
+        fflush(stdout);
+        free(inflated);
+      }
+      printf("\nend\n");
+    }
   }
   /* end custom part */
 }
