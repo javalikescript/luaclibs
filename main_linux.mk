@@ -127,7 +127,7 @@ luv-tag:
 luv-dep:
 	$(MAKE) -C luv -f ../luv_linux.mk CC=$(CC) $(LUA_VARS)
 
-luv: lua luv-$(LIB_UV_TARGET) libuv
+luv: lua libuv luv-$(LIB_UV_TARGET)
 
 luafilesystem lua-buffer luaserial lua-webview lua-linux luachild lua-struct: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
