@@ -9,7 +9,7 @@ If a Lua code to execute is provided then the executable will only executes this
 Otherwise, if the executable name is "example" then the script "example.lua" is executed.
 
 The Lua application open standard libraries, create table "arg", execute arguments "-e" and "-l", execute main script.
-It is possible to run a preloaded Lua script by using the code "require('preloaded-module')()".
+It is possible to run a preloaded Lua script by using the code "require('preloaded-module')".
 ]]
 
 local function charToHex(c)

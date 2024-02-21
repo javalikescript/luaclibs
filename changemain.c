@@ -45,7 +45,6 @@ int main (int argc, char **argv) {
   sprintf(pscr, "%s.lua", argv[0]);
   rargv[rargc++] = pscr;
 #endif
-  rargv[rargc++] = "--";
   for (parg = argv + 1; *parg; parg++) {
     rargv[rargc++] = *parg;
   }
