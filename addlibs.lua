@@ -1,6 +1,6 @@
 --[[
 This Lua script generates the content of the "addlibs-custom.c" file.
-The syntax is "-c <C module name> ... -l <Lua file or directory> ...".
+The syntax is "-c <C module name> ... -l|-L <Lua file or directory> ...".
 The "addlibs-custom.c" file is used in conjonction with the "addlibs.c" C file to add custom Lua loaders.
 The Lua function "luaL_openlibs" is overrided in order to add loaders in the table "package.preload".
 The loaders consists in C functions available in the executable and external Lua files.
@@ -14,6 +14,8 @@ local dumbParser = require('dumbParser')
 
 local windowBits = -15
 local minDeflatedSize = 512
+
+-- helper functions
 
 local function charToHex(c)
   return string.format('0x%02x, ', string.byte(c))
@@ -36,9 +38,9 @@ local function getBaseName(filename)
   return n or filename, e
 end
 
-local function forEach(filename, fn, path)
+local function forEach(filename, fn, dirPath, recursive, path)
   local mode = fs.attributes(filename, 'mode')
-  if path then
+  if path and path ~= '' then
     path = path..'.'
   else
     path = ''
@@ -49,11 +51,13 @@ local function forEach(filename, fn, path)
     if ext == 'lua' then
       fn(filename, path..bname)
     end
-  elseif mode == 'directory' then
-    path = path..fname
+  elseif mode == 'directory' and (recursive or path == '') then
+    if path ~= '' or dirPath then
+      path = path..fname
+    end
     for n in fs.dir(filename) do
       if n ~= '.' and n ~= '..' then
-        forEach(filename..'/'..n, fn, path)
+        forEach(filename..'/'..n, fn, dirPath, recursive, path)
       end
     end
   end
@@ -79,24 +83,46 @@ local function readFile(filename)
   return data
 end
 
+-- collect arguments
 
 local luanames = {}
+local luasubnames = {}
 local libnames = {}
+local printPreloads = false
 local l = libnames
 for _, value in ipairs(arg) do
   if value == '-c' then
     l = libnames
   elseif value == '-l' then
     l = luanames
+  elseif value == '-L' then
+    l = luasubnames
+  elseif value == '-p' then
+    printPreloads = not printPreloads
   else
     table.insert(l, value)
   end
 end
 
+local luafiles = {}
+local function addLuaFile(file, name)
+  table.insert(luafiles, {file = file, name = name})
+end
+for _, luaname in ipairs(luanames) do
+  forEach(luaname, addLuaFile, true, true)
+end
+for _, luaname in ipairs(luasubnames) do
+  forEach(luaname, addLuaFile)
+end
+table.sort(luafiles, function(a, b)
+  return a.name < b.name
+end)
 
 local lines = {}
 
 table.insert(lines, '// Generated custom preloads\n\n')
+
+-- list C libraries
 
 for _, libname in ipairs(libnames) do
   table.insert(lines, string.format('int luaopen_%s(lua_State *L);\n', libname))
@@ -115,36 +141,32 @@ table.insert(lines, [[
 
 ]])
 
-local deflatedNames = {}
+-- list preloads
 
 local preloads = {}
 local luaPreloads = {}
 local count, index, total = 0, 0, 0
 table.insert(lines, 'static const struct custom_preload custom_preloads[] = {\n')
-for _, luaname in ipairs(luanames) do
-  forEach(luaname, function(filename, path)
-    local lua = stripLua(readFile(filename))
-    if #lua > 0 then
-      if #lua > minDeflatedSize then
-        count = count + 1
-        local deflated = assert(deflate(lua))
-        table.insert(lines, string.format('  {"%s", %d, %d},\n', path, index, #lua))
-        table.insert(deflatedNames, path)
-        table.insert(preloads, deflated)
-        index = index + #deflated
-        total = total + #lua
-      else
-        table.insert(luaPreloads, string.format('package.preload["%s"] = function(...)\n', path))
-        table.insert(luaPreloads, lua)
-        table.insert(luaPreloads, '\nend\n')
-      end
+for _, item in ipairs(luafiles) do
+  local lua = stripLua(readFile(item.file))
+  if #lua > 0 then
+    if #lua > minDeflatedSize then
+      count = count + 1
+      local deflated = assert(deflate(lua))
+      table.insert(lines, string.format('  {"%s", %d, %d},\n', item.name, index, #lua))
+      table.insert(preloads, deflated)
+      index = index + #deflated
+      total = total + #lua
+    else
+      table.insert(luaPreloads, string.format('package.preload["%s"] = function(...)\n', item.name))
+      table.insert(luaPreloads, lua)
+      table.insert(luaPreloads, '\nend\n')
     end
-  end)
+  end
 end
-
 local lua = stripLua(table.concat(luaPreloads))
 local deflated = assert(deflate(lua))
-table.insert(lines, string.format('  {"%s", %d, %d},\n', ":preloads:", index, #lua))
+table.insert(lines, string.format('  {NULL, %d, %d},\n', index, #lua))
 table.insert(preloads, deflated)
 index = index + #deflated
 total = total + #lua
@@ -154,29 +176,25 @@ table.insert(lines, '};\n\n')
 table.insert(lines, string.format('#define WINDOW_BITS %d\n', windowBits))
 table.insert(lines, string.format('#define PRELOADS_INDEX %d\n', count))
 
-table.insert(lines, [[
+-- print preloads as comment
 
-static const char *custom_names[] = {
-]])
-for _, modname in ipairs(deflatedNames) do
-  table.insert(lines, string.format('  "%s",\n', modname))
-end
-table.insert(lines, string.format([[
-  NULL
-};
-]], #deflatedNames))
-
-if false then
-  table.insert(lines, '/*\n')
-  table.insert(lines, table.concat(luaPreloads))
+if printPreloads then
+  table.insert(lines, '\n/*\n')
+  for _, preload in ipairs(luaPreloads) do
+    table.insert(lines, (string.gsub(preload, '%*/', '* /')))
+  end
   table.insert(lines, '\n*/\n')
 end
+
+-- generate preloads blob
 
 table.insert(lines, '\nstatic const unsigned char custom_chunk_preloads[] = {\n')
 for _, preload in ipairs(preloads) do
   table.insert(lines, stringToHex(preload))
 end
 table.insert(lines, '\n};\n')
+
+-- create file
 
 local fd = assert(io.open('addlibs-custom.c', 'wb'))
 for _, line in ipairs(lines) do

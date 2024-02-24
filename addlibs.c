@@ -74,16 +74,16 @@ static void load_deflated_chunk(lua_State *L, const char *name, const unsigned c
   }
 }
 
-static int preload_custom_rawget(lua_State *L, int index, int nresults) {
+static int preload_custom_rawget(lua_State *L, int index, const char *name, int nresults) {
   if ((index < 0) || (index > PRELOADS_INDEX)) {
 	  luaL_error(L, "invalid preload index!");
     return 0;
   }
   const struct custom_preload* cp = custom_preloads + index;
   const struct custom_preload* cpn = cp + 1;
-  trace("preload_custom_rawget(%d, %d) at %d, size: %d - %d\n", index, nresults, cp->index, cpn->index - cp->index, cp->size);
-  load_deflated_chunk(L, cp->name, custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
-  lua_pushstring(L, cp->name);
+  trace("preload_custom_rawget(%d, '%s', %d) at %d, size: %d - %d\n", index, name, nresults, cp->index, cpn->index - cp->index, cp->size);
+  load_deflated_chunk(L, name, custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
+  lua_pushstring(L, name);
   lua_call(L, 1, nresults);
   return nresults;
 }
@@ -103,7 +103,7 @@ static int preload_custom_get(lua_State *L) {
     }
   }
   trace("preload_custom_get('%s') => %d\n", name, index);
-  return preload_custom_rawget(L, index, 1);
+  return preload_custom_rawget(L, index, name, 1);
 }
 
 /* override Lua openlibs to add user libraries */
@@ -146,13 +146,13 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
   }
   if (env == NULL || strstr(env, "lua")) {
     luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
-    for (pname = custom_names; *pname; pname++) {
-      trace("preload lua '%s'\n", *pname);
+    for (cp = custom_preloads; cp->name; cp++) {
+      trace("preload lua '%s'\n", cp->name);
       lua_pushcfunction(L, preload_custom_get);
-      lua_setfield(L, -2, *pname);
+      lua_setfield(L, -2, cp->name);
     }
     lua_pop(L, 1);
-    preload_custom_rawget(L, PRELOADS_INDEX, 0);
+    preload_custom_rawget(L, PRELOADS_INDEX, ":preloads:", 0);
   }
   if (env != NULL && strstr(env, "show")) {
     printf("--[[\npreload C modules:\n");
