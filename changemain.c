@@ -7,6 +7,7 @@ int main (int argc, char **argv) {
   char **parg;
   char *papp;
   char *pscr;
+  int lapp;
   if (argv[0] == NULL) {
     return 1; // not supported
   }
@@ -37,12 +38,22 @@ int main (int argc, char **argv) {
   rargv[rargc++] = CUSTOM_EXECUTE;
   rargv[rargc++] = argv[0]; // fake script name
 #else
-  pscr = malloc(sizeof(char) * (strlen(argv[0]) + 5));
+  lapp = strlen(argv[0]);
+  pscr = malloc(sizeof(char) * (lapp + 5));
   if (pscr == NULL) {
     free(rargv);
     return 12;
   }
+#if defined(_WIN32)
+  if (lapp > 4 && strcmp(argv[0] + lapp - 4, ".exe") == 0) {
+    strcpy(pscr, argv[0]);
+    strcpy(pscr + lapp - 4, ".lua");
+  } else {
+    sprintf(pscr, "%s.lua", argv[0]);
+  }
+#else
   sprintf(pscr, "%s.lua", argv[0]);
+#endif
   rargv[rargc++] = pscr;
 #endif
   for (parg = argv + 1; *parg; parg++) {
