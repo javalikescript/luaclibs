@@ -74,16 +74,15 @@ RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
 EXPAT=expat-2.5.0
 
 STATIC_NAME := luajls
-STATIC_CORE_LUAS := $(LUAJLS)/jls
-STATIC_CORE_LIBNAMES := zlib luv cjson lxp
+STATIC_CORE_LIBNAMES := zlib luv cjson
 STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
-		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
-		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a
-STATIC_LUAS := $(STATIC_CORE_LUAS) DumbLuaParser/dumbParser.lua
-STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) serial webview openssl
+		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o
+STATIC_LUAS := $(LUAJLS)/jls DumbLuaParser/dumbParser.lua
+STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial webview openssl
 STATIC_LIBS := $(STATIC_CORE_LIBS) \
+		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a \
 		luaserial/luaserial.o \
 		lua-webview/webview.o \
 		lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
@@ -204,7 +203,7 @@ $(LUAJLS_TESTS):
 test-cross:
 
 
-static: static-example static-$(PLAT) static-test
+static: static-$(PLAT) static-test
 	rm addlibs.o addlibs-custom.c addlibs-main.c
 
 static-test:
@@ -219,7 +218,7 @@ static-windows:
 		addlibs-main.c $(STATIC_LIBS) \
 		lua-win32\win32.o \
 		winapi\winapi.o winapi\wutils.o \
-		-lm -Ilua\src \
+		-lm -Ilua/src \
 		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
 		-lcomctl32 -loleaut32 -lgdi32 \
 		-lkernel32 -ladvapi32 -lMpr
@@ -239,13 +238,13 @@ static-linux:
 static-example:
 	@echo "print('You could rename this executable to, or create a link with, the name of an example to run it.')" > $(MK_DIR)/example.lua
 	@echo "print('Examples: $(patsubst $(LUAJLS)/examples/%.lua,%,$(wildcard $(LUAJLS)/examples/*.lua))')" >> $(MK_DIR)/example.lua
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls -L $(LUAJLS)/examples -l example.lua -c $(STATIC_CORE_LIBNAMES)
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls xml2lua/XmlParser.lua -L $(LUAJLS)/examples -l example.lua -c $(STATIC_CORE_LIBNAMES)
 	$(RM) example.lua
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "require((function() for i=-1,-99,-1 do if not arg[i] then return (string.gsub(string.gsub(arg[i+1], '^.*[/\\\\]', ''), '%.exe$$', '')); end; end; end)())" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example.exe -s $(STATIC_FLAGS) addlibs.o \
 		addlibs-main.c $(STATIC_CORE_LIBS) \
-		-lm -Ilua\src \
+		-lm -Ilua/src \
 		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
 		-lcomctl32 -loleaut32 -lgdi32 \
 		-lkernel32 -ladvapi32 -lMpr
