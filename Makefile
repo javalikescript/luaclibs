@@ -241,7 +241,7 @@ static-example:
 	@echo "print('Examples: $(patsubst $(LUAJLS)/examples/%.lua,%,$(wildcard $(LUAJLS)/examples/*.lua))')" >> $(MK_DIR)/example.lua
 	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls -L $(LUAJLS)/examples -l example.lua -c $(STATIC_CORE_LIBNAMES)
 	$(RM) example.lua
-	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "require(string.gsub(string.gsub(arg[0], '^.*[/\\\\]', ''), '%.exe', ''))" > addlibs-main.c
+	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "require((function() for i=-1,-99,-1 do if not arg[i] then return (string.gsub(string.gsub(arg[i+1], '^.*[/\\\\]', ''), '%.exe$$', '')); end; end; end)())" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example.exe -s $(STATIC_FLAGS) addlibs.o \
 		addlibs-main.c $(STATIC_CORE_LIBS) \

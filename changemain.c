@@ -1,5 +1,11 @@
 // see changemain.lua
 
+#if defined(_WIN32)
+#define NULL_SCRIPT "NUL"
+#else
+#define NULL_SCRIPT "/dev/null"
+#endif
+
 int main (int argc, char **argv) {
   int status;
   char **rargv;
@@ -36,7 +42,7 @@ int main (int argc, char **argv) {
   pscr = NULL;
   rargv[rargc++] = "-e";
   rargv[rargc++] = CUSTOM_EXECUTE;
-  rargv[rargc++] = argv[0]; // fake script name
+  rargv[rargc++] = NULL_SCRIPT;
 #else
   lapp = strlen(argv[0]);
   pscr = malloc(sizeof(char) * (lapp + 5));

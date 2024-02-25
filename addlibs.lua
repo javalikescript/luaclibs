@@ -5,7 +5,10 @@ The "addlibs-custom.c" file is used in conjonction with the "addlibs.c" C file t
 The Lua function "luaL_openlibs" is overrided in order to add loaders in the table "package.preload".
 The loaders consists in C functions available in the executable and external Lua files.
 
-It is possible to run a preloaded Lua script by using the argument "-e" or "-l".
+The Lua application open standard libraries, create table "arg", execute arguments "-e" and "-l", execute main script.
+It is possible to run a preloaded Lua script with the following arguments:
+  -e "require('<module name>')" NUL
+  -l <module name> /dev/null
 ]]
 
 local lz = require('zlib')
