@@ -340,9 +340,6 @@ dist-dup-copy:
 	cp -u luasocket/src/ltn12.lua luasocket/src/mime.lua luasocket/src/socket.lua $(LUA_DIST)/
 	cp -u luasocket/src/ftp.lua luasocket/src/headers.lua luasocket/src/http.lua \
 		luasocket/src/smtp.lua luasocket/src/tp.lua luasocket/src/url.lua $(LUA_DIST)/socket/
-	mkdir $(LUA_DIST)/sha1
-	cp -u sha1/src/sha1/*.lua $(LUA_DIST)/sha1/
-	printf "return require('sha1.init')" > $(LUA_DIST)/sha1.lua
 
 dist-ext-copy:
 	-cp -u lua-struct/struct.$(SO) $(LUA_CDIST)/
