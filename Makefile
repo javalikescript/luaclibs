@@ -111,7 +111,8 @@ core quick full extras show-main configure configure-libjpeg configure-libexif c
 	@$(MAKE) $(EXPAT)
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif \
+lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat fann lua-fann:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -278,6 +279,7 @@ clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./lua-win32/*.o ./lua-win32/*.$(SO)
 	-$(RM) ./luachild/*.o ./luachild/*.$(SO)
 	-$(RM) ./lua-struct/*.o ./lua-struct/*.$(SO)
+	-$(RM) ./lua-fann/src/*.o ./lua-fann/*.$(SO)
 
 clean-libuv:
 	-$(RM) ./luv/deps/libuv/*.a ./luv/deps/libuv/src/*.o
@@ -288,6 +290,7 @@ clean-libs: clean-libuv
 	-$(RM) ./openssl/*/*.$(SO)
 	-$(RM) ./zlib/*.o ./zlib/*.lo ./zlib/*.a ./zlib/*.$(SO)*
 	-$(MAKE) -C $(EXPAT) clean
+	-$(RM) ./fann/src/*.o
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
 
@@ -350,6 +353,7 @@ dist-ext-copy:
 	-cp -u luacov/src/luacov/*.lua $(LUA_DIST)/luacov/
 	-cp -u lua-cbor/cbor.lua $(LUA_DIST)/
 	-cp -u lpeglabel/lpeglabel.$(SO) $(LUA_CDIST)/
+	-cp -u lua-fann/fann.$(SO) $(LUA_CDIST)/
 
 dist-copy: dist-copy-$(PLAT) dist-copy-openssl-$(LUA_OPENSSL_LINKING)-$(PLAT)
 	cp -u licenses.txt $(LUA_DIST)/
@@ -500,5 +504,5 @@ sync: sync-git
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
 	lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg lpeglabel zlib lua-zlib \
 	openssl lua-openssl luaserial luabt libjpeg lua-jpeg libexif lua-exif lua-webview \
-	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct luaexpat
+	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct luaexpat fann lua-fann
 

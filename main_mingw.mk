@@ -97,6 +97,12 @@ luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi luachild l
 lua-llthreads2: lua
 	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
+fann:
+	$(MAKE) -C fann -f ../fann.mk
+
+lua-fann: fann
+	$(MAKE) -C lua-fann -f ../lua-fann.mk
+
 zlib:
 	$(MAKE) -C zlib -f ../zlib.mk
 
@@ -146,4 +152,5 @@ lua-exif: lua libexif
 
 .PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
 	luaexpat luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
-	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel
+	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel \
+	fann lua-fann
