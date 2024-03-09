@@ -21,7 +21,7 @@ LIBOPT_dll = -O \
   -shared \
   -static-libgcc \
   -Wl,-s \
-  -L..\$(LUA_PATH)\src -l$(LUA_LIB) \
+  -L../$(LUA_PATH)/src -l$(LUA_LIB) \
   -lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
 
 CFLAGS_dll = -Wall \
@@ -37,7 +37,7 @@ LIBOPT_so = -O \
   -shared \
   -static-libgcc \
   -Wl,-s \
-  -L..\$(LUA_PATH)\src \
+  -L../$(LUA_PATH)/src \
   $(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
 
 CFLAGS_so = -pedantic \

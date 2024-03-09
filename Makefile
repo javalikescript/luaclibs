@@ -73,19 +73,52 @@ RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
 
 EXPAT=expat-2.5.0
 
+
 STATIC_NAME := luajls
+
 STATIC_CORE_LIBNAMES := zlib luv cjson
 STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o
+
 STATIC_LUAS := $(LUAJLS)/jls DumbLuaParser/dumbParser.lua
-STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial webview openssl
+STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial webview
 STATIC_LIBS := $(STATIC_CORE_LIBS) \
 		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a \
 		luaserial/luaserial.o \
-		lua-webview/webview.o \
-		lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
+		lua-webview/webview.o
+
+OPENSSL_LIBNAMES := openssl
+OPENSSL_LIBS := lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
+
+LUV_DEP_LIBS_linux=-lrt -pthread -lpthread
+LUV_DEP_LIBS_windows=-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
+LUAW32_DEP_LIBS=-lcomdlg32
+WINAPI_DEP_LIBS=-lkernel32 -luser32 -lpsapi -ladvapi32 -lshell32 -lMpr
+WEBVIEW_DEP_LIBS_linux=$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
+WEBVIEW_DEP_LIBS_windows=-lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
+
+STATIC_DEP_CORE_LIBS_linux=-ldl $(LUV_DEP_LIBS_linux)
+STATIC_DEP_CORE_LIBS_windows=$(LUV_DEP_LIBS_windows) $(LUAW32_DEP_LIBS) $(WINAPI_DEP_LIBS)
+STATIC_DEP_CORE_LIBS=$(STATIC_DEP_LIBS_$(PLAT))
+
+STATIC_DEP_LIBS_linux=$(STATIC_DEP_CORE_LIBS_linux) $(WEBVIEW_DEP_LIBS_linux)
+STATIC_DEP_LIBS_windows=$(STATIC_DEP_CORE_LIBS_windows) $(WEBVIEW_DEP_LIBS_windows)
+STATIC_DEP_LIBS=$(STATIC_DEP_LIBS_$(PLAT))
+
+STATIC_OS_LIBNAMES_linux=linux
+STATIC_OS_LIBNAMES_windows=win32 winapi
+STATIC_OS_LIBNAMES=$(STATIC_OS_LIBNAMES_$(PLAT))
+
+STATIC_OS_LIBS_linux=lua-linux/linux.o
+STATIC_OS_LIBS_windows=lua-win32\win32.o winapi\winapi.o winapi\wutils.o
+STATIC_OS_LIBS=$(STATIC_OS_LIBS_$(PLAT))
+
+STATIC_SHARED_LIBS_linux=$(LUA_PATH)/src/liblua.a -ldl
+STATIC_SHARED_LIBS_windows=-L$(LUA_PATH)\src -l$(LUA_LIB)
+STATIC_SHARED_LIBS=$(STATIC_SHARED_LIBS_$(PLAT)) -lm
+
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
@@ -209,31 +242,28 @@ static: static-$(PLAT) static-test
 static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
-static-windows:
+static-full:
 	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) \
-		-c $(STATIC_LIBNAMES) win32 winapi
+		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(OPENSSL_LIBNAMES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME).exe -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_LIBS) \
-		lua-win32\win32.o \
-		winapi\winapi.o winapi\wutils.o \
-		-lm -Ilua/src \
-		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
-		-lcomctl32 -loleaut32 -lgdi32 \
-		-lkernel32 -ladvapi32 -lMpr
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
+		addlibs-main.c $(STATIC_LIBS) $(OPENSSL_LIBS) \
+		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_LIBS)
 
-static-linux:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(STATIC_LUAS) \
-		-c $(STATIC_LIBNAMES) linux
+static-shared:
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_LIBS) \
-		lua-linux/linux.o \
-		-lm -Ilua/src \
-		$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0) \
-		-lrt -pthread -lpthread -ldl
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
+		addlibs-main.c zlib/libz.a -Ilua/src $(STATIC_SHARED_LIBS)
+
+static-windows: static-full
+	@$(MAKE) static-shared STATIC_NAME=c$(STATIC_NAME) STATIC_FLAGS="$(LUA_PATH)/src/wlua.res"
+	@$(MAKE) static-shared STATIC_NAME=w$(STATIC_NAME) STATIC_FLAGS="$(LUA_PATH)/src/wlua.res -mwindows"
+
+static-linux: static-full
+	@$(MAKE) static-shared STATIC_NAME=c$(STATIC_NAME)
 
 static-example:
 	@echo "print('You could rename this executable to, or create a link with, the name of an example to run it.')" > $(MK_DIR)/example.lua
@@ -242,12 +272,8 @@ static-example:
 	$(RM) example.lua
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "require((function() for i=-1,-99,-1 do if not arg[i] then return (string.gsub(string.gsub(arg[i+1], '^.*[/\\\\]', ''), '%.exe$$', '')); end; end; end)())" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example.exe -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_CORE_LIBS) \
-		-lm -Ilua/src \
-		-lcomdlg32 -lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid \
-		-lcomctl32 -loleaut32 -lgdi32 \
-		-lkernel32 -ladvapi32 -lMpr
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example$(EXE) -s $(STATIC_FLAGS) addlibs.o \
+		addlibs-main.c $(STATIC_CORE_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS)
 
 clean-lua:
 	-$(RM) ./$(LUA_PATH)/src/*.o ./$(LUA_PATH)/src/*.a

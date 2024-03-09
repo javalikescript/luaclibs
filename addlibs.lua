@@ -205,4 +205,4 @@ for _, line in ipairs(lines) do
 end
 fd:close()
 
-print(string.format('addlibs generated, deflate ratio is %s for %d modules\n', (total * 10 // index) / 10, count))
+print(string.format('addlibs generated, deflate ratio is %s for %d modules, using %d kbytes\n', (total * 10 // index) / 10, count, index // 1024))
