@@ -70,6 +70,7 @@ LUA_APP = $(LUA_PATH)/src/lua$(EXE)
 RELEASE_DATE = $(shell date '+%Y%m%d')
 LUA_VERSION = $(shell $(LUA_APP) -e "print(string.sub(_VERSION, 5))")
 RELEASE_NAME ?= -$(LUA_VERSION)-$(DIST_TARGET).$(RELEASE_DATE)
+TAR_OPTIONS := --group=jls --owner=jls
 
 EXPAT=expat-2.5.0
 
@@ -460,7 +461,7 @@ dist: dist-all dist-jls-do dist-versions
 
 
 luajls.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls$(RELEASE_NAME).tar.gz *
+	cd $(LUA_DIST) && tar $(TAR_OPTIONS) -zcvf luajls$(RELEASE_NAME).tar.gz *
 
 luajls.zip:
 	cd $(LUA_DIST) && zip -r luajls$(RELEASE_NAME).zip *
@@ -482,10 +483,12 @@ release: release-all
 STATIC_FILES := docs.zip examples licenses.txt versions.txt
 
 static.tar.gz:
-	cd $(LUA_DIST) && tar --group=jls --owner=jls -zcvf luajls-static$(RELEASE_NAME).tar.gz lua$(EXE) $(STATIC_FILES)
+	cd $(LUA_DIST) && tar $(TAR_OPTIONS) -zcvf luajls-static$(RELEASE_NAME).tar.gz lua$(EXE) $(STATIC_FILES) && \
+		tar $(TAR_OPTIONS) -zcvf luajls-shared$(RELEASE_NAME).tar.gz c$(STATIC_NAME)$(EXE)
 
 static.zip:
-	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) WebView2Loader.dll
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) WebView2Loader.dll && \
+		zip -r luajls-shared$(RELEASE_NAME).zip c$(STATIC_NAME)$(EXE) w$(STATIC_NAME)$(EXE)
 
 static-pre:
 	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/lua-pre$(EXE)
@@ -516,8 +519,8 @@ sync-git:
 	git rebase
 	git submodule update --init --recursive
 
-sync-5.1: sync-git release-5.1
-	$(MAKE) all releases
+sync-5.1: sync-git
+	$(MAKE) release-5.1 all releases
 
 sync: sync-git
 	$(MAKE) all releases
