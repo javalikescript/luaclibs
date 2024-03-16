@@ -76,6 +76,7 @@ EXPAT=expat-2.5.0
 
 
 STATIC_NAME := luajls
+SHARED_NAME := c$(STATIC_NAME)
 
 STATIC_CORE_LIBNAMES := zlib luv cjson
 STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
@@ -237,7 +238,7 @@ $(LUAJLS_TESTS):
 test-cross:
 
 
-static: static-$(PLAT) static-test
+static: static-full static-test
 	rm addlibs.o addlibs-custom.c addlibs-main.c
 
 static-test:
@@ -252,20 +253,6 @@ static-full:
 		addlibs-main.c $(STATIC_LIBS) $(OPENSSL_LIBS) \
 		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_LIBS)
 
-static-shared:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS)
-	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
-	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c zlib/libz.a -Ilua/src $(STATIC_SHARED_LIBS)
-
-static-windows: static-full
-	@$(MAKE) static-shared STATIC_NAME=c$(STATIC_NAME) STATIC_FLAGS="$(LUA_PATH)/src/wlua.res"
-	@$(MAKE) static-shared STATIC_NAME=w$(STATIC_NAME) STATIC_FLAGS="$(LUA_PATH)/src/wlua.res -mwindows"
-
-static-linux: static-full
-	@$(MAKE) static-shared STATIC_NAME=c$(STATIC_NAME)
-
 static-example:
 	@echo "print('You could rename this executable to, or create a link with, the name of an example to run it.')" > $(MK_DIR)/example.lua
 	@echo "print('Examples: $(patsubst $(LUAJLS)/examples/%.lua,%,$(wildcard $(LUAJLS)/examples/*.lua))')" >> $(MK_DIR)/example.lua
@@ -275,6 +262,27 @@ static-example:
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example$(EXE) -s $(STATIC_FLAGS) addlibs.o \
 		addlibs-main.c $(STATIC_CORE_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS)
+
+
+shared: shared-$(PLAT) shared-test
+	rm addlibs.o addlibs-custom.c addlibs-main.c
+
+shared-test:
+	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) $(MK_DIR)$(LUA_DIST)/$(SHARED_NAME)$(EXE)" test
+
+shared-windows:
+	@$(MAKE) static-shared STATIC_FLAGS="$(LUA_PATH)/src/wlua.res"
+	@$(MAKE) static-shared STATIC_FLAGS="$(LUA_PATH)/src/wlua.res -mwindows" SHARED_NAME=w$(STATIC_NAME)
+
+shared-linux: static-shared
+
+static-shared:
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS)
+	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
+	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
+	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(SHARED_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
+		addlibs-main.c zlib/libz.a -Ilua/src $(STATIC_SHARED_LIBS)
+
 
 clean-lua:
 	-$(RM) ./$(LUA_PATH)/src/*.o ./$(LUA_PATH)/src/*.a
