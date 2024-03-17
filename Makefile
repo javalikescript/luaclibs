@@ -245,7 +245,7 @@ static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-full:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) \
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) $(STATIC_RESOURCES) \
 		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(OPENSSL_LIBNAMES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
@@ -277,7 +277,7 @@ shared-windows:
 shared-linux: static-shared
 
 static-shared:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS)
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) $(STATIC_RESOURCES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(SHARED_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
