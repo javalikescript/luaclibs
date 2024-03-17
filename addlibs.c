@@ -88,23 +88,48 @@ static int preload_custom_rawget(lua_State *L, int index, const char *name, int 
   return nresults;
 }
 
-static int preload_custom_get(lua_State *L) {
-  const char *name = luaL_checkstring(L, 1);
+static int preload_custom_find(const char *name, int from) {
   const struct custom_preload* cp;
   int index;
-  for (index = 0; ; index++) {
+  for (index = from; ; index++) {
     cp = custom_preloads + index;
     if (cp->name == NULL) {
-      index = -1;
       break;
     }
     if (strcmp(name, cp->name) == 0) {
-      break;
+      return index;
     }
   }
+  return -1;
+}
+
+static int preload_custom_get(lua_State *L) {
+  const char *name = luaL_checkstring(L, 1);
+  int index = preload_custom_find(name, 0);
   trace("preload_custom_get('%s') => %d\n", name, index);
   return preload_custom_rawget(L, index, name, 1);
 }
+
+#ifdef RESOURCES_INDEX
+static int preload_custom_res(lua_State *L) {
+  const struct custom_preload* cp;
+  const struct custom_preload* cpn;
+  unsigned char* inflated;
+  const char *name = luaL_checkstring(L, 1);
+  int index = preload_custom_find(name, RESOURCES_INDEX);
+  trace("preload_custom_res('%s') => %d\n", name, index);
+  if (index > 0) {
+    cp = custom_preloads + index;
+    cpn = cp + 1;
+    inflated = inflate_chunk(custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
+    if (inflated) {
+      lua_pushstring(L, inflated);
+      return 1;
+    }
+  }
+  return 0;
+}
+#endif
 
 /* override Lua openlibs to add user libraries */
 
@@ -154,6 +179,18 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
     lua_pop(L, 1);
     preload_custom_rawget(L, PRELOADS_INDEX, ":preloads:", 0);
   }
+#ifdef RESOURCES_INDEX
+  if (env == NULL || strstr(env, "res")) {
+    lua_getglobal(L, "package");
+    luaL_getsubtable(L, -1, "resource");
+    for (cp = custom_preloads + RESOURCES_INDEX; cp->name; cp++) {
+      trace("preload resource '%s'\n", cp->name);
+      lua_pushcfunction(L, preload_custom_res);
+      lua_setfield(L, -2, cp->name);
+    }
+    lua_pop(L, 2);
+  }
+#endif
   if (env != NULL && strstr(env, "show")) {
     printf("--[[\npreload C modules:\n");
     for (lib = custom_libs; lib->func; lib++) {
