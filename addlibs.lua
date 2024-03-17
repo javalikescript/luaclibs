@@ -1,6 +1,6 @@
 --[[
 This Lua script generates the content of the "addlibs-custom.c" file.
-The syntax is "-c <C module name> ... -l|-L <Lua file or directory> ... -r <Resource file or directory> ...".
+The syntax is "-c <C module name> ... -l|-L <Lua file or directory> ... -r|-R <Resource file or directory> ...".
 The "addlibs-custom.c" file is used in conjonction with the "addlibs.c" C file to add custom Lua loaders.
 The Lua function "luaL_openlibs" is overrided in order to add loaders in the table "package.preload".
 The loaders consists in C functions available in the executable and external Lua files.
@@ -46,10 +46,10 @@ local function getBaseName(filename)
   return n or filename, e
 end
 
-local function forEach(filename, fn, dirPath, recursive, path)
+local function forEach(filename, fn, dirPath, recursive, sep, path)
   local mode = fs.attributes(filename, 'mode')
   if path and path ~= '' then
-    path = path..'.'
+    path = path..(sep or '.')
   else
     path = ''
   end
@@ -63,7 +63,7 @@ local function forEach(filename, fn, dirPath, recursive, path)
     end
     for n in fs.dir(filename) do
       if n ~= '.' and n ~= '..' then
-        forEach(filename..'/'..n, fn, dirPath, recursive, path)
+        forEach(filename..'/'..n, fn, dirPath, recursive, sep, path)
       end
     end
   end
@@ -94,6 +94,7 @@ local luasubnames = {}
 local libnames = {}
 local luanames = {}
 local resnames = {}
+local ressubnames = {}
 local printPreloads = false
 local l = libnames
 for _, value in ipairs(arg) do
@@ -105,6 +106,8 @@ for _, value in ipairs(arg) do
     l = luasubnames
   elseif value == '-r' then
     l = resnames
+  elseif value == '-R' then
+    l = ressubnames
   elseif value == '-p' then
     printPreloads = not printPreloads
   else
@@ -121,7 +124,7 @@ end
 local resfiles = {}
 local function addResFile(file, name, ext)
   if ext ~= 'lua' then
-    table.insert(resfiles, {file = file, name = string.gsub(name, '%.', '/')..'.'..ext})
+    table.insert(resfiles, {file = file, name = name..'.'..ext})
   end
 end
 for _, luaname in ipairs(luanames) do
@@ -131,7 +134,10 @@ for _, luaname in ipairs(luasubnames) do
   forEach(luaname, addLuaFile)
 end
 for _, luaname in ipairs(resnames) do
-  forEach(luaname, addResFile)
+  forEach(luaname, addResFile, false, false, '/')
+end
+for _, luaname in ipairs(ressubnames) do
+  forEach(luaname, addResFile, true, true, '/')
 end
 table.sort(luafiles, compareByName)
 table.sort(resfiles, compareByName)
