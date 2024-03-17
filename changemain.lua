@@ -12,7 +12,6 @@ Otherwise, if the executable name is "example" then the script "example.lua" is 
 local function charToHex(c)
   return string.format('0x%02x, ', string.byte(c))
 end
-
 local function stringToHex(s)
   return (string.gsub(s, '.', charToHex))
 end
@@ -44,7 +43,7 @@ if execute and execute ~= '' then
 
 #define CUSTOM_EXECUTE custom_execute
 
-static char custom_execute[] = {%s};
+static char custom_execute[] = {%s0x00};
 
 ]], stringToHex(execute)))
   cc = replace(cc, '\n *static +int +handle_script *%(', [[
