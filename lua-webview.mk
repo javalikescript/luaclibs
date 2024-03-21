@@ -9,6 +9,7 @@ LUA_LIB = lua53
 
 WEBVIEW_C = webview-c
 MS_WEBVIEW2 = $(WEBVIEW_C)/ms.webview2
+MEMMODULE = MemoryModule
 
 GCC_NAME ?= $(shell $(CC) -dumpmachine)
 
@@ -17,6 +18,9 @@ ifeq (,$(findstring x86_64,$(GCC_NAME)))
   WEBVIEW_ARCH = x86
 endif
 
+WOPTS = -w
+#WOPTS = -Wall -Wextra -Wno-unused-parameter -Wstrict-prototypes
+
 LIBOPT_dll = -O \
   -shared \
   -static-libgcc \
@@ -24,13 +28,12 @@ LIBOPT_dll = -O \
   -L../$(LUA_PATH)/src -l$(LUA_LIB) \
   -lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
 
-CFLAGS_dll = -Wall \
-  -Wextra \
-  -Wno-unused-parameter \
-  -Wstrict-prototypes \
+CFLAGS_dll = $(WOPTS) \
   -I$(WEBVIEW_C) \
+  -I$(MEMMODULE) \
   -I$(MS_WEBVIEW2)/include \
   -I../$(LUA_PATH)/src \
+  -DWEBVIEW2_MEMORY_MODULE=1 \
   -DWEBVIEW_WINAPI=1
 
 LIBOPT_so = -O \
@@ -42,22 +45,25 @@ LIBOPT_so = -O \
 
 CFLAGS_so = -pedantic \
   -fPIC \
-  -Wall \
-  -Wextra \
-  -Wno-unused-parameter \
-  -Wstrict-prototypes \
+  $(WOPTS) \
   -I$(WEBVIEW_C) \
   -I../$(LUA_PATH)/src \
   -DWEBVIEW_GTK=1 \
   $(shell pkg-config --cflags gtk+-3.0 webkit2gtk-4.0)
 
+SOURCES_dll=$(MEMMODULE)/MemoryModule.c
+SOURCES_so=
+
+OBJS_dll=$(MEMMODULE)/MemoryModule.o
+OBJS_so=
+
 LIBOPT = $(LIBOPT_$(LIBEXT))
 
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
-SOURCES = webview.c
+SOURCES = webview.c $(SOURCES_$(LIBEXT))
 
-OBJS = webview.o
+OBJS = webview.o $(OBJS_$(LIBEXT))
 
 SRCS = $(WEBVIEW_C)/webview.h \
   $(WEBVIEW_C)/webview-cocoa.c \
