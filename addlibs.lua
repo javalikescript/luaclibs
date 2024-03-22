@@ -80,7 +80,7 @@ end
 
 local function readFile(filename)
   local data
-  local f = io.open(filename, 'r')
+  local f = io.open(filename, 'rb')
   if f then
     data = f:read('*a')
     f:close()
@@ -95,6 +95,7 @@ local libnames = {}
 local luanames = {}
 local resnames = {}
 local ressubnames = {}
+local prenames = {}
 local printPreloads = false
 local l = libnames
 for _, value in ipairs(arg) do
@@ -109,6 +110,8 @@ for _, value in ipairs(arg) do
   elseif value == '-R' then
     l = ressubnames
   elseif value == '-p' then
+    l = prenames
+  elseif value == '-pp' then
     printPreloads = not printPreloads
   else
     table.insert(l, value)
@@ -196,6 +199,13 @@ for _, item in ipairs(luafiles) do
 end
 
 local preloadsIndex = index
+for _, prename in ipairs(prenames) do
+  local lua = readFile(prename)
+  if lua then
+    table.insert(luaPreloads, lua)
+    table.insert(luaPreloads, '\n')
+  end
+end
 local lua = stripLua(table.concat(luaPreloads))
 local deflated = assert(deflate(lua))
 table.insert(lines, string.format('  {NULL, %d, %d},\n', deflateIndex, #lua))

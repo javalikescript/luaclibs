@@ -84,12 +84,15 @@ STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
 		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o
 
+STATIC_RESOURCES_windows=lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll
+STATIC_LIBS_windows=lua-webview/MemoryModule/MemoryModule.o
+
 STATIC_LUAS := $(LUAJLS)/jls DumbLuaParser/dumbParser.lua
 STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial webview
 STATIC_LIBS := $(STATIC_CORE_LIBS) \
 		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a \
 		luaserial/luaserial.o \
-		lua-webview/webview.o
+		lua-webview/webview.o $(STATIC_LIBS_$(PLAT))
 
 OPENSSL_LIBNAMES := openssl
 OPENSSL_LIBS := lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
@@ -245,7 +248,7 @@ static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-full:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) $(STATIC_RESOURCES) \
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp -l $(STATIC_LUAS) -p addwebview.lua -r $(STATIC_RESOURCES_$(PLAT)) $(STATIC_RESOURCES) \
 		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(OPENSSL_LIBNAMES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
@@ -277,7 +280,7 @@ shared-windows:
 shared-linux: static-shared
 
 static-shared:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -p -l $(STATIC_LUAS) $(STATIC_RESOURCES)
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp -l $(STATIC_LUAS) -r $(STATIC_RESOURCES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(SHARED_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
