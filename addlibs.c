@@ -123,7 +123,8 @@ static int preload_custom_res(lua_State *L) {
     cpn = cp + 1;
     inflated = inflate_chunk(custom_chunk_preloads + cp->index, cpn->index - cp->index, cp->size);
     if (inflated) {
-      lua_pushstring(L, inflated);
+      lua_pushlstring(L, inflated, cp->size);
+      free(inflated);
       return 1;
     }
   }
@@ -160,6 +161,18 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
   }
   /* custom part */
   env = getenv("JLS_STATIC_PRELOADS");
+#ifdef RESOURCES_INDEX
+  if (env == NULL || strstr(env, "res")) {
+    lua_getglobal(L, "package");
+    luaL_getsubtable(L, -1, "resource");
+    for (cp = custom_preloads + RESOURCES_INDEX; cp->name; cp++) {
+      trace("preload resource '%s'\n", cp->name);
+      lua_pushcfunction(L, preload_custom_res);
+      lua_setfield(L, -2, cp->name);
+    }
+    lua_pop(L, 2);
+  }
+#endif
   if (env == NULL || strstr(env, "lib")) {
     luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_PRELOAD_TABLE);
     for (lib = custom_libs; lib->func; lib++) {
@@ -179,18 +192,6 @@ LUALIB_API void luaL_openlibs(lua_State *L) {
     lua_pop(L, 1);
     preload_custom_rawget(L, PRELOADS_INDEX, ":preloads:", 0);
   }
-#ifdef RESOURCES_INDEX
-  if (env == NULL || strstr(env, "res")) {
-    lua_getglobal(L, "package");
-    luaL_getsubtable(L, -1, "resource");
-    for (cp = custom_preloads + RESOURCES_INDEX; cp->name; cp++) {
-      trace("preload resource '%s'\n", cp->name);
-      lua_pushcfunction(L, preload_custom_res);
-      lua_setfield(L, -2, cp->name);
-    }
-    lua_pop(L, 2);
-  }
-#endif
   if (env != NULL && strstr(env, "show")) {
     printf("--[[\npreload C modules:\n");
     for (lib = custom_libs; lib->func; lib++) {
