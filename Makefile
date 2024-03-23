@@ -325,6 +325,7 @@ clean-libs: clean-libuv
 	-$(MAKE) -C openssl clean
 	-$(RM) ./openssl/*/*.$(SO)
 	-$(RM) ./zlib/*.o ./zlib/*.lo ./zlib/*.a ./zlib/*.$(SO)*
+	-$(RM) ./lua-webview/*.o ./lua-webview/MemoryModule/*.o
 	-$(MAKE) -C $(EXPAT) clean
 	-$(MAKE) -C lua-jpeg/libjpeg clean
 	-$(MAKE) -C lua-exif/libexif clean
@@ -498,7 +499,7 @@ static.tar.gz:
 		tar $(TAR_OPTIONS) -zcvf luajls-shared$(RELEASE_NAME).tar.gz c$(STATIC_NAME)$(EXE)
 
 static.zip:
-	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) WebView2Loader.dll && \
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) && \
 		zip -r luajls-shared$(RELEASE_NAME).zip c$(STATIC_NAME)$(EXE) w$(STATIC_NAME)$(EXE)
 
 static-pre:
@@ -509,7 +510,7 @@ static-post:
 	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/$(STATIC_NAME)$(EXE)
 	mv $(LUA_DIST)/lua-pre$(EXE) $(LUA_DIST)/lua$(EXE)
 
-static-release: static static-pre static$(ZIP) static-post
+static-release: static shared static-pre static$(ZIP) static-post
 
 static-release-cross:
 
