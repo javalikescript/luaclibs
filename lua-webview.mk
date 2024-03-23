@@ -34,6 +34,7 @@ CFLAGS_dll = $(WOPTS) \
   -I$(MS_WEBVIEW2)/include \
   -I../$(LUA_PATH)/src \
   -DWEBVIEW2_MEMORY_MODULE=1 \
+  -DWEBVIEW_WIN32_ICON_RES=0 \
   -DWEBVIEW_WINAPI=1
 
 LIBOPT_so = -O \
