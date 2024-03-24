@@ -426,6 +426,7 @@ ldoc-dev-content:
 		sed 's/[^A-Za-z][^A-Za-z]*/_/g' | sed 's/_$$//g' | sed -E 's/^(.*)$$/@{manual.md.\1|\1}/g'
 
 ldoc-dev:
+	rm -rf ../$(LUAJLS)/doc
 	cd ../$(LUAJLS) && $(LUADOC_CMD) -i --date "" -d doc .
 
 md-ldoc:
