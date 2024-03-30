@@ -76,7 +76,6 @@ EXPAT=expat-2.5.0
 
 
 STATIC_NAME := luajls
-SHARED_NAME := c$(STATIC_NAME)
 
 STATIC_CORE_LIBNAMES := zlib luv cjson
 STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
@@ -94,8 +93,13 @@ STATIC_LIBS := $(STATIC_CORE_LIBS) \
 		luaserial/luaserial.o \
 		lua-webview/webview.o $(STATIC_LIBS_$(PLAT))
 
-OPENSSL_LIBNAMES := openssl
-OPENSSL_LIBS := lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
+STATIC_OPENSSL_LIBNAMES:=openssl
+STATIC_OPENSSL_LIBS:=lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
+STATIC_OPENSSL:=Y
+ifndef STATIC_OPENSSL
+	STATIC_OPENSSL_LIBNAMES:=
+	STATIC_OPENSSL_LIBS:=
+endif
 
 LUV_DEP_LIBS_linux=-lrt -pthread -lpthread
 LUV_DEP_LIBS_windows=-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
@@ -120,10 +124,9 @@ STATIC_OS_LIBS_linux=lua-linux/linux.o
 STATIC_OS_LIBS_windows=lua-win32\win32.o winapi\winapi.o winapi\wutils.o
 STATIC_OS_LIBS=$(STATIC_OS_LIBS_$(PLAT))
 
-STATIC_SHARED_LIBS_linux=$(LUA_PATH)/src/liblua.a -ldl
-STATIC_SHARED_LIBS_windows=-L$(LUA_PATH)\src -l$(LUA_LIB)
-STATIC_SHARED_LIBS=$(STATIC_SHARED_LIBS_$(PLAT)) -lm
-
+STATIC_FLAGS_windows=lua/src/wlua.res
+STATIC_FLAGS_linux=
+STATIC_FLAGS=$(STATIC_FLAGS_$(PLAT))
 
 # in case of cross compilation, we need to use host lua for doc generation and disable lua for tests
 
@@ -248,12 +251,14 @@ static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-full:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp -l $(STATIC_LUAS) -p addwebview.lua -r $(STATIC_RESOURCES_$(PLAT)) $(STATIC_RESOURCES) \
-		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(OPENSSL_LIBNAMES)
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp \
+		-l $(STATIC_LUAS) -p addwebview.lua \
+		-r $(STATIC_RESOURCES_$(PLAT)) $(STATIC_RESOURCES) \
+		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES)
 	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_LIBS) $(OPENSSL_LIBS) \
+		addlibs-main.c $(STATIC_LIBS) $(STATIC_OPENSSL_LIBS) \
 		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_LIBS)
 
 static-example:
@@ -265,26 +270,6 @@ static-example:
 	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example$(EXE) -s $(STATIC_FLAGS) addlibs.o \
 		addlibs-main.c $(STATIC_CORE_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS)
-
-
-shared: shared-$(PLAT) shared-test
-	rm addlibs.o addlibs-custom.c addlibs-main.c
-
-shared-test:
-	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=$(MK_DIR)$(LUA_DIST)/?.$(SO) $(MK_DIR)$(LUA_DIST)/$(SHARED_NAME)$(EXE)" test
-
-shared-windows:
-	@$(MAKE) static-shared STATIC_FLAGS="$(LUA_PATH)/src/wlua.res"
-	@$(MAKE) static-shared STATIC_FLAGS="$(LUA_PATH)/src/wlua.res -mwindows" SHARED_NAME=w$(STATIC_NAME)
-
-shared-linux: static-shared
-
-static-shared:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp -l $(STATIC_LUAS) -r $(STATIC_RESOURCES)
-	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
-	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
-	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(SHARED_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c zlib/libz.a -Ilua/src $(STATIC_SHARED_LIBS)
 
 
 clean-lua:
@@ -496,12 +481,10 @@ release: release-all
 STATIC_FILES := docs.zip examples licenses.txt versions.txt
 
 static.tar.gz:
-	cd $(LUA_DIST) && tar $(TAR_OPTIONS) -zcvf luajls-static$(RELEASE_NAME).tar.gz lua$(EXE) $(STATIC_FILES) && \
-		tar $(TAR_OPTIONS) -zcvf luajls-shared$(RELEASE_NAME).tar.gz c$(STATIC_NAME)$(EXE)
+	cd $(LUA_DIST) && tar $(TAR_OPTIONS) -zcvf luajls-static$(RELEASE_NAME).tar.gz lua$(EXE) $(STATIC_FILES)
 
 static.zip:
-	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES) && \
-		zip -r luajls-shared$(RELEASE_NAME).zip c$(STATIC_NAME)$(EXE) w$(STATIC_NAME)$(EXE)
+	cd $(LUA_DIST) && zip -r luajls-static$(RELEASE_NAME).zip lua$(EXE) $(STATIC_FILES)
 
 static-pre:
 	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/lua-pre$(EXE)
@@ -511,7 +494,7 @@ static-post:
 	mv $(LUA_DIST)/lua$(EXE) $(LUA_DIST)/$(STATIC_NAME)$(EXE)
 	mv $(LUA_DIST)/lua-pre$(EXE) $(LUA_DIST)/lua$(EXE)
 
-static-release: static shared static-pre static$(ZIP) static-post
+static-release: static static-pre static$(ZIP) static-post
 
 static-release-cross:
 
