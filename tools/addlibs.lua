@@ -254,12 +254,10 @@ for _, preload in ipairs(preloads) do
 end
 table.insert(lines, '\n};\n')
 
--- create file
+-- write generated file
 
-local fd = assert(io.open('addlibs-custom.c', 'wb'))
 for _, line in ipairs(lines) do
-  fd:write(line)
+  io.stdout:write(line)
 end
-fd:close()
 
-print(string.format('addlibs generated, deflate ratio is %s for %d modules, using %d kbytes\n', (total * 10 // deflateIndex) / 10, index, deflateIndex // 1024))
+io.stderr:write(string.format('addlibs generated, deflate ratio is %s for %d modules, using %d kbytes\n', (total * 10 // deflateIndex) / 10, index, deflateIndex // 1024))

@@ -182,7 +182,7 @@ echo show:
 	@echo MK_DIR: $(MK_DIR)
 
 versions-dist:
-	@$(LUAJLS_CMD) -v versions.lua
+	@$(LUAJLS_CMD) -v tools/versions.lua
 
 versions-cross:
 	@printf "cc\t"
@@ -245,31 +245,33 @@ test-cross:
 
 
 static: static-full static-test
-	rm addlibs.o addlibs-custom.c addlibs-main.c
+	rm addlibs.o tools/addlibs-custom.c tools/addlibs-main.c
 
 static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
 static-full:
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -pp \
-		-l $(STATIC_LUAS) -p addwebview.lua \
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) tools/addlibs.lua -pp \
+		-l $(STATIC_LUAS) -p tools/addwebview.lua \
 		-r $(STATIC_RESOURCES_$(PLAT)) $(STATIC_RESOURCES) \
-		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES)
-	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > addlibs-main.c
-	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
+		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES) > tools/addlibs-custom.c
+	$(LUA_APP) tools/changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > tools/addlibs-main.c
+	$(CC) -c -Os tools/addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_LIBS) $(STATIC_OPENSSL_LIBS) \
+		tools/addlibs-main.c $(STATIC_LIBS) $(STATIC_OPENSSL_LIBS) \
 		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_LIBS)
 
 static-example:
 	@echo "print('You could rename this executable to, or create a link with, the name of an example to run it.')" > $(MK_DIR)/example.lua
 	@echo "print('Examples: $(patsubst $(LUAJLS)/examples/%.lua,%,$(wildcard $(LUAJLS)/examples/*.lua))')" >> $(MK_DIR)/example.lua
-	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) addlibs.lua -l $(LUAJLS)/jls xml2lua/XmlParser.lua -L $(LUAJLS)/examples -l example.lua -c $(STATIC_CORE_LIBNAMES)
+	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) tools/addlibs.lua \
+		-l $(LUAJLS)/jls xml2lua/XmlParser.lua -L $(LUAJLS)/examples -l example.lua \
+		-c $(STATIC_CORE_LIBNAMES) > tools/addlibs-custom.c
 	$(RM) example.lua
-	$(LUA_APP) changemain.lua $(LUA_PATH)/src/lua.c "require((function() for i=-1,-99,-1 do if not arg[i] then return (string.gsub(string.gsub(arg[i+1], '^.*[/\\\\]', ''), '%.exe$$', '')); end; end; end)())" > addlibs-main.c
-	$(CC) -c -Os addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
+	$(LUA_APP) tools/changemain.lua $(LUA_PATH)/src/lua.c "require((function() for i=-1,-99,-1 do if not arg[i] then return (string.gsub(string.gsub(arg[i+1], '^.*[/\\\\]', ''), '%.exe$$', '')); end; end; end)())" > tools/addlibs-main.c
+	$(CC) -c -Os tools/addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/example$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		addlibs-main.c $(STATIC_CORE_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS)
+		tools/addlibs-main.c $(STATIC_CORE_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS)
 
 
 clean-lua:
@@ -437,11 +439,11 @@ dist-doc-cross:
 
 dist-jls-lua51:
 	mv $(LUA_DIST)/luaunit.lua $(LUA_DIST)/luaunit-.lua
-	cp -u luaunit-patch.lua $(LUA_DIST)/luaunit.lua
+	cp -u tools/luaunit-patch.lua $(LUA_DIST)/luaunit.lua
 	mkdir $(LUA_DIST)/luvit
 	printf "return require('uv')" > $(LUA_DIST)/luvit/luv.lua
 	LUA_PATH="$(LUAJLS)/?.lua;$(LUA_DIST)/?.lua" LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) \
-		compat.lua -pretty "-t=$(LUA_DIST)" $(LUAJLS)/jls
+		tools/compat.lua -pretty "-t=$(LUA_DIST)" $(LUAJLS)/jls
 	echo "export LUA_PATH=\"$(MK_DIR)$(LUA_DIST)/luvit/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua\""
 
 dist-jls-lua54:
