@@ -38,17 +38,33 @@ endif
 
 EXPAT=expat-2.5.0
 
+ifeq ($(OS),Windows_NT)
+	NULL := NUL
+else
+	NULL := /dev/null
+endif
+
+OPT_LINUX_GPIO := $(shell echo -e "\x23include <linux/gpio.h>" | $(CC) -E - >$(NULL) 2>&1 && test -d lua-periphery && echo ok || echo na)
+OPT_WEBKIT2GTK := $(shell pkg-config gtk+-3.0 webkit2gtk-4.0 >$(NULL) 2>&1 && echo ok || echo na)
+
+
 all: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
 
 quick: core luaserial lua-jpeg lua-exif luaexpat
 
-full: quick lua-openssl lua-linux full-$(ARCH_SUFFIX)
+full: quick lua-openssl lua-linux opt-linux-gpio-$(OPT_LINUX_GPIO) opt-webview-$(OPT_WEBKIT2GTK)
 
-full-default: lua-webview
+opt-webview-ok: lua-webview
 
-full-arm full-aarch64:
+opt-webview-na:
+	@echo WebView not available
+
+opt-linux-gpio-ok: lua-periphery
+
+opt-linux-gpio-na:
+	@echo Linux GPIO not available
 
 extras: luabt
 
@@ -176,6 +192,9 @@ libexpat:
 luaexpat: lua libexpat
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) EXPAT=../$(EXPAT) $(LUA_VARS)
 
+lua-periphery:
+	CROSS_COMPILE=$(HOST) $(MAKE) -C $@ LUA_INCDIR=../lua/src $(LUA_VARS)
+
 configure-libjpeg:
 	cd lua-jpeg/libjpeg && sh configure CFLAGS='-O2 -fPIC'
 
@@ -202,5 +221,5 @@ lua-exif: lua libexif
 
 
 .PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaexpat luaserial luabt \
-	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2 lua-linux luachild lpeglabel
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2 lua-linux luachild lpeglabel lua-periphery
 

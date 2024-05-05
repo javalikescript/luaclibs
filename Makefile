@@ -152,7 +152,7 @@ core quick full extras show-main configure configure-libjpeg configure-libexif c
 	@$(MAKE) $(EXPAT)
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
-lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat:
+lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat lua-periphery:
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 help:
@@ -345,6 +345,7 @@ dist-copy-openssl-static-linux dist-copy-openssl-static-windows:
 
 dist-copy-linux:
 	-cp -u lua-linux/linux.$(SO) $(LUA_CDIST)/
+	-cp -u lua-periphery/periphery.$(SO) $(LUA_CDIST)/
 
 dist-copy-windows:
 	-cp -u $(LUA_PATH)/src/lua*.$(SO) $(LUA_CDIST)/
@@ -527,5 +528,5 @@ sync: sync-git
 .PHONY: dist release clean linux mingw windows win32 arm test ldoc full quick extras \
 	lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg lpeglabel zlib lua-zlib \
 	openssl lua-openssl luaserial luabt libjpeg lua-jpeg libexif lua-exif lua-webview \
-	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct luaexpat
+	winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct luaexpat lua-periphery
 
