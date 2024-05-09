@@ -23,6 +23,8 @@ fi
 # Collect options and packages from arguments
 OPTS=""
 PKGS=""
+ADD_LIBS=""
+ADD_FILES=""
 for ARG in "$@"
 do
   case "$ARG" in
@@ -32,6 +34,10 @@ do
     ;;
   --*)
     OPTS="$OPTS $ARG"
+    ;;
+  bluetooth)
+    ADD_FILES="$ADD_FILES /usr/include/$ARG"
+    ADD_LIBS="$ADD_LIBS $ARG"
     ;;
   *)
     PKGS="$PKGS $ARG"
@@ -98,6 +104,14 @@ do
     CFG=`pkg-config --cflags --libs $PKGS`
     FILES=`echo $CFG | tr ' ' '\n' | grep "^-I" | sed 's/^-I//' | xargs`
     LIBS=`echo $CFG | tr ' ' '\n' | grep "^-l" | sed 's/^-l//' | xargs`
+    if test -n "$ADD_FILES"
+    then
+      FILES="$FILES $ADD_FILES"
+    fi
+    if test -n "$ADD_LIBS"
+    then
+      LIBS="$LIBS $ADD_LIBS"
+    fi
     LIB_DIRS=`echo $CFG | tr ' ' '\n' | grep "^-L" | sed 's/^-L//' | xargs`
     GCC_ARCH=`gcc -print-multiarch`
     LIB_DIRS="$LIB_DIRS /usr/lib/$GCC_ARCH /usr/lib /lib"

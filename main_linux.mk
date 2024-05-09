@@ -38,6 +38,14 @@ endif
 
 EXPAT=expat-2.5.0
 
+ifeq ($(LIBBT),)
+	BT_OPTS = 
+else
+	INCBT ?= $(LIBBT)/../../include
+	BT_OPTS = EXTRA_CFLAGS=-I$(INCBT) EXTRA_LIBOPT=-L$(LIBBT)
+endif
+
+
 ifeq ($(OS),Windows_NT)
 	NULL := NUL
 else
@@ -140,7 +148,7 @@ luafilesystem lua-buffer luaserial lua-webview lua-linux luachild lua-struct: lu
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
 luabt: lua
-	$(MAKE) -C luabt -f ../luabt.mk CC=$(CC) LIBEXT=$(SO) EXTRA_CFLAGS=-I$(LIBBT) EXTRA_LIBOPT=-L$(LIBBT) $(LUA_VARS)
+	$(MAKE) -C luabt -f ../luabt.mk CC=$(CC) LIBEXT=$(SO) $(BT_OPTS) $(LUA_VARS)
 
 lua-llthreads2: lua
 	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
