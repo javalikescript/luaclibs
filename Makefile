@@ -148,8 +148,7 @@ main: main-$(PLAT)
 
 all: full
 
-core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl configure-libexpat:
-	@$(MAKE) $(EXPAT)
+core quick full extras show-main configure configure-libjpeg configure-libexif configure-openssl configure-libexpat: $(EXPAT)
 	@$(MAKE) PLAT=$(PLAT) MAIN_TARGET=$@ main
 
 lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg luaserial luabt lua-zlib openssl lua-openssl lua-jpeg lua-exif lua-webview winapi lua-win32 lua-llthreads2 lua-linux luachild lua-struct lpeglabel luaexpat lua-periphery:
@@ -303,6 +302,7 @@ clean-lua-libs: clean-luv clean-lua-openssl
 	-$(RM) ./lua-win32/*.o ./lua-win32/*.$(SO)
 	-$(RM) ./luachild/*.o ./luachild/*.$(SO)
 	-$(RM) ./lua-struct/*.o ./lua-struct/*.$(SO)
+	-$(RM) ./lua-periphery/c-periphery/obj/*.o ./lua-periphery/c-periphery/periphery.a ./lua-periphery/periphery.$(SO)
 
 clean-libuv:
 	-$(RM) ./luv/deps/libuv/*.a ./luv/deps/libuv/src/*.o
