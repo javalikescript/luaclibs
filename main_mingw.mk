@@ -24,17 +24,15 @@ endif
 
 EXPAT=expat-2.5.0
 
-all: full
+all any: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
 
 quick: core luaserial lua-jpeg lua-exif luaexpat
 
-full: quick lua-openssl lua-webview winapi lua-win32
+extras: winapi lua-win32 lua-webview luabt
 
-extras: luabt
-
-any: full
+full: quick lua-openssl extras
 
 configure: configure-libjpeg configure-libexif configure-openssl configure-libexpat
 

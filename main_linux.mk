@@ -44,31 +44,22 @@ else
 	NULL := /dev/null
 endif
 
-OPT_LINUX_GPIO := $(shell echo -e "\x23include <linux/gpio.h>" | $(CC) -E - >$(NULL) 2>&1 && test -d lua-periphery && echo ok || echo na)
-OPT_WEBKIT2GTK := $(shell pkg-config gtk+-3.0 webkit2gtk-4.0 >$(NULL) 2>&1 && echo ok || echo na)
+OPT_BLUETOOTH = $(shell env echo -e "\x23include <bluetooth/bluetooth.h>"| $(CC) -E - >$(NULL) 2>&1 || echo -NA-)
+OPT_LINUX_GPIO = $(shell env echo -e "\x23include <linux/gpio.h>" | $(CC) -E - >$(NULL) 2>&1 && test -d lua-periphery || echo -NA-)
+OPT_WEBKIT2GTK = $(shell pkg-config gtk+-3.0 webkit2gtk-4.0 >$(NULL) 2>&1 || echo -NA-)
 
-
-all: full
+all any: full
 
 core: lua lua-buffer luasocket luafilesystem lua-cjson luv lpeg lua-zlib lua-llthreads2 luachild lpeglabel lua-struct
 
 quick: core luaserial lua-jpeg lua-exif luaexpat
 
-full: quick lua-openssl lua-linux opt-linux-gpio-$(OPT_LINUX_GPIO) opt-webview-$(OPT_WEBKIT2GTK)
+extras: lua-linux lua-periphery$(OPT_LINUX_GPIO) lua-webview$(OPT_WEBKIT2GTK) luabt$(OPT_BLUETOOTH)
 
-opt-webview-ok: lua-webview
+full: quick lua-openssl extras
 
-opt-webview-na:
-	@echo WebView not available
-
-opt-linux-gpio-ok: lua-periphery
-
-opt-linux-gpio-na:
-	@echo Linux GPIO not available
-
-extras: luabt
-
-any: full
+%-NA-:
+	@echo Ignoring $@
 
 configure: configure-$(ARCH_SUFFIX)
 

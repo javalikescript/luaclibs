@@ -92,6 +92,8 @@ sudo apt-get install gcc-arm-linux-gnueabihf
 sudo apt-get install gcc-aarch64-linux-gnu
 ```
 
+You could also get a standalone toolchain from [abhiTronix](https://github.com/abhiTronix/raspberry-pi-cross-compilers).
+
 Then export the following variables prior running make
 
 ```bash
