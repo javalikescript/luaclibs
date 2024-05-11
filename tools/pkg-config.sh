@@ -18,6 +18,9 @@ if test -n "$PKG_HOME"
 then
   ZIP_PATH="$PKG_HOME/$ZIP_NAME"
   CFG_PATH="$PKG_HOME/$CFG_NAME"
+else
+  ZIP_PATH="$ZIP_NAME"
+  CFG_PATH="$CFG_NAME"
 fi
 
 # Collect options and packages from arguments
