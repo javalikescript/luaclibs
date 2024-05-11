@@ -49,6 +49,7 @@ printVersion('luacov.runner', 'version')
 --printVersion('struct') -- not available 1.8
 printVersion('dkjson', 'version')
 --printVersion('winapi') -- not available
+printVersion('periphery', 'version')
 
 printVersion('exif')
 printVersion('jpeg')
