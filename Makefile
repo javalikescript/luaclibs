@@ -77,11 +77,12 @@ EXPAT=expat-2.5.0
 
 STATIC_NAME := luajls
 
-STATIC_CORE_LIBNAMES := zlib luv cjson
+STATIC_CORE_LIBNAMES := zlib luv cjson buffer
 STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
 		lua-zlib/lua_zlib.o zlib/libz.a \
 		luv/src/luv.o luv/deps/libuv/libuv.a \
-		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o
+		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
+		lua-buffer/buffer.o
 
 STATIC_RESOURCES_windows=lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll
 STATIC_LIBS_windows=lua-webview/MemoryModule/MemoryModule.o
