@@ -4,12 +4,13 @@ LIBEXT ?= dll
 LIBNAME = buffer
 TARGET = $(LIBNAME).$(LIBEXT)
 LUA_PATH = lua
-LUA_LIB = lua53
+LUA_LIB = lua54
 
 LIBOPT_dll = -O \
   -shared \
   -Wl,-s \
-  -L..\$(LUA_PATH)\src -l$(LUA_LIB)
+  -L..\$(LUA_PATH)\src -l$(LUA_LIB) \
+  -lkernel32
 
 CFLAGS_dll = -Wall \
   -Wextra \
@@ -19,12 +20,15 @@ CFLAGS_dll = -Wall \
 
 LIBOPT_so = -O \
   -shared \
+	-pthread \
+	-lpthread \
   -static-libgcc \
   -Wl,-s \
   -L..\$(LUA_PATH)\src
 
 CFLAGS_so = -pedantic  \
   -fPIC \
+  -pthread \
   -Wall \
   -Wextra \
   -Wno-unused-parameter \
@@ -43,6 +47,8 @@ ifdef CLIBS_NDEBUG
 	CFLAGS += -DNDEBUG
 endif
 
+#-DNO_MUTEX=1
+#-DUSE_SOFT_MUTEX=1
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
 SOURCES = buffer.c
