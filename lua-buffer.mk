@@ -51,7 +51,7 @@ endif
 #-DUSE_SOFT_MUTEX=1
 CFLAGS += $(CFLAGS_$(LIBEXT))
 
-SOURCES = buffer.c
+SOURCES = buffer.c mutex.c ../lua-buffer.mk
 
 OBJS = buffer.o
 
