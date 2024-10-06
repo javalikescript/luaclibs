@@ -100,3 +100,6 @@
 [submodule "luaexpat"]
 	path = luaexpat
 	url = https://github.com/lunarmodules/luaexpat.git
+[submodule "lua-periphery"]
+	path = lua-periphery
+	url = https://github.com/javalikescript/lua-periphery.git
