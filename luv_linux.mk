@@ -69,6 +69,7 @@ SRCS = src/async.c \
 	src/prepare.c \
 	src/process.c \
 	src/req.c \
+	src/schema.c \
 	src/signal.c \
 	src/stream.c \
 	src/tcp.c \
