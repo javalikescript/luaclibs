@@ -58,6 +58,13 @@ INCLUDES = src/lhandle.h \
 
 OBJS = src/luv.o
 
+HDRS = src/lhandle.h \
+	src/lreq.h \
+	src/lthreadpool.h \
+	src/luv.h \
+	src/private.h \
+	src/util.h
+
 SRCS = src/async.c \
 	src/check.c \
 	src/constants.c \
@@ -96,6 +103,6 @@ luv.dll: $(OBJS) $(LIB_UV_LIB)
 clean:
 	-$(RM) $(OBJS) luv.dll
 
-$(OBJS): %.o : %.c $(INCLUDES) $(SRCS)
+$(OBJS): %.o : %.c $(INCLUDES) $(HDRS) $(SRCS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
