@@ -84,15 +84,20 @@ STATIC_CORE_LIBS := $(LUA_PATH)/src/liblua.a \
 		lua-cjson/lua_cjson.o lua-cjson/fpconv.o lua-cjson/strbuf.o \
 		lua-buffer/buffer.o
 
-STATIC_RESOURCES_windows=lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll
-STATIC_LIBS_windows=lua-webview/MemoryModule/MemoryModule.o
+WEBVIEW_LIBNAMES:=webview
+WEBVIEW_LIBS_windows=lua-webview/MemoryModule/MemoryModule.o
+WEBVIEW_LIBS=lua-webview/webview.o $(WEBVIEW_LIBS_$(PLAT))
+WEBVIEW_DEP_LIBS_linux=$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
+WEBVIEW_DEP_LIBS_windows=-lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
+WEBVIEW_DEP_LIBS=$(WEBVIEW_DEP_LIBS_$(PLAT))
+WEBVIEW_RESOURCES_windows=lua-webview/webview-c/ms.webview2/$(WEBVIEW_ARCH)/WebView2Loader.dll
+WEBVIEW_RESOURCES=$(WEBVIEW_RESOURCES_$(PLAT))
 
 STATIC_LUAS := $(LUAJLS)/jls DumbLuaParser/dumbParser.lua
-STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial webview
+STATIC_LIBNAMES := $(STATIC_CORE_LIBNAMES) lxp serial
 STATIC_LIBS := $(STATIC_CORE_LIBS) \
 		luaexpat/src/lxplib.o $(EXPAT)/lib/.libs/libexpat.a \
-		luaserial/luaserial.o \
-		lua-webview/webview.o $(STATIC_LIBS_$(PLAT))
+		luaserial/luaserial.o
 
 STATIC_OPENSSL_LIBNAMES:=openssl
 STATIC_OPENSSL_LIBS:=lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
@@ -106,16 +111,10 @@ LUV_DEP_LIBS_linux=-lrt -pthread -lpthread
 LUV_DEP_LIBS_windows=-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
 LUAW32_DEP_LIBS=-lcomdlg32
 WINAPI_DEP_LIBS=-lkernel32 -luser32 -lpsapi -ladvapi32 -lshell32 -lMpr
-WEBVIEW_DEP_LIBS_linux=$(shell pkg-config --libs gtk+-3.0 webkit2gtk-4.0)
-WEBVIEW_DEP_LIBS_windows=-lole32 -lcomctl32 -loleaut32 -luuid -lgdi32
 
 STATIC_DEP_CORE_LIBS_linux=-ldl $(LUV_DEP_LIBS_linux)
 STATIC_DEP_CORE_LIBS_windows=$(LUV_DEP_LIBS_windows) $(LUAW32_DEP_LIBS) $(WINAPI_DEP_LIBS)
-STATIC_DEP_CORE_LIBS=$(STATIC_DEP_LIBS_$(PLAT))
-
-STATIC_DEP_LIBS_linux=$(STATIC_DEP_CORE_LIBS_linux) $(WEBVIEW_DEP_LIBS_linux)
-STATIC_DEP_LIBS_windows=$(STATIC_DEP_CORE_LIBS_windows) $(WEBVIEW_DEP_LIBS_windows)
-STATIC_DEP_LIBS=$(STATIC_DEP_LIBS_$(PLAT))
+STATIC_DEP_CORE_LIBS=$(STATIC_DEP_CORE_LIBS_$(PLAT))
 
 STATIC_OS_LIBNAMES_linux=linux
 STATIC_OS_LIBNAMES_windows=win32 winapi
@@ -250,16 +249,17 @@ static: static-full static-test
 static-test:
 	$(MAKE) LUATEST_CMD="LUA_PATH=$(MK_DIR)/luaunit/?.lua LUA_CPATH=./?.no $(MK_DIR)$(LUA_DIST)/$(STATIC_NAME)$(EXE)" test
 
+# bundling webview is problematic on Linux as it requires gtk-webkit2 to be available even is not used adding more than 100 dependencies
 static-full:
 	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) tools/addlibs.lua -pp \
 		-l $(STATIC_LUAS) -p tools/addwebview.lua \
-		-r $(STATIC_RESOURCES_$(PLAT)) $(STATIC_RESOURCES) \
-		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES) > tools/addlibs-custom.c
+		-r $(STATIC_RESOURCES) $(WEBVIEW_RESOURCES) \
+		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES) $(WEBVIEW_LIBNAMES) > tools/addlibs-custom.c
 	$(LUA_APP) tools/changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > tools/addlibs-main.c
 	$(CC) -c -Os tools/addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
 	$(CC) -std=gnu99 -static-libgcc -o $(LUA_DIST)/$(STATIC_NAME)$(EXE) -s $(STATIC_FLAGS) addlibs.o \
-		tools/addlibs-main.c $(STATIC_LIBS) $(STATIC_OPENSSL_LIBS) \
-		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_LIBS)
+		tools/addlibs-main.c $(STATIC_LIBS) $(STATIC_OPENSSL_LIBS) $(WEBVIEW_LIBS) \
+		$(STATIC_OS_LIBS) -lm -Ilua/src $(STATIC_DEP_CORE_LIBS) $(WEBVIEW_DEP_LIBS)
 
 static-example:
 	@echo "print('You could rename this executable to, or create a link with, the name of an example to run it.')" > $(MK_DIR)/example.lua
