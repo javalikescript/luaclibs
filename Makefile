@@ -102,7 +102,7 @@ STATIC_LIBS := $(STATIC_CORE_LIBS) \
 STATIC_OPENSSL_LIBNAMES:=openssl
 STATIC_OPENSSL_LIBS:=lua-openssl/libopenssl.a openssl/libssl.a openssl/libcrypto.a
 STATIC_OPENSSL:=Y
-ifndef STATIC_OPENSSL
+ifneq ($(STATIC_OPENSSL),Y)
 	STATIC_OPENSSL_LIBNAMES:=
 	STATIC_OPENSSL_LIBS:=
 endif
@@ -253,7 +253,7 @@ static-test:
 static-full:
 	LUA_PATH=$(LUA_DIST)/?.lua LUA_CPATH=$(LUA_DIST)/?.$(SO) $(LUA_APP) tools/addlibs.lua -pp \
 		-l $(STATIC_LUAS) -p tools/addwebview.lua \
-		-r $(STATIC_RESOURCES) $(WEBVIEW_RESOURCES) \
+		-r $(WEBVIEW_RESOURCES) $(STATIC_RESOURCES) \
 		-c $(STATIC_LIBNAMES) $(STATIC_OS_LIBNAMES) $(STATIC_OPENSSL_LIBNAMES) $(WEBVIEW_LIBNAMES) > tools/addlibs-custom.c
 	$(LUA_APP) tools/changemain.lua $(LUA_PATH)/src/lua.c "$(STATIC_EXECUTE)" > tools/addlibs-main.c
 	$(CC) -c -Os tools/addlibs.c -I$(LUA_PATH)/src -Izlib -o addlibs.o
