@@ -23,6 +23,7 @@ else
 endif
 
 EXPAT=expat-2.5.0
+LSQLITE=lsqlite3_v096
 
 all any: full
 
@@ -92,6 +93,9 @@ luv: lua libuv
 luafilesystem lua-webview lua-buffer lua-win32 luaserial luabt winapi luachild lua-struct: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
+lsqlite3: lua
+	$(MAKE) -C $(LSQLITE) -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
+
 lua-llthreads2: lua
 	$(MAKE) -C $@/src -f ../../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
@@ -144,4 +148,4 @@ lua-exif: lua libexif
 
 .PHONY: full quick extras lua lua-buffer luasocket luafilesystem lua-cjson libuv luv lpeg \
 	luaexpat luaserial luabt zlib lua-zlib openssl lua-openssl libjpeg \
-	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel
+	lua-jpeg libexif lua-exif lua-webview winapi lua-win32 lua-llthreads2 luachild lpeglabel lsqlite3

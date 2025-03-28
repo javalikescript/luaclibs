@@ -37,6 +37,7 @@ else
 endif
 
 EXPAT=expat-2.5.0
+LSQLITE=lsqlite3_v096
 
 ifeq ($(LIBBT),)
 	BT_OPTS = 
@@ -147,6 +148,9 @@ luv: lua libuv luv-$(LIB_UV_TARGET)
 luafilesystem lua-buffer luaserial lua-webview lua-linux luachild lua-struct: lua
 	$(MAKE) -C $@ -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
 
+lsqlite3: lua
+	$(MAKE) -C $(LSQLITE) -f ../$@.mk CC=$(CC) LIBEXT=$(SO) $(LUA_VARS)
+
 luabt: lua
 	$(MAKE) -C luabt -f ../luabt.mk CC=$(CC) LIBEXT=$(SO) $(BT_OPTS) $(LUA_VARS)
 
@@ -220,5 +224,5 @@ lua-exif: lua libexif
 
 
 .PHONY: full quick extras lua lua-buffer lua-cjson luafilesystem luasocket libuv luv lpeg luaexpat luaserial luabt \
-	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2 lua-linux luachild lpeglabel lua-periphery
+	zlib lua-zlib openssl lua-openssl libjpeg lua-jpeg libexif lua-exif lua-webview lua-llthreads2 lua-linux luachild lpeglabel lua-periphery lsqlite3
 
