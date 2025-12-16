@@ -72,7 +72,7 @@ full: quick lua-openssl extras
 
 configure: configure-$(ARCH_SUFFIX)
 
-configure-default: configure-libjpeg configure-libexif configure-openssl configure-libexpat-default
+configure-default: configure-libjpeg configure-libexif configure-openssl-default configure-libexpat-default
 
 configure-arm: configure-libjpeg-arm configure-libexif-arm configure-openssl-arm configure-libexpat-arm
 
@@ -166,7 +166,7 @@ lua-zlib: lua zlib
 ## perl Configure --cross-compile-prefix=arm-linux-gnueabihf- no-threads linux-armv4 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86_64 -Wl,-rpath=.
 ## perl Configure no-threads linux-x86 -Wl,-rpath=.
-configure-openssl:
+configure-openssl-default:
 	cd openssl && perl Configure no-threads linux-$(ARCH) -Wl,-rpath=.
 
 configure-openssl-arm:
@@ -174,6 +174,8 @@ configure-openssl-arm:
 
 configure-openssl-aarch64:
 	cd openssl && perl Configure --cross-compile-prefix=$(HOST)- no-threads linux-aarch64 -Wl,-rpath=.
+
+configure-openssl: configure-openssl-$(ARCH_SUFFIX)
 
 openssl:
 	$(MAKE) -C openssl CC=$(CC) LD=$(LD) AR="$(AR)"
