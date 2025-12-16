@@ -75,6 +75,7 @@ TAR_OPTIONS := --group=jls --owner=jls
 EXPAT=expat-2.5.0
 LSQLITE=lsqlite3_v096
 
+#WGET_OPTIONS=--no-check-certificate
 
 STATIC_NAME := luajls
 
@@ -232,12 +233,12 @@ main-windows:
 
 
 expat-2.5.0:
-	wget -q --no-check-certificate https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+	wget -q $(WGET_OPTIONS) https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
 	tar -xf expat-2.5.0.tar.gz
 	rm expat-2.5.0.tar.gz
 
 lsqlite3_v096:
-	wget -q --no-check-certificate http://lua.sqlite.org/index.cgi/zip/lsqlite3_v096.zip
+	wget -q $(WGET_OPTIONS) http://lua.sqlite.org/index.cgi/zip/lsqlite3_v096.zip
 	unzip -q lsqlite3_v096.zip
 	rm lsqlite3_v096.zip
 
@@ -470,7 +471,10 @@ dist-jls: dist-min dist-jls-do
 dist-versions:
 	-@$(MAKE) --quiet versions$(CROSS_SUFFIX) >$(LUA_DIST)/versions.txt
 
-dist: dist-all dist-jls-do dist-versions
+dist-certs:
+	wget -q $(WGET_OPTIONS) https://mkcert.org/generate/ -O $(LUA_DIST)/certs.pem
+
+dist: dist-all dist-jls-do dist-versions dist-certs
 
 
 luajls.tar.gz:
@@ -484,7 +488,7 @@ luajls-archive: luajls$(ZIP)
 dist-archive: luajls-archive
 
 
-release-do: dist-versions dist-doc$(CROSS_SUFFIX) test$(CROSS_SUFFIX) luajls-archive
+release-do: dist-versions dist-certs dist-doc$(CROSS_SUFFIX) test$(CROSS_SUFFIX) luajls-archive
 
 release-all: dist-all dist-jls-do release-do
 
@@ -518,7 +522,7 @@ releases: release static-release$(CROSS_SUFFIX)
 
 
 lua-5.1.5:
-	wget -q --no-check-certificate https://www.lua.org/ftp/lua-5.1.5.tar.gz
+	wget -q $(WGET_OPTIONS) https://www.lua.org/ftp/lua-5.1.5.tar.gz
 	tar -xf lua-5.1.5.tar.gz
 	rm lua-5.1.5.tar.gz
 
