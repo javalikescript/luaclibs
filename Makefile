@@ -431,8 +431,8 @@ ldoc-dev:
 	cd ../$(LUAJLS) && $(LUADOC_CMD) -i --date "" -d doc .
 
 md-ldoc:
-	$(MD_CMD) LDoc/doc/doc.md
-	mv LDoc/doc/doc.html $(JLSDOC_DIR)/ldoc.html
+	$(MD_CMD) LDoc/manual.md
+	mv LDoc/manual.html $(JLSDOC_DIR)/ldoc.html
 	-$(MD_CMD) luaunit/doc/index.md
 	-mv luaunit/doc/index.html $(JLSDOC_DIR)/luaunit.html
 
@@ -471,6 +471,7 @@ dist-jls: dist-min dist-jls-do
 dist-versions:
 	-@$(MAKE) --quiet versions$(CROSS_SUFFIX) >$(LUA_DIST)/versions.txt
 
+#wget -N -q $(WGET_OPTIONS) https://curl.se/ca/cacert.pem
 dist-certs:
 	wget -q $(WGET_OPTIONS) https://mkcert.org/generate/ -O $(LUA_DIST)/certs.pem
 
