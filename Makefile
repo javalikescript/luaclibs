@@ -40,7 +40,7 @@ endif
 MAIN_TARGET = core
 
 LUA_PATH := lua
-LUA_LIB := lua54
+LUA_LIB := lua55
 
 MK_DIR := $(dir $(MK_PATH))
 LUA_DIST := dist
@@ -460,7 +460,7 @@ dist-jls-lua51:
 		tools/compat.lua -pretty "-t=$(LUA_DIST)" $(LUAJLS)/jls
 	echo "export LUA_PATH=\"$(MK_DIR)$(LUA_DIST)/luvit/?.lua;$(MK_DIR)$(LUA_DIST)/?.lua\""
 
-dist-jls-lua54:
+dist-jls-lua54 dist-jls-lua55:
 	cp -ur $(LUAJLS)/jls $(LUA_DIST)/
 
 dist-jls-do: dist-jls-$(LUA_LIB)
