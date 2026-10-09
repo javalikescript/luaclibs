@@ -101,7 +101,7 @@ lua51:
 		MYLIBS="-Wl,-E -ldl" \
 		SYSLIBS="-Wl,-E -ldl"
 
-lua54:
+lua54 lua55:
 	$(MAKE) -C $(LUA_PATH)/src all \
 		CC="$(CC) -std=gnu99" \
 		AR="$(AR) rcu" \
