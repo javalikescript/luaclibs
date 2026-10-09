@@ -35,7 +35,7 @@ INCLUDES += src/heap-inl.h \
 	src/strscpy.h \
 	src/strtok.h \
 	src/uv-common.h \
-	src/win/atomicops-inl.h \
+	src/win/fs-fd-hash-inl.h \
 	src/win/handle-inl.h \
 	src/win/internal.h \
 	src/win/req-inl.h \

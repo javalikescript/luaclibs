@@ -15,7 +15,7 @@ LIB_OPTION += -shared \
 	-Wl,-s \
 	-L..\$(LUA_PATH)\src -l$(LUA_LIB) \
 	$(LIB_UV_LIB) \
-	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
+	-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid -lsynchronization
 
 ##-lws2_32 -lpsapi -liphlpapi -luserenv
 
@@ -84,7 +84,6 @@ SRCS = src/async.c \
 	src/prepare.c \
 	src/process.c \
 	src/req.c \
-	src/schema.c \
 	src/signal.c \
 	src/stream.c \
 	src/tcp.c \
