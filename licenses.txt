@@ -1,5 +1,5 @@
 Lua
-Copyright © 1994–2023 Lua.org, PUC-Rio
+Copyright © 1994–2026 Lua.org, PUC-Rio
 MIT license
 https://www.lua.org/about.html
 
@@ -29,7 +29,7 @@ MIT License
 https://github.com/mpx/lua-cjson
 
 lua-openssl
-Copyright (c) 2011 - 2023 zhaozg, zhaozg(at)gmail.com
+Copyright (c) 2011 - 2025 zhaozg, zhaozg(at)gmail.com
 MIT License
 https://github.com/zhaozg/lua-openssl
 
@@ -99,6 +99,6 @@ MIT and Unlicense license
 https://github.com/pocomane/luachild
 
 luajls
-Copyright 2018-2024 SPYL, javalikescript@free.fr
+Copyright 2018-2026 SPYL, javalikescript@free.fr
 MIT License
 https://github.com/javalikescript/luajls
