@@ -110,7 +110,7 @@ ifneq ($(STATIC_OPENSSL),Y)
 endif
 
 LUV_DEP_LIBS_linux=-lrt -pthread -lpthread
-LUV_DEP_LIBS_windows=-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid
+LUV_DEP_LIBS_windows=-lws2_32 -lpsapi -liphlpapi -lshell32 -luserenv -luser32 -ldbghelp -lole32 -luuid -lsynchronization
 LUAW32_DEP_LIBS=-lcomdlg32
 WINAPI_DEP_LIBS=-lkernel32 -luser32 -lpsapi -ladvapi32 -lshell32 -lMpr
 
